@@ -237,9 +237,9 @@ cd /var/www/europapark && sudo git pull
 
 Pour publier une nouvelle version, change `APP_VERSION` en haut du script de `index.html` et complète la rubrique « Nouveautés » de l'aide (`#help-news`). À la prochaine ouverture, chaque téléphone affiche « Nouvelle version de l'appli · Voir les nouveautés ».
 
-### Protéger l'accès (recommandé)
+### Protéger l'accès (optionnel)
 
-Les profils n'ont pas de mot de passe et les positions partagées sont visibles par tous les utilisateurs. Pour réserver l'appli à ton groupe, active le mot de passe commun prévu (commenté) dans `deploy/nginx/europapark.conf` :
+Les profils n'ont pas de mot de passe et les positions partagées sont visibles par tous ceux qui ouvrent l'appli. Pour un usage privé, une adresse que tu ne diffuses pas suffit généralement. Pour réserver l'appli à ton groupe, tu peux aussi activer le mot de passe commun prévu (commenté) dans `deploy/nginx/europapark.conf` :
 
 ```bash
 sudo apt install apache2-utils
