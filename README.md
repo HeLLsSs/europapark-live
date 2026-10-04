@@ -263,9 +263,19 @@ Le tableau donne les incontournables faits, le nombre de tours, le temps de file
 
 ## Les profils et la synchronisation
 
-Chaque profil est un fichier sur le serveur. L'appli y envoie son état 1 s après chaque changement, et récupère la version du serveur à chaque actualisation si elle est plus récente. En cas de conflit, la modification la plus récente gagne.
+Chaque profil est un fichier sur le serveur. Les téléphones ne s'échangent pas le profil entier, seulement ce qui a changé :
+- après chaque modification, le téléphone envoie la différence avec la dernière version confirmée par le serveur (« Silver Star faite », « note 5 sur Wodan »…) ;
+- le serveur la fusionne avec la version actuelle : attraction par attraction pour les tours faits, le programme, les notes ou les alertes, élément par élément pour le journal de la journée et les créneaux ;
+- la version est datée par le serveur, donc l'horloge des téléphones ne compte pas ;
+- à chaque actualisation, le téléphone récupère la version du serveur si elle est plus récente et y réapplique ses changements pas encore envoyés.
 
-Les réglages d'affichage restent propres à chaque téléphone : onglet ouvert, filtre, GPS activé ou non, langue.
+Deux téléphones du même profil qui touchent « Fini ! » en même temps sur deux attractions différentes gardent donc les deux tours. « Annuler » ne retire que le changement concerné. Sans réseau, les changements restent sur le téléphone et partent dès le retour du réseau, avec de nouveaux essais de plus en plus espacés (jusqu'à une minute).
+
+Le matin, le premier téléphone ouvert passe le profil à la nouvelle journée ; les suivants ne remettent pas à zéro les tours déjà faits par les autres.
+
+En **heure simulée** (`?now=`), l'appli travaille sur une copie à part, jamais envoyée au serveur : la vraie journée n'est pas touchée.
+
+Les réglages d'affichage restent propres à chaque téléphone : langue, mode simple ou complet, onglet, filtres, GPS, plein soleil, économie, carte téléchargée.
 
 ## Les notifications push
 
@@ -306,7 +316,7 @@ sudo cp /var/www/europapark/deploy/cron/europapark /etc/cron.d/europapark
 sudo chmod 644 /etc/cron.d/europapark
 ```
 
-Le cron tourne en `www-data`, le même utilisateur que PHP-FPM, pour que `data/` reste modifiable par la page. Lance-le **quelques jours avant ta visite** : chaque journée enregistrée améliore les prévisions.
+Le cron tourne en `www-data`, le même utilisateur que PHP-FPM, pour que `data/` reste modifiable par la page. Les heures du cron suivent le fuseau du serveur : vérifie avec `timedatectl` qu'il est réglé sur celui du parc (par exemple `sudo timedatectl set-timezone Europe/Paris`), sinon la collecte et les notifications démarrent trop tôt ou trop tard. Une seule collecte tourne à la fois (`data/collect.lock`). Lance-le **quelques jours avant ta visite** : chaque journée enregistrée améliore les prévisions.
 
 ### Vérification
 

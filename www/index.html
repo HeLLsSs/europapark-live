@@ -72,7 +72,7 @@ h2{font:700 1.05rem/1.2 var(--font-body);margin:0}
 .banner{margin-top:12px;display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);background:var(--accent-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
 .banner.warn{background:color-mix(in srgb,var(--w-high) 14%,var(--surface));border-color:color-mix(in srgb,var(--w-high) 40%,transparent)}
 .banner p{margin:0;flex:1;min-width:0}
-.banner button{border:0;background:transparent;padding:2px 4px;font-weight:700;color:var(--muted)}
+.banner button{border:0;background:transparent;padding:10px 8px;min-width:44px;min-height:44px;font-weight:700;color:var(--muted)}
 
 .tab{display:flex;flex-direction:column;gap:22px;padding-top:16px}
 section.block{display:flex;flex-direction:column;gap:10px}
@@ -140,7 +140,7 @@ section.block{display:flex;flex-direction:column;gap:10px}
 .est{font:700 .95rem var(--font-display);color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 
 /* Liste */
-.controls{display:flex;flex-direction:column;gap:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px);z-index:10;background:var(--bg);padding-block:6px 8px;margin-inline:-16px;padding-inline:16px}
+.controls{display:flex;flex-direction:column;gap:10px;position:sticky;top:var(--strip-h,calc(env(safe-area-inset-top,0px) + 66px));z-index:10;background:var(--bg);padding-block:6px 8px;margin-inline:-16px;padding-inline:16px}
 .seg{display:flex;background:var(--sunk);border-radius:12px;padding:3px;gap:2px;overflow-x:auto}
 .seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:8px 10px;font-weight:700;font-size:.88rem;white-space:nowrap;color:var(--muted);min-height:38px}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -172,7 +172,7 @@ section.block{display:flex;flex-direction:column;gap:10px}
 .set{display:flex;flex-direction:column;gap:8px}
 .set + .set{border-top:1px solid var(--line);padding-top:14px}
 .toggle{display:flex;gap:12px;align-items:center;justify-content:space-between}
-.toggle input{width:22px;height:22px;accent-color:var(--accent)}
+.toggle input{width:24px;height:24px;flex:none;accent-color:var(--accent)}
 code{font-size:.85em;background:var(--sunk);padding:1px 5px;border-radius:5px;overflow-wrap:anywhere}
 
 /* Barre d'onglets */
@@ -255,12 +255,12 @@ details.adv > .set{padding-top:14px}
 .map-ctl button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .mk.poi{background:var(--surface);color:var(--ink);font-size:12px;border-width:1.5px}
 .mk.car{background:var(--surface);font-size:15px;border-color:var(--accent)}
-.chip.toggle{border:0;cursor:pointer}
+.chip.toggle{border:0;cursor:pointer;min-height:38px;padding:6px 12px}
 .chip.toggle[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:700}
 .stars{display:inline-flex;gap:2px}
 .stars button{border:0;background:transparent;font-size:1.5rem;line-height:1;padding:4px 2px;color:var(--line);cursor:pointer}
 .stars button[aria-pressed="true"]{color:var(--accent)}
-.banner .stars button{font-size:1.35rem;padding:2px 1px}
+.banner .stars button{font-size:1.5rem;padding:8px 5px;min-width:36px;min-height:44px}
 .mk{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:var(--c,var(--w-off));color:#fff;font:800 14px/1 var(--font-display);
   border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);font-variant-numeric:tabular-nums}
 .mk.next{box-shadow:0 0 0 4px var(--accent),0 1px 4px rgba(0,0,0,.35)}
@@ -300,7 +300,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
 .help td{border-top:1px solid var(--line);padding:6px 6px 6px 0;vertical-align:top}
 .help td:first-child{font-weight:700;white-space:nowrap}
 
-.toast{position:fixed;left:0;right:0;margin-inline:auto;width:max-content;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 12px);z-index:50;
+.toast{position:fixed;inset:auto 0 auto 0;margin:0 auto;border:0;height:auto;overflow:visible;width:max-content;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 12px);z-index:90;
   background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;max-width:calc(100% - 32px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .toast button{border:0;background:transparent;color:var(--accent-soft);font-weight:700;padding:6px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -771,7 +771,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
 </div></dialog>
 <dialog class="sheet" id="wizard" aria-label="EP Live"></dialog>
 <dialog class="sheet" id="login" aria-labelledby="loginTitle"></dialog>
-<div class="toast" id="toast" role="status" hidden></div>
+<div class="toast" id="toast" role="status" popover="manual" hidden></div>
 
 <script src="i18n.js"></script>
 <script>
@@ -835,7 +835,10 @@ function applyFormats() {
 /* Config du parc : celle du serveur, sinon la dernière connue, sinon le premier parc de parks.json */
 async function bootPark() {
   const cached = loadJSON('ep-park');
-  if (cached) applyPark(cached);
+  if (cached) { applyPark(cached); updatePark(cached); return; }   // pas d'attente : la page s'affiche tout de suite
+  await updatePark(null);
+}
+async function updatePark(cached) {
   let fresh = null;
   try { fresh = await getJSON(`${SERVER}?r=config`, 5000); } catch (e) {
     if (!cached) try { const all = await getJSON('parks.json', 5000); const slug = Object.keys(all)[0]; fresh = {slug, ...all[slug]}; } catch (e2) {}
@@ -843,7 +846,11 @@ async function bootPark() {
   if (!fresh || JSON.stringify(fresh) === JSON.stringify(cached)) return;
   saveJSON('ep-park', fresh);
   // Autre parc qu'avant : les caches (attractions, horaires, temps) ne valent plus rien
-  if (cached && cached.id !== fresh.id) { for (const k of ['children', 'schedule', 'live', 'trail', 'weather']) try { localStorage.removeItem('ep-cache-' + k); } catch (e) {} }
+  if (cached && cached.id !== fresh.id) {
+    for (const k of ['children', 'schedule', 'live', 'trail', 'weather']) try { localStorage.removeItem('ep-cache-' + k); } catch (e) {}
+    location.reload();   // autre parc : on repart de zéro
+    return;
+  }
   applyPark(fresh);
 }
 
@@ -901,13 +908,14 @@ let device = Object.assign({gps: false, filter: 'plan', sort: 'wait', tab: 'now'
 LANG = pickLang(device.lang || navigator.language);
 if (!device.id) device.id = Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, '0')).join('');
 let user = loadJSON('ep-user');     // {id, name} ou {id:'local', local:true}
-let prefs = withDefaults(user ? loadJSON('ep-state-' + user.id) : null);
+// Heure simulée (?now=) : copie à part, jamais envoyée au serveur, pour ne pas toucher à la vraie journée
+const SIM = !!NOW_OFFSET;
+const stateKey = id => (SIM ? 'ep-sim-state-' : 'ep-state-') + id;
+let prefs = withDefaults(user ? loadJSON(stateKey(user.id)) || (SIM ? loadJSON('ep-state-' + user.id) : null) : null);
+let synced = user && !SIM ? loadJSON('ep-synced-' + user.id) : null;   // {state, rev} : dernière version confirmée par le serveur
 const saveDevice = () => saveJSON('ep-device', device);
-/* touch = changement voulu par l'utilisateur : il devient la version de référence.
-   Les écritures automatiques (position, repas calculé, nouveau jour) ne l'écrasent pas sur le serveur. */
-function savePrefs(touch = true) {
-  if (touch) prefs.updatedAt = Date.now();
-  if (user) saveJSON('ep-state-' + user.id, prefs);
+function savePrefs() {
+  if (user) saveJSON(stateKey(user.id), prefs);
   scheduleSync();
 }
 
@@ -919,78 +927,176 @@ function setLang(lang) {
   render();
 }
 
+/* Nouvelle journée : on vide ce qui ne vaut que pour un jour */
+function rolled(st, d) {
+  if (!st || st.day === d) return st;
+  const s = Object.assign({}, st, {day: d, done: {}, skip: {}, alerted: {}, lastDone: null, mealDone: false, mealSkip: 0, queue: null, planned: null, srSeen: {}, log: [], badges: []});
+  s.slots = (st.slots || []).filter(x => x.day >= d);
+  if (s.meet && s.meet.day < d) s.meet = null;
+  return s;
+}
 function rolloverDay() {
   const d = berlin(now()).day;
-  if (prefs.day !== d) {
-    Object.assign(prefs, {day: d, done: {}, skip: {}, alerted: {}, lastDone: null, mealDone: false, mealSkip: 0, queue: null, planned: null, srSeen: {}, log: [], badges: []});
-    prefs.slots = (prefs.slots || []).filter(s => s.day >= d);
-    if (prefs.meet && prefs.meet.day < d) prefs.meet = null;
-    savePrefs(false);
-  }
+  if (prefs.day !== d) { prefs = withDefaults(rolled(prefs, d)); savePrefs(); }
 }
 
-/* ---------- Synchronisation avec le serveur ---------- */
-let syncTimer = null, syncDirty = false, serverPushSubs = 0;
-const remote = () => user && !user.local;
-function scheduleSync() {
+/* ---------- Synchronisation avec le serveur ----------
+   Chaque téléphone envoie seulement ce qu'il a changé depuis la dernière version confirmée (synced),
+   et le serveur fusionne (state_merge() dans api.php) :
+   - dictionnaires (faits, programme, notes…) : clé par clé ;
+   - listes (journal, mesures, créneaux, badges) : éléments ajoutés ou retirés ;
+   - le reste : valeur entière.
+   Deux téléphones du même profil qui touchent « Fini ! » en même temps gardent donc les deux tours.
+   La version est datée par le serveur : l'horloge des téléphones ne compte pas. */
+const MAP_FIELDS = new Set(['plan', 'shows', 'again', 'done', 'skip', 'alerts', 'alerted', 'ratings', 'srSeen', 'meal']);
+const LIST_FIELDS = new Set(['log', 'samples', 'slots', 'badges']);
+const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+const js = v => JSON.stringify(v);
+/* Changements qui transforment l'état a en b, ou null s'il n'y en a pas */
+function diffState(a, b) {
+  const p = {set: {}, keys: {}, add: {}, del: {}};
+  let n = 0;
+  for (const f of new Set([...Object.keys(a || {}), ...Object.keys(b || {})])) {
+    if (f === 'updatedAt') continue;
+    const x = a?.[f], y = b?.[f];
+    if (MAP_FIELDS.has(f) && isObj(x) && isObj(y)) {
+      for (const k of new Set([...Object.keys(x), ...Object.keys(y)])) {
+        if (js(x[k]) !== js(y[k])) { (p.keys[f] = p.keys[f] || {})[k] = y[k] === undefined ? null : y[k]; n++; }
+      }
+    } else if (LIST_FIELDS.has(f) && Array.isArray(x) && Array.isArray(y)) {
+      const xs = new Set(x.map(js)), ys = new Set(y.map(js));
+      const add = y.filter(v => !xs.has(js(v))), del = x.filter(v => !ys.has(js(v)));
+      if (add.length) { p.add[f] = add; n++; }
+      if (del.length) { p.del[f] = del; n++; }
+    } else if (js(x) !== js(y)) { p.set[f] = y === undefined ? null : y; n++; }
+  }
+  return n ? p : null;
+}
+function applyPatch(st, p) {
+  const s = JSON.parse(js(st || {}));
+  if (!p) return s;
+  for (const [f, v] of Object.entries(p.set || {})) s[f] = v;
+  for (const [f, kv] of Object.entries(p.keys || {})) {
+    if (!isObj(s[f])) s[f] = {};
+    for (const [k, v] of Object.entries(kv)) { if (v === null) delete s[f][k]; else s[f][k] = v; }
+  }
+  for (const [f, items] of Object.entries(p.add || {})) {
+    const list = Array.isArray(s[f]) ? s[f] : [], seen = new Set(list.map(js));
+    for (const v of items) if (!seen.has(js(v))) { list.push(v); seen.add(js(v)); }
+    s[f] = list.slice(-300);
+  }
+  for (const [f, items] of Object.entries(p.del || {})) {
+    if (!Array.isArray(s[f])) continue;
+    const rm = new Set(items.map(js));
+    s[f] = s[f].filter(v => !rm.has(js(v)));
+  }
+  return s;
+}
+
+let syncTimer = null, pushing = false, serverSeen = false, retryMs = 0, serverPushSubs = 0;
+const remote = () => user && !user.local && !SIM;
+function setSynced(state, rev) { synced = {state, rev: rev || 0}; saveJSON('ep-synced-' + user.id, synced); }
+function scheduleSync(ms = 1200) {
   if (!remote()) return;
-  syncDirty = true;
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(pushState, 1200);
+  syncTimer = setTimeout(pushState, ms);
 }
-async function pushState(keepalive = false) {
-  if (!remote() || !syncDirty) return;
-  syncDirty = false; clearTimeout(syncTimer);
-  const forUser = user.id;
+async function postJSON(url, body, keepalive = false, ms = 10000) {
+  const c = new AbortController(), tm = setTimeout(() => c.abort(), ms);
   try {
-    const r = await fetch(`${SERVER}?r=state&u=${encodeURIComponent(forUser)}`, {method: 'POST', keepalive, cache: 'no-store',
-      headers: {'Content-Type': 'application/json'}, body: JSON.stringify({updatedAt: prefs.updatedAt, state: prefs})});
-    if (r.status === 409) { const j = await r.json(); if (user?.id === forUser && j.state) adoptState(j.state); }
-    else if (r.status === 404) { await recreateUser(); }
-    else if (!r.ok) throw new Error('HTTP ' + r.status);
-  } catch (e) { if (user?.id === forUser) syncDirty = true; }
+    return await fetch(url, {method: 'POST', keepalive, cache: 'no-store', signal: c.signal, headers: {'Content-Type': 'application/json'}, body: js(body)});
+  } finally { clearTimeout(tm); }
 }
-function adoptState(st) {
-  prefs = withDefaults(st);
-  saveJSON('ep-state-' + user.id, prefs);
+/* Envoi des changements locaux ; on attend d'avoir vu la version du serveur une fois (sinon on écraserait des changements d'un autre téléphone) */
+async function pushState(keepalive = false) {
+  if (!remote() || pushing || !serverSeen || !synced) return;
+  const base = synced.state || {}, patch = diffState(base, prefs);
+  if (!patch) return;
+  pushing = true; clearTimeout(syncTimer);
+  const forUser = user.id, sent = applyPatch(base, patch);
+  try {
+    const r = await postJSON(`${SERVER}?r=state&u=${encodeURIComponent(forUser)}`, {patch}, keepalive);
+    if (user?.id !== forUser) return;
+    if (r.status === 404) { await recreateUser(forUser); return; }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    if (user?.id !== forUser) return;
+    // Changements faits pendant l'envoi : réappliqués sur la version fusionnée du serveur
+    const later = diffState(sent, prefs);
+    setSynced(j.state, j.updatedAt);
+    prefs = withDefaults(applyPatch(j.state, later));
+    saveJSON(stateKey(forUser), prefs);
+    retryMs = 0;
+    if (later) scheduleSync();
+    scheduleRender();
+  } catch (e) {
+    // Réseau capricieux : on réessaie, de plus en plus espacé (jusqu'à 1 min)
+    retryMs = Math.min(60000, (retryMs || 4000) * 2);
+    scheduleSync(retryMs);
+  } finally { pushing = false; }
+}
+/* Version plus récente du serveur (autre téléphone) : on la prend et on y réapplique nos changements pas encore envoyés */
+function receiveState(state, rev) {
+  // Le serveur a déjà commencé la journée (autre téléphone) alors que notre dernière version date d'hier :
+  // notre propre remise à zéro ne doit pas effacer ses tours d'aujourd'hui, on compare donc à hier « remis à zéro »
+  let base = synced?.state;
+  if (base && state.day && base.day && base.day < state.day) base = rolled(base, state.day);
+  const local = base ? diffState(base, prefs) : null;
+  setSynced(state, rev);
+  prefs = withDefaults(applyPatch(state, local));
+  saveJSON(stateKey(user.id), prefs);
+  serverSeen = true;
   rolloverDay();
+  if (diffState(state, prefs)) scheduleSync(300);
   if (!$('#sheet').open) render();
 }
-async function recreateUser() {
+async function recreateUser(forUser) {
   // Profil absent du serveur (dossier data effacé) : on le recrée avec le même pseudo, donc le même identifiant
-  try { await fetch(`${SERVER}?r=user`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: user.name})}); } catch (e) { return; }
-  syncDirty = true; pushState();
+  if (user?.id !== forUser) return;
+  try { await postJSON(`${SERVER}?r=user&lang=${LANG}`, {name: user.name}); } catch (e) { return; }
+  if (user?.id !== forUser) return;
+  setSynced({}, 0); serverSeen = true;
+  scheduleSync(300);
 }
 function handleUserInfo(info) {
   if (!remote() || info === undefined) return;
-  if (info === null) { recreateUser(); return; }
+  if (info === null) { recreateUser(user.id); return; }
   serverPushSubs = info.push || 0;
-  if (info.state && info.updatedAt > (prefs.updatedAt || 0) && !syncDirty) adoptState(info.state);
-  else if (syncDirty || (info.updatedAt || 0) < (prefs.updatedAt || 0)) { syncDirty = true; pushState(); }
+  if (info.state && (info.updatedAt || 0) > (synced?.rev || 0)) receiveState(info.state, info.updatedAt);
+  else {
+    if (!synced) setSynced({}, 0);   // profil encore vide sur le serveur
+    serverSeen = true;
+    scheduleSync(300);
+  }
 }
 
 /* ---------- Choix du profil ---------- */
 async function selectUser(u) {
-  if (remote()) await pushState();
+  if (remote()) pushState();   // sans attendre : la copie locale est déjà enregistrée
+  clearTimeout(syncTimer);
   user = u; saveJSON('ep-user', u);
-  let st = loadJSON('ep-state-' + u.id), fromServer = false;
-  if (!u.local) {
-    try {
-      const j = await getJSON(`${SERVER}?r=state&u=${encodeURIComponent(u.id)}`);
-      if (j.state && (!st || (j.updatedAt || 0) >= (st.updatedAt || 0))) { st = j.state; fromServer = true; }
-    } catch (e) {}
-  }
+  synced = !SIM && !u.local ? loadJSON('ep-synced-' + u.id) : null;
+  serverSeen = false;
+  prefs = withDefaults(loadJSON(stateKey(u.id)) || (SIM ? loadJSON('ep-state-' + u.id) : null));
   // Ancienne version de la page (un seul programme par téléphone) : on le reprend une fois
   const legacy = loadJSON('ep-planner-v1');
   if (legacy) {
-    if (!st || !Object.keys(st.plan || {}).length) { st = Object.assign({}, legacy, {updatedAt: Date.now()}); fromServer = false; }
+    if (!Object.keys(prefs.plan).length) prefs = withDefaults(Object.assign({}, prefs, legacy));
     try { localStorage.removeItem('ep-planner-v1'); } catch (e) {}
   }
-  prefs = withDefaults(st);
-  saveJSON('ep-state-' + u.id, prefs);
+  saveJSON(stateKey(u.id), prefs);
+  if (remote()) {
+    try {
+      const j = await getJSON(`${SERVER}?r=state&u=${encodeURIComponent(u.id)}`);
+      if (user?.id === u.id) {
+        if (j.state) receiveState(j.state, j.updatedAt || 1);
+        else { if (!synced) setSynced({}, 0); serverSeen = true; }
+      }
+    } catch (e) {}
+  }
   rolloverDay();
   syncLang();
-  if (!u.local && !fromServer) { syncDirty = true; pushState(); }
+  scheduleSync(300);
   if (pushOn && !u.local) subscribePush(true).catch(() => {});
   $('#login').close();
   toast(u.local ? t('toast.localProfile') : t('toast.hello', {name: u.name}));
@@ -1097,7 +1203,9 @@ function hoursFor(day) {
   const op = list.find(s => s.type === 'OPERATING');
   if (!op) return null;
   const ex = list.find(s => s.type === 'EXTRA_HOURS');
-  return {open: isoMod(op.openingTime).mod, close: isoMod(op.closingTime).mod, early: ex ? isoMod(ex.openingTime).mod : null};
+  const open = isoMod(op.openingTime).mod, close = isoMod(op.closingTime).mod;
+  // Fermeture après minuit (nocturnes) : minutes au-delà de 24 h
+  return {open, close: close <= open ? close + 1440 : close, early: ex ? isoMod(ex.openingTime).mod : null};
 }
 function phaseInfo() {
   const {day, mod} = berlin(now());
@@ -1273,7 +1381,9 @@ function availAt(id, arr, P) {
   }
   if (st === 'OPERATING') return true;
   if (st === 'DOWN') return arr >= P.t0 + 45;
-  if (st === 'CLOSED' && P.mod < P.h.open) return arr >= P.h.open; // entrée anticipée : ouvre avec le parc
+  // Avant l'ouverture (entrée anticipée) et pendant la première demi-heure (les données tardent souvent à passer
+  // en « ouverte ») : une attraction fermée est considérée comme ouvrant avec le parc
+  if (st === 'CLOSED' && P.mod < P.h.open + 30) return arr >= P.h.open;
   return false;
 }
 function laterAvg(id, from, close, P, w0) {
@@ -1357,7 +1467,7 @@ const stepName = s => s.kind === 'meal' ? t('meal') : s.kind === 'meet' ? t('mee
 /* Étapes à heure fixe : créneaux VirtualLine notés, spectacles choisis, repas.
    Spectacles et repas tombent au moment où les files de ton programme sont au plus haut. */
 function fixedSlots(P, cands, w0, from) {
-  const out = todaySlots(P.day).filter(s => s.start + 10 >= from)
+  const out = todaySlots(P.day).filter(s => s.start + 15 >= from)
     .map(s => ({kind: 'vl', id: s.id, start: s.start, by: s.start, slack: 5, end: s.start + 15}));
   const musts = cands.filter(id => prefs.plan[id] === 'must');
   const crowd = m => musts.reduce((s, id) => s + predict(id, m, P.t0, w0[id]), 0);
@@ -1367,14 +1477,14 @@ function fixedSlots(P, cands, w0, from) {
     for (const m of times) { if (!free(m, m + len)) continue; const v = crowd(m + len / 2); if (v > bv + .5) { bv = v; best = m; } }
     return best;
   };
-  if (P.phase !== 'closed') for (const id of Object.keys(prefs.shows)) {
-    if (!ents.has(id) || prefs.done[id] > 0 || (prefs.skip[id] || 0) > from) continue;
-    const m = pickTime(todayShowtimes(id).map(s => s.mod).filter(m => m >= from + 10 && m + 10 <= P.h.close), SHOW_MIN);
-    if (m != null) out.push({kind: 'show', id, start: m, by: m - 5, slack: 0, end: m + SHOW_MIN});
-  }
   // Rendez-vous du groupe : heure et lieu fixes, l'itinéraire s'arrange pour y être à l'heure
   const mt = prefs.meet;
   if (mt && mt.day === P.day && ents.has(mt.id) && mt.start + 5 >= from) out.push({kind: 'meet', id: mt.id, start: mt.start, by: mt.start, slack: 0, end: mt.start + 5});
+  if (P.phase !== 'closed') for (const id of Object.keys(prefs.shows)) {
+    if (!ents.has(id) || prefs.done[id] > 0 || (prefs.skip[id] || 0) > from) continue;
+    const m = pickTime(todayShowtimes(id).map(s => s.mod).filter(m => m >= from - 2 && m + 10 <= P.h.close), SHOW_MIN);
+    if (m != null) out.push({kind: 'show', id, start: m, by: m - 5, slack: 0, end: m + SHOW_MIN});
+  }
   const M = prefs.meal;
   if (M.on && !prefs.mealDone) {
     const a = Math.max(M.from, from, prefs.mealSkip || 0), b = Math.max(a, M.to - M.dur);
@@ -1433,7 +1543,7 @@ function computePlan(P) {
     const srf = srFactor(id, e);
     const rf = realFactor(id), qp = predict(id, arr, P.t0, w0[id]) * srf, qr = qp * rf, end = arr + qr + rideMin(e);
     if (slot && end + walkMin(e, placeOf(slot, e)) > slot.by + slot.slack) return null;
-    const later = laterAvg(id, end, close, P, w0[id]) * srf;
+    const la = laterAvg(id, end, close, P, w0[id]), later = la == null ? null : la * srf;
     const gain = later == null ? 0 : (later - qp) * rf;
     const wx = wxBonus(e, arr, P.day);
     const walkCost = (ROUTE[prefs.route] || ROUTE.equilibre) * (w + Math.max(0, w - 8));
@@ -1441,7 +1551,7 @@ function computePlan(P) {
   };
 
   let alts = null;
-  for (let guard = 0; guard < 60 && t < close; guard++) {
+  for (let guard = 0; guard < 150 && t < close; guard++) {
     const slot = pending[0];
     if (slot && t + walkMin(pos, placeOf(slot, pos)) >= slot.by - 4) { takeSlot(slot); continue; }
     const musts = cands.filter(id => !used.has(id) && prefs.plan[id] === 'must' && !(prefs.done[id] > 0));
@@ -1459,7 +1569,14 @@ function computePlan(P) {
       used.delete(a.id);
       if (a.score + .8 * nb > bv) { bv = a.score + .8 * nb; best = a; }
     }
-    if (!best) { if (slot) { takeSlot(slot); continue; } break; }
+    if (!best) {
+      // Rien de faisable tout de suite (ouverture, pannes, « Pas maintenant ») : on avance de 10 min
+      // au lieu d'abandonner ou de sauter directement à la prochaine étape fixe
+      const left = cands.some(id => !used.has(id) && !pending.some(s => s.id === id) && !(prefs.done[id] > 0 && !againOK(id)));
+      const wake = slot ? Math.min(t + 10, slot.by - walkMin(pos, placeOf(slot, pos))) : t + 10;
+      if (!left || wake <= t || wake >= close - 3) { if (slot) { takeSlot(slot); continue; } break; }
+      t = wake; continue;
+    }
     if (!alts && !steps.length) alts = scored.filter(s => s.id !== best.id).slice(0, 3);
     steps.push({kind: 'ride', start: t, ...best});
     used.add(best.id); t = best.end; pos = ents.get(best.id) || pos;
@@ -1941,7 +2058,7 @@ function renderMap(P, plan) {
     .bindTooltip(esc(t('car.title')), {permanent: true, direction: 'right', offset: [14, 0], className: 'lbl'}).addTo(lLayer);
   if (pos.lat != null) {
     if (pos.src === 'gps' && gpsPos?.acc) L.circle([pos.lat, pos.lon], {radius: gpsPos.acc, stroke: false, fillOpacity: .12, fillColor: getComputedStyle(document.body).getPropertyValue('--accent')}).addTo(lLayer);
-    L.marker([pos.lat, pos.lon], {icon: icon('<span class="mk me"></span>', 18), zIndexOffset: 2000, interactive: false}).addTo(lLayer);
+    meMarker = L.marker([pos.lat, pos.lon], {icon: icon('<span class="mk me"></span>', 18), zIndexOffset: 2000, interactive: false}).addTo(lLayer);
   }
   const group = others.length ? t('map.group', {list: others.map(o => t('map.member', {nick: o.nick, walk: walkMin(pos, o), age: Math.round((Date.now() - o.ts) / 60000)})).join(', ')}) + (meet ? t('map.meet', {name: shortName(meet)}) : '') : device.share ? t('map.alone') : '';
   $('#mapNote').textContent = t('map.note', {where: pos.src === 'gps' ? t('map.gps') : pos.src === 'last' ? t('map.last', {name: pos.name}) : t('map.entrance'), group});
@@ -2039,7 +2156,7 @@ function saveCar(car) {
 function mapTiles() {
   const out = [], x = (lon, z) => Math.floor((lon + 180) / 360 * 2 ** z),
     y = (lat, z) => { const r = lat * Math.PI / 180; return Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * 2 ** z); };
-  for (let z = 15; z <= 18; z++)
+  for (let z = 14; z <= 18; z++)
     for (let i = x(BOUNDS.west, z); i <= x(BOUNDS.east, z); i++)
       for (let j = y(BOUNDS.north, z); j <= y(BOUNDS.south, z); j++) out.push(MAP_TILES.replace('{z}', z).replace('{x}', i).replace('{y}', j));
   return out;
@@ -2364,20 +2481,44 @@ function slotForm(id, P) {
 
 /* ---------- Toast ---------- */
 let toastTimer = null, toastUndo = null;
+// Référence gardée : le message peut être déplacé dans une fiche, voire détaché si la fiche est redessinée
+const toastEl = document.getElementById('toast');
 function toast(text, undo) {
-  const box = $('#toast');
+  const box = toastEl;
   toastUndo = undo || null;
   box.innerHTML = `<span>${esc(text)}</span>${undo ? `<button type="button" data-act="undo">${t('undo')}</button>` : ''}`;
-  box.hidden = false;
+  showToastEl(box);
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { box.hidden = true; toastUndo = null; }, 6000);
+  toastTimer = setTimeout(() => { hideToastEl(box); toastUndo = null; }, 6000);
+}
+/* Popover : le message passe au-dessus des fiches ouvertes. Une fiche ouverte rend inactif tout ce qui est
+   en dehors d'elle : le message est donc placé dans la fiche ouverte (sinon « Annuler » ne répondrait pas).
+   Placement au tour suivant : l'action qui affiche le message ferme parfois la fiche juste après. */
+function showToastEl(box) {
+  box.hidden = false;
+  setTimeout(() => {
+    if (box.hidden) return;
+    const host = [...document.querySelectorAll('dialog')].find(d => d.open) || document.body;
+    if (box.parentElement !== host) host.appendChild(box);
+    if (box.showPopover) { try { box.hidePopover(); } catch (e) {} try { box.showPopover(); } catch (e) {} }
+  }, 0);
+}
+// Fiche fermée avec le message dedans : il revient dans la page
+document.addEventListener('close', ev => {
+  const box = toastEl;
+  if (ev.target.tagName === 'DIALOG' && ev.target.contains(box)) { document.body.appendChild(box); if (!box.hidden) showToastEl(box); }
+}, true);
+function hideToastEl(box) {
+  if (box.hidePopover) try { box.hidePopover(); } catch (e) {}
+  box.hidden = true;
 }
 /* Change l'état, l'enregistre et propose « Annuler » qui remet la version d'avant */
 function withUndo(text, change) {
-  const before = JSON.stringify(prefs);
+  const before = JSON.parse(js(prefs));
   change();
+  const undo = diffState(prefs, before);
   savePrefs();
-  toast(text, () => { prefs = withDefaults(JSON.parse(before)); savePrefs(); render(); });
+  toast(text, () => { prefs = withDefaults(applyPatch(prefs, undo)); savePrefs(); render(); });
   render();
 }
 
@@ -2550,7 +2691,7 @@ document.addEventListener('click', ev => {
     case 'sheet-close': $('#sheet').close(); break;
     case 'banner-close': pendingAlert = null; render(); break;
     case 'itin-more': itinExpanded = !itinExpanded; render(); break;
-    case 'undo': if (toastUndo) { const u = toastUndo; toastUndo = null; $('#toast').hidden = true; u(); } break;
+    case 'undo': if (toastUndo) { const u = toastUndo; toastUndo = null; hideToastEl(toastEl); u(); } break;
     case 'gps': if (device.gps) stopGps(true); else { device.gps = true; saveDevice(); startGps(); } renderSettings(); break;
     case 'push-on': enablePush(); break;
     case 'help': if (el.dataset.section === 'news') versionNote = null; openHelp(el.dataset.section); break;
@@ -2785,7 +2926,8 @@ function shareRecap() {
 
 /* ---------- Groupe : positions partagées ---------- */
 let where = [], lastShare = 0;
-const shareNick = () => (device.nick || (remote() ? user.name : '') || t('me')).slice(0, 24);
+// Mêmes caractères que ceux acceptés par api.php (route where) : sinon le prénom serait refusé sans message
+const shareNick = () => ((device.nick || (remote() ? user.name : '') || t('me')).replace(/[^\p{L}\p{N} _.'-]/gu, '').trim() || t('me')).slice(0, 24);
 const groupMembers = () => where.filter(x => x.device !== device.id && x.lat != null && Date.now() - x.ts < 20 * 60000);
 function postWhere(pos) {
   lastShare = Date.now();
@@ -2831,9 +2973,12 @@ function simpleHTML(P, plan) {
     const rides = steps.filter(s => s.kind === 'ride').slice(0, 3).map(s => esc(shortName(ents.get(s.id))));
     return `<article class="simple"><div class="s-emoji">${P.phase === 'before' ? '🌅' : '🌙'}</div>
       <div class="s-label">${P.phase === 'before' ? t('s.today') : esc(fmtDay(P.day))}</div>
-      <div class="s-title">${t('s.beAt', {time: hhmm(Math.max(0, P.h.open - 15))})}</div>
+      <div class="s-title">${t('s.beAt', {time: hhmm(Math.max(0, P.t0 - 15))})}</div>
       ${rides.length ? `<p>${t('s.startWith', {list: rides.join(', ')})}</p>` : ''}
       <div class="s-actions">${bigBtn('diag', '🧳 ' + t('d.title'), false)}</div>${more}</article>`;
+  }
+  if (!first && (plan?.missing.length || plan?.unavailable.length)) {
+    return `<article class="simple"><div class="s-emoji">🤔</div><p>${t('now.noneFeasible', {extra: plan.unavailable.length ? t('now.closedOrDown') : ''})}</p>${more}</article>`;
   }
   if (!first) {
     const easy = [...live.keys()].filter(id => hasQueue(id) && waitOf(id) != null && !tooSmall(id)).sort((a, b) => waitOf(a) - waitOf(b)).slice(0, 3);
@@ -2889,7 +3034,10 @@ function bearing(a, b) {
   const x = Math.cos(a.lat * r) * Math.sin(b.lat * r) - Math.sin(a.lat * r) * Math.cos(b.lat * r) * Math.cos((b.lon - a.lon) * r);
   return (Math.atan2(y, x) / r + 360) % 360;
 }
+let lastOrient = 0;
 function onOrient(e) {
+  if (document.hidden || performance.now() - lastOrient < 120) return;   // ~8 fois par seconde suffisent
+  lastOrient = performance.now();
   let h = e.webkitCompassHeading ?? (e.absolute && e.alpha != null ? 360 - e.alpha : null);
   if (h == null) return;
   h = (h + (screen.orientation?.angle || 0)) % 360;
@@ -2914,18 +3062,26 @@ async function enableCompass() {
 }
 function updateCompass() {
   const el = $('#compass');
-  if (!el || !compassTarget) return;
+  if (!el || !compassTarget || document.hidden || el.offsetParent === null) return;
   const fresh = gpsPos && Date.now() - gpsPos.ts < 5 * 60000;
-  if (!fresh) {
-    el.innerHTML = `<button class="btn" type="button" data-act="compass">${t('c.enable')}</button>`;
-    return;
+  const d = fresh ? dist(gpsPos, compassTarget) : null;
+  const mode = !fresh ? 'nogps' : d < 35 ? 'here' : heading == null ? 'north' : 'turn';
+  // On ne reconstruit le contenu que quand le cas change ; sinon seules la rotation et la distance bougent
+  if (el.dataset.mode !== mode) {
+    el.dataset.mode = mode; el.dataset.rot = '';
+    el.innerHTML = mode === 'nogps' ? `<button class="btn" type="button" data-act="compass">${t('c.enable')}</button>`
+      : mode === 'here' ? `<div class="c-here">${t('c.here')}</div>`
+      : `<div class="c-arrow">${icArrow}</div><div class="c-dist"><span></span>${mode === 'north' ? `<small>${t('c.north')}</small>` : ''}</div>
+        ${mode === 'north' ? `<button class="btn small" type="button" data-act="compass">${t('c.turn')}</button>` : ''}`;
   }
-  const d = dist(gpsPos, compassTarget), b = bearing(gpsPos, compassTarget);
-  if (d < 35) { el.innerHTML = `<div class="c-here">${t('c.here')}</div>`; return; }
-  const rot = heading == null ? b : b - heading;
-  el.innerHTML = `<div class="c-arrow" style="transform:rotate(${Math.round(rot)}deg)">${icArrow}</div>
-    <div class="c-dist">${Math.round(d / 10) * 10} m${heading == null ? `<small>${t('c.north')}</small>` : ''}</div>
-    ${heading == null && !device.compass ? `<button class="btn small" type="button" data-act="compass">${t('c.turn')}</button>` : ''}`;
+  if (mode !== 'north' && mode !== 'turn') return;
+  const target = (heading == null ? 0 : -heading) + bearing(gpsPos, compassTarget);
+  // Rotation par le plus court chemin (359° → 1° tourne de 2°, pas de 358°)
+  let rot = el.dataset.rot === '' ? target : +el.dataset.rot;
+  rot += ((target - rot) % 360 + 540) % 360 - 180;
+  el.dataset.rot = rot;
+  el.querySelector('.c-arrow').style.transform = `rotate(${Math.round(rot)}deg)`;
+  el.querySelector('.c-dist span').textContent = `${Math.round(d / 10) * 10} m`;
 }
 
 /* ---------- Démarrage en 3 questions ---------- */
@@ -3222,7 +3378,13 @@ function renderInstall() {
 }
 
 /* ---------- Position ---------- */
-const asked = new Set();          // questions déjà posées (« tu fais la queue ? »)
+// Questions et bandeaux déjà écartés (« tu fais la queue ? », pluie, dernier appel…), gardés pour la journée
+const asked = (() => {
+  const day = new Date().toDateString(), set = new Set(device.asked?.day === day ? device.asked.keys : []);
+  const add = set.add.bind(set);
+  set.add = k => { add(k); device.asked = {day, keys: [...set].slice(-100)}; saveDevice(); return set; };
+  return set;
+})();
 let gpsPrompt = null, nearRide = null;
 function checkGpsPrompt() {
   gpsPrompt = null;
@@ -3261,7 +3423,7 @@ function startGps() {
       if (!prefs.pos || q.ts - prefs.pos.ts > 120000) { prefs.pos = {lat: q.lat, lon: q.lon, ts: q.ts}; savePrefs(false); }
       if (device.share && Date.now() - lastShare > 60000) postWhere(q);
     } else { gpsPos = null; gpsState = 'out'; }
-    scheduleRender();
+    gpsRender();
   }, err => {
     gpsState = err.code === 1 ? 'denied' : 'unavailable';
     if (err.code === 1) { device.gps = false; saveDevice(); }
@@ -3274,6 +3436,17 @@ function stopGps(byUser) {
   if (byUser) { device.gps = false; gpsState = 'off'; saveDevice(); render(); }
 }
 let renderQueued = false;
+/* En marchant, le GPS envoie une position par seconde : recalcul complet au plus toutes les 5 s,
+   entre deux on ne bouge que la flèche et le point sur la carte (économise processeur et batterie) */
+let lastGpsRender = 0, meMarker = null;
+function gpsRender() {
+  if (Date.now() - lastGpsRender >= 5000) { lastGpsRender = Date.now(); scheduleRender(); return; }
+  updateCompass();
+  if (lmap && gpsPos && device.tab === 'map') {
+    if (meMarker) meMarker.setLatLng([gpsPos.lat, gpsPos.lon]);
+    if (follow) lmap.panTo([gpsPos.lat, gpsPos.lon], {animate: true});
+  }
+}
 function scheduleRender() { if (renderQueued) return; renderQueued = true; setTimeout(() => { renderQueued = false; if (!$('#sheet').open) render(); else renderHeader(phaseInfo()); }, 400); }
 
 /* =====================================================================
@@ -3309,7 +3482,7 @@ async function refresh() {
   busy = true; lastRefresh = Date.now(); $('#refreshBtn').classList.add('spin');
   try {
     try {
-      const uq = remote() ? `&u=${encodeURIComponent(user.id)}&since=${prefs.updatedAt || 0}` : '';
+      const uq = remote() ? `&u=${encodeURIComponent(user.id)}&since=${synced?.rev || 0}` : '';
       const b = await getJSON(`${SERVER}?r=bundle${uq}`);
       if (!b || !b.live) throw new Error('réponse invalide');
       ingestLive(b.live); stats = b.stats || null;
@@ -3358,6 +3531,9 @@ function restoreFromCache() {
   if (user) { rolloverDay(); syncLang(); }
   applySun();
   applyMode();
+  const stripH = () => document.documentElement.style.setProperty('--strip-h', $('.strip').offsetHeight + 'px');
+  stripH();
+  try { new ResizeObserver(stripH).observe($('.strip')); } catch (e) {}
   if (device.compass) listenCompass();
   // Batterie faible (Android) : on propose le mode économie
   navigator.getBattery?.().then(b => {

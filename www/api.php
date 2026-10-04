@@ -153,7 +153,7 @@ if (!defined('EP_LIB')) {
                     . ',"weather":' . ($weather ?? 'null')
                     . ($uid === null ? '' : ',"user":' . json_encode(user_summary($DATA, $uid, (float) ($_GET['since'] ?? 0)), JSON_OUT))
                     . ',"where":' . json_encode(where_list($DATA), JSON_OUT)
-                    . ',"real":' . json_encode(pooled_real($DATA), JSON_OUT)
+                    . ',"real":' . json_encode((function () use ($DATA) { try { return pooled_real($DATA); } catch (Throwable $e) { return null; } })(), JSON_OUT)
                     . ',"live":' . $live . '}';
                 break;
 
@@ -240,6 +240,20 @@ if (!defined('EP_LIB')) {
                 }
                 require_post();
                 $body = read_body(MAX_STATE, false);
+                // Nouvelle page : {patch} = seulement ce que le téléphone a changé, fusionné ici.
+                // Ancienne page encore en cache : {updatedAt, state}, le plus récent gagne.
+                if (isset($body->patch)) {
+                    if (!is_object($body->patch)) throw new HttpError('Champ « patch » invalide (objet attendu).', 400);
+                    with_lock($file, function () use ($file, $body) {
+                        $u = read_user($file);
+                        $u->state = state_merge(is_object($u->state ?? null) ? $u->state : new stdClass(), $body->patch);
+                        // Version datée par le serveur : l'horloge des téléphones ne compte pas
+                        $u->updatedAt = max(now_ms(), (int) ($u->updatedAt ?? 0) + 1);
+                        write_json($file, $u);
+                        send(200, ['ok' => true, 'updatedAt' => $u->updatedAt, 'state' => $u->state]);
+                    });
+                    break;
+                }
                 $at = $body->updatedAt ?? null;
                 if (!is_int($at) && !is_float($at)) throw new HttpError('Champ « updatedAt » manquant (horodatage en ms).', 400);
                 if (!isset($body->state) || !is_object($body->state)) throw new HttpError('Champ « state » manquant ou invalide (objet attendu).', 400);
@@ -249,10 +263,10 @@ if (!defined('EP_LIB')) {
                         send(409, ['updatedAt' => $u->updatedAt, 'state' => $u->state ?? null]);
                         return;
                     }
-                    $u->updatedAt = $at;
+                    $u->updatedAt = min((int) $at, now_ms() + 60000);   // horloge du téléphone en avance : plafonnée
                     $u->state = $body->state;
                     write_json($file, $u);
-                    send(200, ['ok' => true, 'updatedAt' => $at]);
+                    send(200, ['ok' => true, 'updatedAt' => $u->updatedAt]);
                 });
                 break;
 
@@ -326,14 +340,25 @@ if (!defined('EP_LIB')) {
                     $nick = trim((string) ($b['nick'] ?? ''));
                     if ($nick === '' || !preg_match('/^[\p{L}\p{N} _.\'-]{1,24}$/u', $nick)) throw new HttpError('Prénom invalide.', 400);
                     $lat = $b['lat'] ?? null; $lon = $b['lon'] ?? null;
-                    if ($lat !== null && (!is_numeric($lat) || !is_numeric($lon))) throw new HttpError('Position invalide.', 400);
+                    if ($lat !== null && (!is_numeric($lat) || !is_numeric($lon) || abs((float) $lat) > 90 || abs((float) $lon) > 180)) throw new HttpError('Position invalide.', 400);
                     where_update($DATA, $dev, $lat === null ? null : ['nick' => $nick, 'lat' => (float) $lat, 'lon' => (float) $lon, 'ts' => now_ms()]);
                 }
                 send(200, where_list($DATA));
                 break;
 
             case 'collect':
-                [$live, $stale] = cached($DATA, 'live', 30, $UPSTREAM . PARK_ID . '/live');
+                // Une seule collecte à la fois : deux passages qui se chevauchent enverraient les notifications en double
+                $runLock = fopen("$DATA/collect.lock", 'c');
+                if (!$runLock || !flock($runLock, LOCK_EX | LOCK_NB)) {
+                    echo json_encode(['ok' => false, 'busy' => true]) . "\n";
+                    break;
+                }
+                try {
+                    [$live, $stale] = cached($DATA, 'live', 30, $UPSTREAM . PARK_ID . '/live');
+                } catch (Throwable $e) {
+                    // API injoignable et pas de cache : les alertes à heure fixe partent quand même
+                    [$live, $stale] = ['{}', true];
+                }
                 $prev = last_snapshot($DATA);
                 $saved = $stale ? false : record_snapshot($DATA, $live);
                 prune_history($DATA);
@@ -700,6 +725,43 @@ function read_user(string $file): stdClass
     return $u;
 }
 
+/**
+ * Applique à l'état d'un profil les changements envoyés par un téléphone (même règles que applyPatch() dans index.html) :
+ *   set  : {champ: valeur}               valeur entière remplacée
+ *   keys : {champ: {clé: valeur|null}}   dictionnaire modifié clé par clé (null = clé supprimée)
+ *   add  : {champ: [éléments]}           éléments ajoutés à une liste (sans doublon)
+ *   del  : {champ: [éléments]}           éléments retirés d'une liste
+ * Deux téléphones du même profil qui changent des clés différentes en même temps gardent donc les deux changements.
+ */
+function state_merge(stdClass $st, stdClass $patch): stdClass
+{
+    $field = function ($f) { return is_string($f) && preg_match('/^[A-Za-z][A-Za-z0-9]{0,30}$/', $f); };
+    foreach ((array) ($patch->set ?? []) as $f => $v) if ($field($f)) $st->$f = $v;
+    foreach ((array) ($patch->keys ?? []) as $f => $kv) {
+        if (!$field($f) || !is_object($kv)) continue;
+        if (!isset($st->$f) || !is_object($st->$f)) $st->$f = new stdClass();
+        foreach ((array) $kv as $k => $v) {
+            if ($v === null) unset($st->$f->$k); else $st->$f->$k = $v;
+        }
+    }
+    foreach ((array) ($patch->add ?? []) as $f => $items) {
+        if (!$field($f) || !is_array($items)) continue;
+        $list = isset($st->$f) && is_array($st->$f) ? $st->$f : [];
+        $seen = array_flip(array_map('json_encode', $list));
+        foreach ($items as $it) {
+            $j = json_encode($it);
+            if (!isset($seen[$j])) { $list[] = $it; $seen[$j] = true; }
+        }
+        $st->$f = array_slice($list, -300);
+    }
+    foreach ((array) ($patch->del ?? []) as $f => $items) {
+        if (!$field($f) || !is_array($items) || !isset($st->$f) || !is_array($st->$f)) continue;
+        $rm = array_flip(array_map('json_encode', $items));
+        $st->$f = array_values(array_filter($st->$f, function ($x) use ($rm) { return !isset($rm[json_encode($x)]); }));
+    }
+    return $st;
+}
+
 /** Résumé du profil pour le bundle : null s'il n'existe pas ; l'état seulement s'il a changé depuis $since. */
 function user_summary(string $data, string $id, float $since): ?array
 {
@@ -726,8 +788,11 @@ function now_ms(): int
 /** Écriture atomique (fichier temporaire + rename) : un lecteur ne voit jamais un fichier à moitié écrit. */
 function write_json(string $file, $payload): void
 {
+    // Valeur non représentable en JSON (ex. 1e999 → INF) : on refuse, sinon le fichier serait vidé
+    $json = json_encode($payload, JSON_OUT);
+    if ($json === false) throw new HttpError('Valeurs non représentables en JSON.', 400);
     $tmp = "$file." . getmypid() . '.' . bin2hex(random_bytes(4)) . '.tmp';
-    if (file_put_contents($tmp, json_encode($payload, JSON_OUT)) === false || !rename($tmp, $file)) {
+    if (file_put_contents($tmp, $json) !== strlen($json) || !rename($tmp, $file)) {
         @unlink($tmp);
         throw new RuntimeException("Écriture impossible dans $file : vérifie les droits de PHP sur data/.");
     }
@@ -756,12 +821,14 @@ function pooled_real(string $data): ?array
     foreach (user_files($data) as $f) {
         $u = json_decode((string) file_get_contents($f), true);
         foreach ((array) ($u['state']['samples'] ?? []) as $x) {
-            if (($x['posted'] ?? 0) >= 10 && is_numeric($x['real'] ?? null) && ($x['t'] ?? 0) > $since) {
+            if (!is_array($x) || !is_numeric($x['posted'] ?? null) || !is_numeric($x['real'] ?? null) || !is_numeric($x['t'] ?? null)) continue;   // profil mal formé : ignoré
+            if ($x['posted'] >= 10 && $x['t'] > $since) {
                 $r[] = $x['real'] / $x['posted'];
                 if (is_string($x['id'] ?? null)) $byRide[$x['id']][] = $x['real'] / $x['posted'];
             }
         }
-        foreach ((array) ($u['state']['ratings'] ?? []) as $id => $n) {
+        if (!is_array($u['state']['ratings'] ?? null)) continue;
+        foreach ($u['state']['ratings'] as $id => $n) {
             if (is_numeric($n) && $n >= 1 && $n <= 5) $notes[(string) $id][] = (int) $n;
         }
     }
@@ -1017,7 +1084,7 @@ function push_remove(array &$p, array $endpoints): void
  * Envoie des messages à tous les téléphones d'un profil (réseau hors verrou), puis supprime les
  * abonnements expirés (404 / 410) et note les clés envoyées. Retourne [messages reçus par au moins un téléphone, codes].
  */
-function push_user(string $data, string $id, array $messages, array $keys = []): array
+function push_user(string $data, string $id, array $messages, array $keys = [], array $cooldowns = []): array
 {
     $p = json_decode((string) @file_get_contents("$data/users/$id.push.json"), true);
     $subs = $p['subs'] ?? [];
@@ -1030,12 +1097,16 @@ function push_user(string $data, string $id, array $messages, array $keys = []):
             if (in_array($sub['endpoint'], $dead, true)) continue;
             $code = push_send($vapid, $sub, $msg);
             $codes[] = $code;
-            if ($code === 404 || $code === 410) $dead[] = $sub['endpoint'];
+            // Abonnement expiré ou refusé (403 : clé VAPID changée) : retiré, le téléphone se réabonne à la prochaine ouverture
+            if (in_array($code, [400, 403, 404, 410, 413], true)) $dead[] = $sub['endpoint'];
             if ($code >= 200 && $code < 300) $ok = true;
         }
         if ($ok) {
             $sent++;
             if (isset($keys[$i])) $sentKeys[$keys[$i]] = time();
+        } elseif (isset($keys[$i])) {
+            // Service push en panne : on ne réessaie pas à chaque minute (la clé compte comme envoyée il y a « délai - 10 min »)
+            $sentKeys[$keys[$i]] = time() - max(0, ($cooldowns[$i] ?? 600) - 600);
         }
     }
     if ($dead || $sentKeys) {
@@ -1211,7 +1282,7 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
         if (is_numeric($planned['meal'] ?? null) && empty($st['mealDone'])) {
             $meal = (int) $planned['meal'];
             if ($now >= $meal - 2 && $now <= $meal + 20) {
-                $msgs[] = ["m:$meal", 86400, ...msg($lang, 'meal')];
+                $msgs[] = ["m:$today", 86400, ...msg($lang, 'meal')];   // une fois par jour, même si l'heure prévue bouge
             }
         }
 
@@ -1273,14 +1344,14 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
             }
         }
 
-        $out = []; $keys = [];
+        $out = []; $keys = []; $cools = [];
         foreach ($msgs as [$key, $cooldown, $title, $body]) {
             if (isset($sent[$key]) && time() - (int) $sent[$key] < $cooldown) continue;
             $out[] = ['title' => $title, 'body' => $body, 'tag' => $key, 'url' => './#now'];
-            $keys[] = $key;
+            $keys[] = $key; $cools[] = $cooldown;
             if (count($out) >= MAX_PUSH_RUN) break;
         }
-        if ($out) $pushed += push_user($data, $uid, $out, $keys)[0];
+        if ($out) $pushed += push_user($data, $uid, $out, $keys, $cools)[0];
     }
     return $pushed;
 }

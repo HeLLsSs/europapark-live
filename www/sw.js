@@ -1,7 +1,7 @@
 /* Service worker : garde la page et les polices en cache pour qu'elle s'ouvre
    instantanément, même quand le réseau du parc est saturé.
    Les temps d'attente (api.php / themeparks.wiki) passent toujours par le réseau. */
-const CACHE = 'ep-live-v5';
+const CACHE = 'ep-live-v6';
 const TILES = 'ep-tiles';   // fond de carte et Leaflet : gardés d'une version à l'autre
 const SHELL = ['./', 'index.html', 'i18n.js', 'manifest.webmanifest', 'parks.json', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
@@ -38,7 +38,8 @@ self.addEventListener('fetch', e => {
 
   // Polices Google : cache d'abord
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
-    e.respondWith(caches.open(CACHE).then(async cache => {
+    // Cache permanent (TILES) : une nouvelle version de l'appli ne les efface pas
+    e.respondWith(caches.open(TILES).then(async cache => {
       const hit = await cache.match(e.request);
       const net = fetch(e.request).then(r => { if (r.ok || r.type === 'opaque') cache.put(e.request, r.clone()); return r; }).catch(() => hit);
       return hit || net;
@@ -46,13 +47,18 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Page et fichiers du site : réseau d'abord, cache si hors ligne
+  // Page et fichiers du site : réseau d'abord, mais pas plus de 3 s s'il y a une copie
+  // (réseau saturé dans le parc : connecté, mais rien ne passe) ; cache si hors ligne
   if (url.origin === self.location.origin) {
-    e.respondWith(
-      fetch(e.request)
-        .then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); } return r; })
-        .catch(() => caches.match(e.request, {ignoreSearch: true}).then(r => r || caches.match('index.html')))
-    );
+    const cached = () => caches.match(e.request, {ignoreSearch: true}).then(r => r || caches.match('index.html'));
+    const net = fetch(e.request).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); } return r; });
+    e.respondWith(new Promise(resolve => {
+      let done = false;
+      const finish = r => { if (!done && r) { done = true; resolve(r); } };
+      const timer = setTimeout(() => cached().then(finish), 3000);
+      net.then(r => { clearTimeout(timer); finish(r); })
+        .catch(() => { clearTimeout(timer); cached().then(r => r ? finish(r) : finish(Response.error())); });
+    }));
   }
 });
 
