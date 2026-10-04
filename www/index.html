@@ -1,0 +1,2351 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Europa-Park Live</title>
+<meta name="description" content="Temps d'attente en direct et itinéraire optimisé pour Europa-Park">
+<meta name="theme-color" content="#EEF2EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1412" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="EP Live">
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Saira+Condensed:wght@600;700;800&display=swap">
+<style>
+/* Layout : une colonne pensée pour le téléphone (max 36rem), bandeau d'état collant en haut,
+   barre d'onglets fixe en bas. Le « panneau » sombre reprend les panneaux de temps d'attente du parc. */
+:root{
+  --bg:#EEF2EE; --surface:#FFFFFF; --sunk:#E2E8E3; --ink:#13231F; --muted:#56675F; --line:#D3DBD5;
+  --accent:#5A2FD3; --accent-ink:#FFFFFF; --accent-soft:#ECE6FC;
+  --board:#13231F; --board-ink:#EEF4F0; --board-muted:#9DB0A8; --board-line:#2A3D37;
+  --w-low:#0A7F53; --w-mid:#9A6F00; --w-high:#C84E16; --w-peak:#BC2039; --w-off:#7D8B86;
+  --b-low:#4FD69B; --b-mid:#F0C454; --b-high:#FF9257; --b-peak:#FF7D93;
+  --font-display:"Saira Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --font-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --tab-h:64px; --r:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0D1412; --surface:#151F1C; --sunk:#0A100E; --ink:#E5EDE8; --muted:#94A69E; --line:#24322D;
+    --accent:#A98EFF; --accent-ink:#160B33; --accent-soft:#241A45;
+    --board:#1A2824; --board-ink:#EEF4F0; --board-muted:#9DB0A8; --board-line:#2E423C;
+    --w-low:#3CC48C; --w-mid:#E0B13B; --w-high:#F27D45; --w-peak:#F2637B; --w-off:#6E7C77;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.45 var(--font-body);-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+.app{max-width:36rem;margin:0 auto;padding-inline:16px;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 28px)}
+h2{font:700 1.05rem/1.2 var(--font-body);margin:0}
+.eyebrow{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* Bandeau d'état */
+.strip{position:sticky;top:0;z-index:30;margin-inline:-16px;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px;
+  background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.strip-row{display:flex;align-items:center;gap:12px}
+.strip-text{flex:1;min-width:0}
+.park-line{font:700 1.02rem/1.25 var(--font-body);text-wrap:balance}
+.fresh{font-size:.8rem;color:var(--muted);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--w-low);display:inline-block}
+.dot.warn{background:var(--w-high)}
+.icon-btn{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.icon-btn svg{width:22px;height:22px}
+.spin svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sim-tag{font-size:.72rem;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:1px 7px;border-radius:99px}
+
+/* Bannière */
+.banner{margin-top:12px;display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);background:var(--accent-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.banner.warn{background:color-mix(in srgb,var(--w-high) 14%,var(--surface));border-color:color-mix(in srgb,var(--w-high) 40%,transparent)}
+.banner p{margin:0;flex:1;min-width:0}
+.banner button{border:0;background:transparent;padding:2px 4px;font-weight:700;color:var(--muted)}
+
+.tab{display:flex;flex-direction:column;gap:22px;padding-top:16px}
+section.block{display:flex;flex-direction:column;gap:10px}
+.block-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+
+/* Panneau « prochaine étape » */
+.board{background:var(--board);color:var(--board-ink);border-radius:18px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px -18px rgba(10,30,25,.6)}
+.board .eyebrow{color:var(--board-muted)}
+.board-top{display:flex;gap:14px;align-items:flex-end;justify-content:space-between}
+.board-name{font:800 2.05rem/0.98 var(--font-display);text-transform:uppercase;letter-spacing:.01em;text-wrap:balance;min-width:0;overflow-wrap:anywhere}
+.board-wait{text-align:right;flex:none}
+.board-wait .big{font:800 3.6rem/.85 var(--font-display);font-variant-numeric:tabular-nums;display:block}
+.board-wait small{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--board-muted);font-weight:700}
+.b-low{color:var(--b-low)}.b-mid{color:var(--b-mid)}.b-high{color:var(--b-high)}.b-peak{color:var(--b-peak)}.b-off{color:var(--board-muted)}
+.board-facts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.92rem;color:var(--board-ink)}
+.board-facts span{display:inline-flex;gap:6px;align-items:center}
+.board-reason{margin:0;font-size:.95rem;color:var(--board-ink);opacity:.92;border-top:1px solid var(--board-line);padding-top:10px}
+.board-actions{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px}
+.board-actions.two{grid-template-columns:1.25fr 1fr}
+.board-actions .btn{padding-inline:8px}
+.btn{text-decoration:none;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;font-weight:700;min-height:44px;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn svg{width:18px;height:18px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.board .btn{background:transparent;border-color:var(--board-line);color:var(--board-ink)}
+.board .btn.primary{background:var(--b-low);border-color:var(--b-low);color:#06261A}
+.btn.small{min-height:36px;padding:6px 11px;font-size:.88rem;border-radius:10px}
+.alts{display:flex;flex-direction:column;border-top:1px solid var(--board-line);padding-top:10px}
+.alts .eyebrow{margin-bottom:2px}
+.alt{border:0;border-bottom:1px solid var(--board-line);background:transparent;color:var(--board-ink);padding:9px 0;display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:baseline;text-align:left;min-height:44px}
+.alt:last-child{border-bottom:0;padding-bottom:0}
+.alt-name{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.alt-walk{font-size:.82rem;color:var(--board-muted);white-space:nowrap}
+.alt b{font:800 1.3rem/1 var(--font-display);min-width:3.2rem;text-align:right}
+.alt b small{font:700 .7rem var(--font-body);color:var(--board-muted)}
+
+/* Cartes génériques */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.card p{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.82rem;border-radius:99px;padding:3px 10px;background:var(--sunk);color:var(--ink);white-space:nowrap}
+.chip.ok{background:color-mix(in srgb,var(--w-low) 16%,var(--surface));color:var(--w-low);font-weight:700}
+.chip.full{background:color-mix(in srgb,var(--w-mid) 16%,var(--surface));color:var(--w-mid);font-weight:700}
+.chip.end{color:var(--muted)}
+.row-inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);min-width:0}
+.field select,.field input{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:6px 10px;color:var(--ink);font-size:1rem}
+
+/* Itinéraire */
+.itin{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.itin li{display:grid;grid-template-columns:3.4rem 1fr auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line)}
+.itin li:last-child{border-bottom:0}
+.itin li.more{display:block;padding-top:12px}
+.itin time{font:700 1.05rem/1 var(--font-display);font-variant-numeric:tabular-nums;color:var(--muted)}
+.itin .it-name{min-width:0;font-weight:700;background:none;border:0;padding:0;text-align:left}
+.itin .it-sub{display:block;font-weight:400;font-size:.82rem;color:var(--muted)}
+.itin .vl{font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-left:6px}
+.note{font-size:.88rem;color:var(--muted);margin:0}
+
+/* Pastilles d'attente */
+.pill{--c:var(--w-off);display:inline-flex;align-items:baseline;gap:2px;justify-content:center;min-width:3.4rem;padding:3px 8px;border-radius:10px;
+  background:color-mix(in srgb,var(--c) 14%,var(--surface));color:var(--c);font:800 1.35rem/1.1 var(--font-display);font-variant-numeric:tabular-nums}
+.pill small{font:700 .66rem/1 var(--font-body);letter-spacing:.03em}
+.pill.word{font:700 .78rem/1.2 var(--font-body);padding:6px 8px}
+.w-low{--c:var(--w-low)}.w-mid{--c:var(--w-mid)}.w-high{--c:var(--w-high)}.w-peak{--c:var(--w-peak)}.w-off{--c:var(--w-off)}
+.est{font:700 .95rem var(--font-display);color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Liste */
+.controls{display:flex;flex-direction:column;gap:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px);z-index:10;background:var(--bg);padding-block:6px 8px;margin-inline:-16px;padding-inline:16px}
+.seg{display:flex;background:var(--sunk);border-radius:12px;padding:3px;gap:2px;overflow-x:auto}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:8px 10px;font-weight:700;font-size:.88rem;white-space:nowrap;color:var(--muted);min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.search{width:100%;min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px 12px;color:var(--ink)}
+.sortline{display:flex;gap:8px;align-items:center;font-size:.85rem;color:var(--muted)}
+.sortline .seg{flex:1}
+.list{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.list li{display:flex;align-items:center;gap:6px;padding:6px 10px 6px 4px;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:0}
+.list li.done .row-name{text-decoration:line-through;text-decoration-color:var(--muted)}
+.star{width:44px;height:44px;flex:none;border:0;background:transparent;display:grid;place-items:center;color:var(--line)}
+.star svg{width:22px;height:22px}
+.star.must{color:var(--accent)}
+.star.bonus{color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.row-main{flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:6px 0;display:flex;flex-direction:column;gap:1px}
+.row-name{font-weight:700;overflow-wrap:anywhere}
+.row-meta{font-size:.8rem;color:var(--muted)}
+.row-meta .up{color:var(--w-high);font-weight:700}.row-meta .down{color:var(--w-low);font-weight:700}
+.empty{padding:22px 16px;text-align:center;color:var(--muted)}
+
+/* Carte */
+.map-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.map-wrap svg{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem;color:var(--muted)}
+.legend span{display:inline-flex;gap:5px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--c)}
+
+/* Réglages */
+.set{display:flex;flex-direction:column;gap:8px}
+.set + .set{border-top:1px solid var(--line);padding-top:14px}
+.toggle{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.toggle input{width:22px;height:22px;accent-color:var(--accent)}
+code{font-size:.85em;background:var(--sunk);padding:1px 5px;border-radius:5px;overflow-wrap:anywhere}
+
+/* Barre d'onglets */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:color-mix(in srgb,var(--surface) 94%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar-in{max-width:36rem;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tab-h)}
+.tabbar button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.72rem;font-weight:700;color:var(--muted)}
+.tabbar svg{width:23px;height:23px}
+.tabbar button[aria-selected="true"]{color:var(--accent)}
+
+/* Fiche (bottom sheet) */
+dialog.sheet{border:0;padding:0;margin:auto auto 0;width:100%;max-width:36rem;max-height:88vh;border-radius:20px 20px 0 0;background:var(--surface);color:var(--ink);overflow:auto}
+dialog.sheet::backdrop{background:rgba(5,12,10,.45)}
+.sheet-in{padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.sheet-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.sheet-title{font:800 1.7rem/1 var(--font-display);text-transform:uppercase;margin:2px 0 0;text-wrap:balance;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--sunk);border-radius:12px;padding:8px 10px;min-width:0}
+.stat b{display:block;font:800 1.5rem/1.05 var(--font-display);font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;color:var(--muted)}
+.chart{width:100%;height:auto;display:block}
+.chart text{font:600 10px var(--font-body);fill:var(--muted)}
+.showtimes{display:flex;flex-wrap:wrap;gap:6px}
+
+/* Profil, calendrier d'affluence */
+.strip-row .icon-btn{width:40px}
+.strip-row{gap:8px}
+.user-btn{height:44px;max-width:5.5rem;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-list{display:flex;flex-wrap:wrap;gap:8px}
+.cal{display:flex;flex-direction:column;gap:3px;font-size:.8rem;color:var(--muted)}
+.cal-row{display:grid;grid-template-columns:5.2rem 1fr 2.6rem;gap:8px;align-items:center}
+.cal-row i{display:block;height:8px;border-radius:4px;background:var(--c)}
+.cal-row b{font:700 .95rem var(--font-display);text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+button.board-name{border:0;background:none;color:inherit;padding:0;text-align:left}
+.banner .yes{color:var(--accent)}
+
+/* Aide */
+.help details{border-top:1px solid var(--line);padding:12px 0}
+.help summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px;min-height:28px;align-items:center}
+.help summary::-webkit-details-marker{display:none}
+.help summary::after{content:'+';color:var(--muted);font-size:1.2rem}
+.help details[open] summary::after{content:'–'}
+.help p,.help ul,.help ol,.help table{margin:8px 0 0}
+.help ul,.help ol{padding-left:20px}
+.help li + li{margin-top:4px}
+.help table{border-collapse:collapse;width:100%;font-size:.92rem}
+.help td{border-top:1px solid var(--line);padding:6px 6px 6px 0;vertical-align:top}
+.help td:first-child{font-weight:700;white-space:nowrap}
+
+.toast{position:fixed;left:0;right:0;margin-inline:auto;width:max-content;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 12px);z-index:50;
+  background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;max-width:calc(100% - 32px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast button{border:0;background:transparent;color:var(--accent-soft);font-weight:700;padding:6px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="strip">
+    <div class="strip-row">
+      <div class="strip-text">
+        <div class="eyebrow">Europa-Park · Rust</div>
+        <div class="park-line" id="parkLine">Chargement…</div>
+        <div class="fresh" id="freshLine"></div>
+      </div>
+      <button class="icon-btn" type="button" data-act="help" aria-label="Aide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01" stroke-width="3"/></svg>
+      </button>
+      <button class="user-btn" id="userBtn" type="button" data-act="switch-user" aria-label="Changer de profil">Profil</button>
+      <button class="icon-btn" id="refreshBtn" type="button" aria-label="Actualiser les temps d'attente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" role="status" hidden></div>
+
+  <main>
+    <!-- MAINTENANT -->
+    <section class="tab" id="tab-now" data-tab-panel="now">
+      <div id="installCard" class="card" hidden></div>
+      <div id="onboard" class="card" hidden>
+        <div class="eyebrow">Ton programme</div>
+        <p>Choisis une base, tu pourras ensuite cocher ou retirer chaque attraction dans l'onglet Attractions.</p>
+        <div class="row-inline">
+          <button class="btn primary" data-act="preset" data-preset="sensations" type="button">Sensations fortes</button>
+          <button class="btn" data-act="preset" data-preset="famille" type="button">En famille</button>
+          <button class="btn" data-act="goto" data-tab="list" type="button">Je choisis moi-même</button>
+        </div>
+      </div>
+      <div id="recapBox"></div>
+      <div id="nextBox"></div>
+      <section class="block" id="vlBlock" hidden></section>
+      <section class="block" id="itinBlock" hidden>
+        <div class="block-head"><h2 id="itinTitle">Itinéraire conseillé</h2><span class="muted num" id="itinEnd"></span></div>
+        <ol class="itin" id="itin"></ol>
+        <p class="note" id="itinNote"></p>
+      </section>
+      <section class="block" id="showsBlock" hidden>
+        <div class="block-head"><h2>Spectacles à venir</h2><span class="muted">2 prochaines heures</span></div>
+        <ol class="itin" id="shows"></ol>
+      </section>
+      <section class="block" id="tipsBlock" hidden>
+        <h2>Pour bien démarrer</h2>
+        <div class="card" id="tips"></div>
+      </section>
+    </section>
+
+    <!-- ATTRACTIONS -->
+    <section class="tab" id="tab-list" data-tab-panel="list" hidden>
+      <div class="controls">
+        <div class="seg" id="filterSeg" role="group" aria-label="Filtrer">
+          <button type="button" data-filter="plan">Mon plan</button>
+          <button type="button" data-filter="rides">Attractions</button>
+          <button type="button" data-filter="shows">Spectacles</button>
+          <button type="button" data-filter="food">Restos</button>
+        </div>
+        <input class="search" id="q" type="search" placeholder="Rechercher (ex. Voltron)" autocomplete="off" aria-label="Rechercher">
+        <div class="sortline"><span>Trier</span>
+          <div class="seg" id="sortSeg" role="group" aria-label="Trier">
+            <button type="button" data-sort="wait">Attente</button>
+            <button type="button" data-sort="walk">Distance</button>
+            <button type="button" data-sort="name">A–Z</button>
+          </div>
+        </div>
+      </div>
+      <p class="note" id="listHint"></p>
+      <ul class="list" id="list"></ul>
+    </section>
+
+    <!-- CARTE -->
+    <section class="tab" id="tab-map" data-tab-panel="map" hidden>
+      <div class="legend">
+        <span><i style="--c:var(--accent)"></i>toi</span>
+        <span><i style="--c:var(--ink)"></i>groupe</span>
+        <span><i style="--c:var(--w-low)"></i>≤ 10 min</span>
+        <span><i style="--c:var(--w-mid)"></i>15–25</span>
+        <span><i style="--c:var(--w-high)"></i>30–45</span>
+        <span><i style="--c:var(--w-peak)"></i>50+</span>
+        <span><i style="--c:var(--w-off)"></i>fermé</span>
+      </div>
+      <div class="map-wrap" id="mapWrap"></div>
+      <p class="note" id="mapNote"></p>
+    </section>
+
+    <!-- RÉGLAGES -->
+    <section class="tab" id="tab-settings" data-tab-panel="settings" hidden>
+      <div class="card">
+        <div class="set">
+          <h2>Profil</h2>
+          <p class="muted" id="userSummary"></p>
+          <div class="row-inline"><button class="btn small" data-act="switch-user" type="button">Changer de profil</button></div>
+          <div class="row-inline" id="copyRow">
+            <label class="field" style="flex:1">Copier le programme de<select id="copyFrom"></select></label>
+            <button class="btn small" data-act="copy-plan" type="button">Copier</button>
+          </div>
+        </div>
+        <div class="set">
+          <h2>Mon programme</h2>
+          <p class="muted" id="planSummary"></p>
+          <div class="row-inline">
+            <button class="btn small" data-act="preset" data-preset="sensations" type="button">Sensations fortes</button>
+            <button class="btn small" data-act="preset" data-preset="famille" type="button">En famille</button>
+            <button class="btn small" data-act="clear-plan" type="button">Vider</button>
+          </div>
+        </div>
+        <div class="set">
+          <label class="toggle"><span><b>Pause repas</b><br><span class="muted">Placée quand les files sont au plus haut, près d'un resto ouvert</span></span>
+            <input type="checkbox" id="mealChk"></label>
+          <div class="seg" id="mealDurSeg" role="group" aria-label="Durée du repas">
+            <button type="button" data-meal-dur="30">30 min</button>
+            <button type="button" data-meal-dur="45">45 min</button>
+            <button type="button" data-meal-dur="60">1 h</button>
+          </div>
+          <div class="row-inline">
+            <label class="field" style="flex:1">Pas avant<select id="mealFrom"></select></label>
+            <label class="field" style="flex:1">Fini avant<select id="mealTo"></select></label>
+          </div>
+        </div>
+        <div class="set">
+          <h2>Priorité de l'itinéraire</h2>
+          <div class="seg" id="routeSeg" role="group" aria-label="Priorité de l'itinéraire">
+            <button type="button" data-route="marche">Moins de marche</button>
+            <button type="button" data-route="equilibre">Équilibré</button>
+            <button type="button" data-route="attente">Moins d'attente</button>
+          </div>
+        </div>
+        <div class="set">
+          <label class="toggle"><span><b>Single rider accepté</b><br><span class="muted">File séparée sur Blue Fire, Voltron, CanCan, Arthur (à vérifier sur place) : souvent bien plus courte, mais vous êtes séparés dans le wagon</span></span>
+            <input type="checkbox" id="singleChk"></label>
+        </div>
+        <div class="set">
+          <h2>Rythme de marche</h2>
+          <div class="seg" id="paceSeg" role="group" aria-label="Rythme de marche">
+            <button type="button" data-pace="enfants">Avec enfants</button>
+            <button type="button" data-pace="normal">Normal</button>
+            <button type="button" data-pace="rapide">Rapide</button>
+          </div>
+        </div>
+        <div class="set">
+          <label class="field">Taille du plus petit du groupe (cm)
+            <input id="heightIn" type="number" inputmode="numeric" min="0" max="220" step="1" placeholder="Pas de limite"></label>
+          <p class="muted">Tailles minimales accompagné, indicatives : vérifie toujours le panneau à l'entrée.</p>
+        </div>
+        <div class="set">
+          <label class="toggle"><span><b>Je dors dans un hôtel du parc</b><br><span class="muted">Entrée anticipée dès l'horaire hôtel (souvent 8:30, certaines attractions seulement)</span></span>
+            <input type="checkbox" id="hotelChk"></label>
+        </div>
+        <div class="set">
+          <h2>Ma position</h2>
+          <p class="muted" id="gpsStatus"></p>
+          <div class="row-inline"><button class="btn small" id="gpsBtn" data-act="gps" type="button">Utiliser ma position</button></div>
+          <label class="toggle"><span><b>Partager ma position avec le groupe</b><br><span class="muted">Visible sur la carte de ceux qui utilisent l'appli, jusqu'à 20 min après ton dernier point</span></span>
+            <input type="checkbox" id="shareChk"></label>
+          <label class="field">Mon prénom sur la carte<input id="nickIn" maxlength="24" autocomplete="given-name"></label>
+        </div>
+        <div class="set" id="installSet"></div>
+        <div class="set">
+          <h2>Notifications</h2>
+          <p class="muted" id="pushStatus"></p>
+          <div class="row-inline">
+            <button class="btn small" id="pushBtn" data-act="push-on" type="button">Activer les notifications</button>
+            <button class="btn small" id="pushTest" data-act="push-test" type="button" hidden>Tester</button>
+          </div>
+        </div>
+        <div class="set">
+          <h2>Affluence</h2>
+          <p class="muted" id="crowdStatus"></p>
+          <div class="cal" id="calendar"></div>
+        </div>
+        <div class="set">
+          <h2>Données</h2>
+          <p class="muted" id="dataStatus"></p>
+        </div>
+        <div class="set">
+          <h2>Aide et mises à jour</h2>
+          <p class="muted" id="versionLine"></p>
+          <div class="row-inline">
+            <button class="btn small" data-act="help" type="button">Comment ça marche</button>
+            <button class="btn small" data-act="help" data-section="news" type="button">Nouveautés</button>
+            <button class="btn small" data-act="recap" type="button">Récap de ma journée</button>
+            <button class="btn small" data-act="check-update" type="button">Mettre à jour</button>
+          </div>
+        </div>
+        <div class="set">
+          <h2>Nouvelle journée</h2>
+          <p class="muted">Remet à zéro les attractions faites, les créneaux VirtualLine, le repas et les alertes envoyées. Ton programme est conservé.</p>
+          <div class="row-inline"><button class="btn small" id="resetBtn" data-act="reset" type="button">Remettre à zéro</button></div>
+        </div>
+      </div>
+      <p class="note">Temps d'attente : ceux annoncés par le parc, relayés par themeparks.wiki. Météo : Open-Meteo. Page non officielle, sans lien avec Europa-Park.</p>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Navigation">
+  <div class="tabbar-in" role="tablist">
+    <button type="button" role="tab" data-tab="now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Maintenant</button>
+    <button type="button" role="tab" data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="3"/></svg>Attractions</button>
+    <button type="button" role="tab" data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 3 6.2v13.6L9 17.6l6 2.2 6-2.2V4.2L15 6.4 9 4Z"/><path d="M9 4v13.6M15 6.4V20"/></svg>Carte</button>
+    <button type="button" role="tab" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Réglages</button>
+  </div>
+</nav>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheetTitle"></dialog>
+<dialog class="sheet" id="help" aria-labelledby="helpTitle"><div class="sheet-in help">
+  <div class="sheet-head"><div><div class="eyebrow">Aide</div><h2 class="sheet-title" id="helpTitle">Comment ça marche</h2></div>
+    <button class="icon-btn" type="button" data-act="help-close" aria-label="Fermer">✕</button></div>
+  <p class="muted">EP Live te dit à chaque instant quelle attraction faire maintenant, et prévoit le reste de ta journée pour attendre et marcher le moins possible.</p>
+
+  <details id="help-start" open><summary>Démarrer en 4 étapes</summary>
+    <ol>
+      <li><b>Installe l'appli</b> sur l'écran d'accueil (voir « Installer l'appli »).</li>
+      <li><b>Choisis ton profil</b> : ton pseudo, sans mot de passe. Tout est enregistré sur le serveur.</li>
+      <li><b>Fais ton programme</b> : <i>Sensations fortes</i> ou <i>En famille</i>, puis ajuste avec les étoiles dans <b>Attractions</b>. Étoile pleine = incontournable, demi-étoile = bonus si on a le temps.</li>
+      <li><b>Dans Réglages</b> : active la position et les notifications, règle la pause repas et la priorité de l'itinéraire.</li>
+    </ol>
+  </details>
+
+  <details id="help-install"><summary>Installer l'appli</summary>
+    <ul>
+      <li><b>Android</b> : bouton <b>Installer l'appli</b> dans l'onglet Maintenant ou dans Réglages, sinon menu ⋮ → <i>Installer l'application</i>.</li>
+      <li><b>iPhone</b> : dans <b>Safari</b>, touche <b>Partager</b> (carré avec une flèche) → <b>Sur l'écran d'accueil</b>. Ouvre ensuite l'appli depuis l'icône : indispensable pour les notifications (iOS 16.4 ou plus).</li>
+    </ul>
+    <p>Installée, elle s'ouvre en plein écran et reste utilisable quand le réseau du parc sature.</p>
+  </details>
+
+  <details id="help-now"><summary>L'écran Maintenant</summary>
+    <p>Le grand panneau montre la <b>prochaine étape</b> : l'attente affichée, le temps de marche et pourquoi c'est le bon moment. En dessous : trois autres bons choix, puis l'itinéraire du reste de la journée avec les heures d'arrivée.</p>
+    <table>
+      <tr><td>Dans la file</td><td>Tu entres dans la queue : un minuteur démarre, l'itinéraire part de la fin de cette attraction.</td></tr>
+      <tr><td>Fait</td><td>À la sortie : l'itinéraire repart d'ici. Si tu étais « dans la file », ton vrai temps d'attente est mesuré.</td></tr>
+      <tr><td>Plus tard</td><td>Écarte l'attraction 30 minutes.</td></tr>
+      <tr><td>Nom</td><td>Ouvre la fiche : courbe de la journée, attente habituelle, alertes, VirtualLine.</td></tr>
+    </table>
+    <p>Une erreur ? Le toast en bas propose toujours <b>Annuler</b>.</p>
+  </details>
+
+  <details id="help-colors"><summary>Les couleurs des temps</summary>
+    <ul>
+      <li><b style="color:var(--w-low)">Vert</b> : 10 min ou moins</li>
+      <li><b style="color:var(--w-mid)">Jaune</b> : 15 à 25 min</li>
+      <li><b style="color:var(--w-high)">Orange</b> : 30 à 45 min</li>
+      <li><b style="color:var(--w-peak)">Rouge</b> : 50 min et plus</li>
+      <li><b style="color:var(--w-off)">Gris</b> : fermée ou en panne</li>
+    </ul>
+    <p>Dans la liste, ↗ / ↘ indique que la file a monté ou baissé d'au moins 10 min ces 30 dernières minutes.</p>
+  </details>
+
+  <details id="help-route"><summary>Comment l'itinéraire est choisi</summary>
+    <ul>
+      <li><b>Gain</b> : l'appli compare l'attente prévue à ton arrivée avec l'attente moyenne plus tard dans la journée. Une grosse attraction peu chargée maintenant passe devant.</li>
+      <li><b>Prévisions</b> : elle part de l'attente actuelle et rejoint le profil habituel de l'attraction, tiré de l'historique du serveur et corrigé de l'affluence du jour.</li>
+      <li><b>Marche</b> : chaque minute de marche coûte (plus encore au-delà de 8 min). Elle regarde aussi l'attraction suivante pour éviter les allers-retours d'un bout à l'autre du parc. <i>Réglages → Priorité</i> : moins de marche, équilibré ou moins d'attente.</li>
+      <li><b>Météo</b> : sous la pluie, les attractions couvertes passent devant. Par orage ou vent fort, les extérieures reculent. Les attractions mouillées vont plutôt aux heures chaudes.</li>
+      <li><b>Bonus</b> : seulement s'il reste assez de temps pour tous les incontournables.</li>
+      <li><b>Temps réels</b> : après deux mesures « Dans la file » → « Fait », l'itinéraire utilise l'écart entre l'affiché et ce que tu attends vraiment (souvent moins).</li>
+    </ul>
+    <p>Le calcul est refait toutes les 2 minutes et à chaque bouton touché.</p>
+  </details>
+
+  <details id="help-vl"><summary>VirtualLine (coupe-file gratuit)</summary>
+    <ol>
+      <li>La carte VirtualLine indique l'attraction où un créneau fait gagner le plus.</li>
+      <li>Réserve dans l'<b>appli officielle Europa-Park</b> (billet lié, localisation activée, un seul créneau à la fois).</li>
+      <li>Note-le avec <b>J'ai un créneau</b> : l'itinéraire s'organise autour et te dit quand partir.</li>
+      <li>Après <b>Fait</b>, l'appli te dit quoi re-réserver tout de suite.</li>
+    </ol>
+  </details>
+
+  <details id="help-fixed"><summary>Repas et spectacles</summary>
+    <p><b>Pause repas</b> (Réglages) : l'appli la place dans ta fenêtre horaire, au moment où les files sont au plus haut, et indique le resto ouvert le plus proche. <i>Plus tard</i> la décale de 30 min, <i>Fait</i> la retire.</p>
+    <p><b>Spectacles</b> : mets une étoile sur un spectacle (Attractions → Spectacles). L'appli choisit la représentation qui fait perdre le moins de temps de file et te prévient quand partir (5 min d'avance).</p>
+  </details>
+
+  <details id="help-notif"><summary>Notifications</summary>
+    <p>Une fois activées dans Réglages, elles arrivent même appli fermée :</p>
+    <ul>
+      <li><b>File courte</b> : sous le seuil choisi dans la fiche (« M'alerter sous… »).</li>
+      <li><b>À refaire</b> : une attraction déjà faite repasse sous son seuil (« À refaire si… »).</li>
+      <li><b>Réouverture</b> : une attraction de ton programme rouvre après une panne.</li>
+      <li><b>Pars maintenant</b> : pour un créneau VirtualLine ou un spectacle, marche comprise.</li>
+      <li><b>Pause repas</b> : le bon moment pour manger.</li>
+      <li><b>Pluie</b> : de la pluie annoncée dans l'heure, l'itinéraire passe aux attractions couvertes.</li>
+    </ul>
+    <p>Pendant que tu es « dans la file », les alertes de file courte sont mises en pause.</p>
+  </details>
+
+  <details id="help-gps"><summary>Position GPS</summary>
+    <p>Avec la position activée, les temps de marche partent de l'endroit où tu es. En arrivant à une attraction du programme, l'appli demande « Tu fais la queue ? », et « Tu as fini ? » quand tu t'éloignes. Sans GPS, les distances partent de la dernière attraction faite, ou de l'entrée.</p>
+  </details>
+
+  <details id="help-group"><summary>En groupe</summary>
+    <ul>
+      <li><b>Un profil commun</b> (ex. « Groupe ») choisi par tout le monde : un « Fait » sur un téléphone arrive sur les autres en 2 minutes au plus, et tout le monde reçoit les notifications.</li>
+      <li><b>Un profil chacun</b> : Réglages → « Copier le programme de… » reprend le programme d'un autre.</li>
+      <li><b>Se retrouver</b> : Réglages → « Partager ma position avec le groupe », avec ton prénom. Sur la <b>Carte</b>, chacun apparaît en point plein avec son prénom et le temps de marche jusqu'à lui. Le losange marque le <b>point de rencontre</b> conseillé : l'attraction la plus proche du centre du groupe.</li>
+    </ul>
+    <p class="muted">Une position partagée est visible par tous ceux qui utilisent l'appli sur ce serveur, et disparaît 20 min après le dernier point. Décoche le partage pour l'effacer tout de suite.</p>
+  </details>
+
+  <details id="help-sr"><summary>Single rider</summary>
+    <p>Certaines attractions ont une file « single rider » pour compléter les places vides : beaucoup plus courte, mais le groupe est séparé dans le wagon. Signalée sur Blue Fire, Voltron, CanCan et Arthur, <b>à vérifier sur place</b> (elle peut être fermée certains jours).</p>
+    <p>Active-la dans <b>Réglages → Single rider accepté</b>. L'appli compte alors la moitié de l'attente normale. Dès que tu vois la vraie attente single rider à l'entrée, note-la dans la fiche de l'attraction : elle est prise en compte pendant 45 min.</p>
+  </details>
+
+  <details id="help-recap"><summary>Récap de la journée</summary>
+    <p>Chaque « Fait » est noté. Le soir, l'onglet Maintenant affiche ta journée : nombre de tours, temps passé dans les files, distance à pied (estimée entre les attractions), attente gagnée par rapport à la moyenne de la journée, meilleur coup et attraction préférée. Bouton <b>Partager</b> pour l'envoyer au groupe. À tout moment : Réglages → <i>Récap de ma journée</i>.</p>
+  </details>
+
+  <details id="help-crowd"><summary>Affluence</summary>
+    <p>Pendant la journée, l'appli compare les files actuelles aux files habituelles à la même heure et en tient compte (« Affluence : +20 % »). La veille, l'aperçu indique l'affluence habituelle de ce jour de la semaine, d'après les jours enregistrés par le serveur. Réglages → Affluence montre les derniers jours et les jours les plus calmes.</p>
+  </details>
+
+  <details id="help-sync"><summary>Profil, coupure, changement de téléphone</summary>
+    <p>Chaque changement est envoyé au serveur une seconde plus tard. Si le téléphone s'éteint ou que tu en changes, ouvre l'appli et choisis ton pseudo : tu reprends exactement où tu en étais (programme, faits, créneaux, file en cours). Le bouton avec ton pseudo, en haut, permet de changer de profil.</p>
+    <p>Sans réseau, l'appli affiche les dernières données reçues (bandeau orange) et envoie tes changements dès le retour du réseau.</p>
+  </details>
+
+  <details id="help-tips"><summary>Bon à savoir</summary>
+    <ul>
+      <li><b>Batterie</b> : GPS et 4G toute la journée vident vite un téléphone. Prends une batterie externe. Sans GPS, l'appli marche très bien en touchant « Fait » à chaque sortie.</li>
+      <li><b>Réseau</b> : la 4G sature parfois aux heures de pointe. L'appli garde les dernières données et se resynchronise toute seule.</li>
+      <li><b>Arrive tôt</b> : être à l'entrée un peu avant l'ouverture, c'est les grosses attractions avec les files les plus courtes de la journée. L'aperçu de la veille commence par elles.</li>
+      <li><b>Temps affichés</b> : ce sont ceux annoncés par le parc, souvent un peu surestimés. Mesure-les avec « Dans la file » : l'appli s'adapte.</li>
+      <li><b>VirtualLine</b> : dans l'appli officielle Europa-Park, avec ton billet lié et la localisation activée, une fois dans le parc. Un seul créneau à la fois : re-réserve dès que tu l'as utilisé.</li>
+      <li><b>Pannes</b> : fréquentes et souvent courtes. L'appli retente 45 min plus tard et te prévient de la réouverture.</li>
+      <li><b>Grands huit</b> : rien dans les poches. Des casiers sont souvent prévus à l'entrée : compte quelques minutes en plus.</li>
+      <li><b>Attractions aquatiques</b> : on peut en ressortir trempé. Par temps frais, l'appli les place plutôt aux heures chaudes.</li>
+      <li><b>Fin de journée</b> : les files ferment à l'heure de fermeture du parc. L'itinéraire s'arrange pour que tu sois dans la dernière à temps.</li>
+    </ul>
+  </details>
+
+  <details id="help-faq"><summary>Problèmes fréquents</summary>
+    <table>
+      <tr><td>Pas de notification</td><td>iPhone : l'appli doit être ouverte depuis l'icône de l'écran d'accueil. Vérifie Réglages → Notifications → <i>Tester</i>, et que le mode Concentration ne les bloque pas.</td></tr>
+      <tr><td>Distances bizarres</td><td>Active la position, ou touche « Fait » après chaque attraction : sans ça, l'appli croit que tu es encore à l'entrée.</td></tr>
+      <tr><td>Une attraction n'est jamais proposée</td><td>Elle est peut-être en panne, fermée, trop grande pour la taille réglée, ou en bonus sans assez de temps. Regarde la note sous l'itinéraire.</td></tr>
+      <tr><td>« Données de 10:12 (il y a 8 min) »</td><td>Le réseau ou la source des temps ne répond pas. Touche ↻ en haut, ça reprend tout seul.</td></tr>
+      <tr><td>Appli pas à jour</td><td>Réglages → <i>Mettre à jour</i>, ou ferme et rouvre l'appli.</td></tr>
+    </table>
+  </details>
+
+  <details id="help-news"><summary>Nouveautés</summary>
+    <p class="muted" id="helpVersion"></p>
+    <ul>
+      <li><b>Profils</b> : un pseudo par personne, tout est enregistré sur le serveur et se retrouve après une coupure ou sur un autre téléphone.</li>
+      <li><b>Notifications push</b>, même appli fermée : files courtes, attractions à refaire, réouvertures, départ pour un créneau, un spectacle ou le repas.</li>
+      <li><b>Itinéraire plus malin</b> : beaucoup moins de traversées du parc, avec un coup d'avance, et un réglage « Moins de marche / Équilibré / Moins d'attente ».</li>
+      <li><b>Pause repas et spectacles</b> placés quand les files sont au plus haut.</li>
+      <li><b>Météo</b> intégrée à l'itinéraire.</li>
+      <li><b>Dans la file</b> avec minuteur, et mesure de tes vrais temps d'attente.</li>
+      <li><b>À refaire si…</b>, <b>taille minimale</b>, <b>affluence du jour</b> et calendrier des jours calmes.</li>
+      <li><b>Installation</b> sur l'écran d'accueil proposée directement dans l'appli, et cette page d'aide.</li>
+      <li><b>Récap de la journée</b> à partager le soir.</li>
+      <li><b>Groupe sur la carte</b> : positions partagées et point de rencontre.</li>
+      <li><b>Single rider</b> en option, <b>alerte pluie</b> et <b>affluence prévue</b> la veille.</li>
+    </ul>
+    <p>Les mises à jour arrivent toutes seules à la prochaine ouverture de l'appli.</p>
+  </details>
+</div></dialog>
+<dialog class="sheet" id="login" aria-labelledby="loginTitle"></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   Configuration
+   ===================================================================== */
+const PARK_ID = '639738d3-9574-4f60-ab5b-4c392901320b';
+const DIRECT  = 'https://api.themeparks.wiki/v1/entity/' + PARK_ID;
+const SERVER  = 'api.php';
+const TZ = 'Europe/Berlin';
+const RIDE_MIN = 5;              // durée moyenne d'un tour + sortie (min)
+const SHOW_MIN = 30;             // durée supposée d'un spectacle (min)
+const REFRESH_MS = 120000;       // actualisation auto toutes les 2 min
+const ENTRANCE = {lat: 48.2689, lon: 7.7232, name: 'Entrée principale'};
+const VL_INFO = 'https://www.europapark.de/fr/parc-de-loisirs/infos/planifiez-votre-sejour/virtualline-europa-park';
+const PACES = {enfants: 55, normal: 75, rapide: 90}; // mètres par minute
+// Poids d'une minute de marche face à une minute de file gagnée.
+// Au-delà de 8 min de trajet, chaque minute compte double : on ne traverse le parc que si ça vaut vraiment le coup.
+const ROUTE = {attente: 1, equilibre: 1.6, marche: 2.4};
+// Même URL que WEATHER_URL dans api.php
+const APP_VERSION = '2026.10.06';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
+const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=48.266&longitude=7.722&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_gusts_10m&timezone=Europe%2FBerlin&forecast_days=3';
+
+// Popularité (sert seulement tant qu'il n'y a pas d'historique)
+const TIER_A = ['voltron','bluefire','silverstar','wodan','cancan','poseidon','arthur','voletarium','supersplash','matterhorn'];
+const TIER_B = ['fjordrafting','swissbob','euromir','pegasus','tirollog','batavia','jungfrau','atlantisadventure','cassandra','alpineexpress','josefina','eurosatcoastiality','jimbutton','whaleadventures'];
+const PEAK = {A: 45, B: 20, C: 8};
+// Courbe générique de remplissage d'un parc sur la journée (multiplicateur), minute du jour -> facteur
+const PRIOR = [[480,.4],[540,.45],[600,.75],[660,.95],[720,1],[900,.95],[960,.85],[1020,.65],[1050,.5],[1080,.3],[1140,.2]];
+
+const PRESETS = {
+  sensations: {
+    must:  ['voltron','bluefire','silverstar','wodan','cancan','poseidon','arthur','voletarium','supersplash','euromir','matterhorn','fjordrafting','batavia'],
+    bonus: ['swissbob','pegasus','tirollog','atlantisadventure','alpineexpress','jungfrau','eurosatcoastiality','cassandra']
+  },
+  famille: {
+    must:  ['arthur','voletarium','batavia','fjordrafting','supersplash','tirollog','jungfrau','jimbutton','whaleadventures','swissbob','pegasus','alpineexpress'],
+    bonus: ['castello','volodavinci','freudenreich','josefina','baaaexpress','oldmacdonald','poppytowers','cassandra','atlantisadventure','eurotower']
+  }
+};
+// Gares et trains : une file, mais pas une attraction à planifier
+const TRANSPORT = /express station|panorama train|monorail/i;
+// Couvertes : prioritaires sous la pluie
+const INDOOR = ['voletarium','cancan','eurosatcoastiality','arthur','batavia','jimbutton','freudenreich','snorri','atlantisadventure','josefina','queensdiamonds','tartaros'];
+// On en ressort mouillé : plutôt aux heures chaudes
+const WET = ['poseidon','supersplash','fjordrafting','tirollog','whaleadventures'];
+// Files « single rider » signalées (à vérifier sur place) et attente estimée par rapport à la file normale,
+// tant qu'on n'a pas relevé la vraie dans la fiche
+const SINGLE_RIDER = ['bluefire', 'voltron', 'cancan', 'arthur'];
+const SR_FACTOR = .5;
+// Taille minimale accompagné (cm), indicative : le panneau à l'entrée fait foi
+const MIN_CM = {silverstar: 140, bluefire: 130, voltron: 130, euromir: 130, wodan: 120, cancan: 120, eurotower: 120, swissbob: 120,
+  poseidon: 120, matterhorn: 120, vindjammer: 120, supersplash: 100, fjordrafting: 100, arthur: 100, pegasus: 100, alpineexpress: 90};
+// Stands de boissons, glaces, bars : pas pour un vrai repas
+const NOT_MEAL = /drinks?\b|langnese|magnum|granini|coca-cola|\beis\b|gelateria|helader|is huset|refresh|wine|le vin|lounge|bar chez/i;
+
+/* =====================================================================
+   Outils
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const r5 = x => Math.max(0, Math.round(x / 5) * 5);
+const norm = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const keyIn = (e, list) => !!e && list.some(k => e.key.includes(k));
+const median = arr => { const a = [...arr].sort((x, y) => x - y); return a[a.length >> 1]; };
+
+const NOW_PARAM = new URLSearchParams(location.search).get('now');
+const NOW_OFFSET = NOW_PARAM && !isNaN(Date.parse(NOW_PARAM)) ? Date.parse(NOW_PARAM) - Date.now() : 0;
+const now = () => Date.now() + NOW_OFFSET;
+
+const partsFmt = new Intl.DateTimeFormat('en-GB', {timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23'});
+function berlin(ts) {
+  const p = {};
+  for (const x of partsFmt.formatToParts(new Date(ts))) p[x.type] = x.value;
+  return {day: `${p.year}-${p.month}-${p.day}`, mod: (+p.hour) * 60 + (+p.minute)};
+}
+const isoMod = iso => berlin(Date.parse(iso));
+function hhmm(mod) { mod = Math.round(mod); return String(Math.floor(mod / 60) % 24).padStart(2, '0') + ':' + String(((mod % 60) + 60) % 60).padStart(2, '0'); }
+function dur(min) { min = Math.max(0, Math.round(min)); const h = Math.floor(min / 60), m = min % 60; return h ? `${h} h ${String(m).padStart(2, '0')}` : `${m} min`; }
+const dayFmt = new Intl.DateTimeFormat('fr-FR', {weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ});
+const fmtDay = d => dayFmt.format(new Date(d + 'T12:00:00Z'));
+const shortDayFmt = new Intl.DateTimeFormat('fr-FR', {weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC'});
+function interp(pts, x) {
+  if (x <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; return y0 + (y1 - y0) * (x - x0) / (x1 - x0); }
+  return pts[pts.length - 1][1];
+}
+function wclass(w) { if (w == null) return 'off'; if (w <= 10) return 'low'; if (w <= 25) return 'mid'; if (w <= 45) return 'high'; return 'peak'; }
+
+/* =====================================================================
+   Profil, préférences et cache local
+   L'état du profil (programme, faits, créneaux…) est enregistré sur le serveur
+   à chaque changement : on le retrouve sur un autre téléphone ou après une coupure.
+   Les réglages d'affichage (onglet, filtre, GPS) restent propres à ce téléphone.
+   ===================================================================== */
+function loadJSON(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+function saveJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+const cacheGet = k => loadJSON('ep-cache-' + k), cacheSet = (k, v) => saveJSON('ep-cache-' + k, v);
+
+const DEFAULTS = {plan:{}, shows:{}, again:{}, done:{}, skip:{}, slots:[], alerts:{}, alerted:{}, pace:'normal', hotel:false,
+  route:'equilibre', meal:{on:true, dur:45, from:690, to:840}, mealDone:false, mealSkip:0, height:0, queue:null, samples:[], planned:null, pos:null, single:false, srSeen:{}, log:[],
+  day:null, lastDone:null, onboarded:false, updatedAt:0};
+function withDefaults(st) {
+  const p = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), st || {});
+  p.meal = Object.assign({}, DEFAULTS.meal, p.meal);
+  return p;
+}
+let device = Object.assign({gps: false, filter: 'plan', sort: 'wait', tab: 'now', share: false, nick: ''}, loadJSON('ep-device'));
+if (!device.id) device.id = Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, '0')).join('');
+let user = loadJSON('ep-user');     // {id, name} ou {id:'local', local:true}
+let prefs = withDefaults(user ? loadJSON('ep-state-' + user.id) : null);
+const saveDevice = () => saveJSON('ep-device', device);
+/* touch = changement voulu par l'utilisateur : il devient la version de référence.
+   Les écritures automatiques (position, repas calculé, nouveau jour) ne l'écrasent pas sur le serveur. */
+function savePrefs(touch = true) {
+  if (touch) prefs.updatedAt = Date.now();
+  if (user) saveJSON('ep-state-' + user.id, prefs);
+  scheduleSync();
+}
+
+function rolloverDay() {
+  const d = berlin(now()).day;
+  if (prefs.day !== d) {
+    Object.assign(prefs, {day: d, done: {}, skip: {}, alerted: {}, lastDone: null, mealDone: false, mealSkip: 0, queue: null, planned: null, srSeen: {}, log: []});
+    prefs.slots = (prefs.slots || []).filter(s => s.day >= d);
+    savePrefs(false);
+  }
+}
+
+/* ---------- Synchronisation avec le serveur ---------- */
+let syncTimer = null, syncDirty = false, serverPushSubs = 0;
+const remote = () => user && !user.local;
+function scheduleSync() {
+  if (!remote()) return;
+  syncDirty = true;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(pushState, 1200);
+}
+async function pushState(keepalive = false) {
+  if (!remote() || !syncDirty) return;
+  syncDirty = false; clearTimeout(syncTimer);
+  const forUser = user.id;
+  try {
+    const r = await fetch(`${SERVER}?r=state&u=${encodeURIComponent(forUser)}`, {method: 'POST', keepalive, cache: 'no-store',
+      headers: {'Content-Type': 'application/json'}, body: JSON.stringify({updatedAt: prefs.updatedAt, state: prefs})});
+    if (r.status === 409) { const j = await r.json(); if (user?.id === forUser && j.state) adoptState(j.state); }
+    else if (r.status === 404) { await recreateUser(); }
+    else if (!r.ok) throw new Error('HTTP ' + r.status);
+  } catch (e) { if (user?.id === forUser) syncDirty = true; }
+}
+function adoptState(st) {
+  prefs = withDefaults(st);
+  saveJSON('ep-state-' + user.id, prefs);
+  rolloverDay();
+  if (!$('#sheet').open) render();
+}
+async function recreateUser() {
+  // Profil absent du serveur (dossier data effacé) : on le recrée avec le même pseudo, donc le même identifiant
+  try { await fetch(`${SERVER}?r=user`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: user.name})}); } catch (e) { return; }
+  syncDirty = true; pushState();
+}
+function handleUserInfo(info) {
+  if (!remote() || info === undefined) return;
+  if (info === null) { recreateUser(); return; }
+  serverPushSubs = info.push || 0;
+  if (info.state && info.updatedAt > (prefs.updatedAt || 0) && !syncDirty) adoptState(info.state);
+  else if (syncDirty || (info.updatedAt || 0) < (prefs.updatedAt || 0)) { syncDirty = true; pushState(); }
+}
+
+/* ---------- Choix du profil ---------- */
+async function selectUser(u) {
+  if (remote()) await pushState();
+  user = u; saveJSON('ep-user', u);
+  let st = loadJSON('ep-state-' + u.id), fromServer = false;
+  if (!u.local) {
+    try {
+      const j = await getJSON(`${SERVER}?r=state&u=${encodeURIComponent(u.id)}`);
+      if (j.state && (!st || (j.updatedAt || 0) >= (st.updatedAt || 0))) { st = j.state; fromServer = true; }
+    } catch (e) {}
+  }
+  // Ancienne version de la page (un seul programme par téléphone) : on le reprend une fois
+  const legacy = loadJSON('ep-planner-v1');
+  if (legacy) {
+    if (!st || !Object.keys(st.plan || {}).length) { st = Object.assign({}, legacy, {updatedAt: Date.now()}); fromServer = false; }
+    try { localStorage.removeItem('ep-planner-v1'); } catch (e) {}
+  }
+  prefs = withDefaults(st);
+  saveJSON('ep-state-' + u.id, prefs);
+  rolloverDay();
+  if (!u.local && !fromServer) { syncDirty = true; pushState(); }
+  if (pushOn && !u.local) subscribePush(true).catch(() => {});
+  $('#login').close();
+  toast(u.local ? 'Profil local : rien n\'est enregistré sur le serveur' : `Bonjour ${u.name} !`);
+  usersCache = null;
+  render();
+  refresh();
+}
+let usersCache = null;
+async function fetchUsers() {
+  if (!usersCache) usersCache = await getJSON(`${SERVER}?r=users`);
+  return usersCache;
+}
+async function openLogin(force) {
+  const dlg = $('#login');
+  dlg.dataset.force = force ? '1' : '';
+  dlg.innerHTML = `<div class="sheet-in">
+    <div class="sheet-head"><div><div class="eyebrow">Profil</div><h2 class="sheet-title" id="loginTitle">Qui es-tu ?</h2></div>
+      ${force ? '' : '<button class="icon-btn" type="button" data-act="login-close" aria-label="Fermer">✕</button>'}</div>
+    <p class="muted">Ton programme et ta journée sont enregistrés sous ton pseudo. Sur un autre téléphone ou après une coupure, choisis-le simplement dans la liste.</p>
+    <div class="user-list" id="userList"><p class="muted">Chargement des profils…</p></div>
+    <form id="newUser" class="row-inline" autocomplete="off">
+      <label class="field" style="flex:1">Nouveau pseudo<input id="newName" maxlength="24" autocomplete="nickname" required></label>
+      <button class="btn primary" type="submit">Créer</button></form>
+    <p class="note" id="loginErr"></p></div>`;
+  if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
+  try {
+    usersCache = null;
+    const list = await fetchUsers();
+    $('#userList').innerHTML = list.length
+      ? list.map(u => `<button class="btn${user?.id === u.id ? ' primary' : ''}" type="button" data-act="login" data-id="${esc(u.id)}" data-name="${esc(u.name)}">${esc(u.name)}</button>`).join('')
+      : '<p class="muted">Aucun profil pour l\'instant : crée le tien.</p>';
+  } catch (e) {
+    $('#userList').innerHTML = `<p class="muted">Serveur injoignable : les profils ne sont pas disponibles.</p>
+      <button class="btn" type="button" data-act="login-local">Continuer sur ce téléphone seulement</button>`;
+  }
+}
+async function createUser(name) {
+  name = name.trim();
+  const err = $('#loginErr');
+  if (!/^[\p{L}\p{N} _.'-]{2,24}$/u.test(name)) { err.textContent = 'De 2 à 24 caractères : lettres, chiffres, espace, point, tiret, apostrophe.'; return; }
+  try {
+    const r = await fetch(`${SERVER}?r=user`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name})});
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 409) { err.textContent = j.error || 'Ce pseudo existe déjà : choisis-le dans la liste.'; return; }
+    if (!r.ok) throw new Error(j.error || 'HTTP ' + r.status);
+    selectUser({id: j.id, name: j.name});
+  } catch (e) { err.textContent = 'Impossible de créer le profil : ' + e.message; }
+}
+
+/* =====================================================================
+   Données
+   ===================================================================== */
+const ents = new Map();   // id -> {id, name, type, lat, lon, key, transport}
+const live = new Map();   // id -> entrée liveData
+let schedule = null, stats = null, trail = null, weather = null, wxIdx = new Map();
+let meta = {fetchedAt: null, source: null, stale: false, offline: false};
+
+function ingestChildren(json) {
+  for (const c of json.children || []) {
+    if (!c.location || c.location.longitude > 7.73) continue; // > 7.73 = Rulantica
+    ents.set(c.id, {id: c.id, name: c.name, type: c.entityType, lat: c.location.latitude, lon: c.location.longitude, key: norm(c.name), transport: TRANSPORT.test(c.name)});
+  }
+}
+function ingestLive(json) {
+  live.clear();
+  for (const e of json.liveData || []) {
+    if (e.parkId && e.parkId !== PARK_ID) continue;
+    live.set(e.id, e);
+    if (!ents.has(e.id)) ents.set(e.id, {id: e.id, name: e.name, type: e.entityType, lat: null, lon: null, key: norm(e.name), transport: TRANSPORT.test(e.name)});
+  }
+}
+function ingestWeather(w) {
+  if (!w?.hourly?.time) return;
+  weather = w;
+  wxIdx = new Map(w.hourly.time.map((t, i) => [t, i]));
+}
+
+const statusOf = id => live.get(id)?.status || 'UNKNOWN';
+const hasQueue = id => !!live.get(id)?.queue?.STANDBY && !ents.get(id)?.transport;
+const vlOf = id => live.get(id)?.queue?.RETURN_TIME || null;
+function waitOf(id) { const e = live.get(id), w = e?.queue?.STANDBY?.waitTime; return e?.status === 'OPERATING' && typeof w === 'number' ? w : null; }
+function tierOf(e) { if (!e) return 'C'; if (keyIn(e, TIER_A)) return 'A'; if (keyIn(e, TIER_B)) return 'B'; return 'C'; }
+// Même logique que short_name() dans api.php
+function shortName(e) {
+  if (!e) return '?';
+  if (/cancan/i.test(e.name)) return 'Eurosat CanCan';
+  return e.name.replace(/^Water rollercoaster\s+/i, '').split(/\s[-–]\s|\spowered by\s/i)[0].replace(/\s+Megacoaster$/i, '').trim();
+}
+function minCm(e) { if (!e) return 0; for (const k in MIN_CM) if (e.key.includes(k)) return MIN_CM[k]; return 0; }
+const tooSmall = id => prefs.height > 0 && minCm(ents.get(id)) > prefs.height;
+const STATUS_FR = {OPERATING: 'Ouverte', DOWN: 'En panne', CLOSED: 'Fermée', REFURBISHMENT: 'En rénovation', UNKNOWN: 'Inconnu'};
+const VL_FR = {AVAILABLE: 'ouvert', TEMP_FULL: 'complet pour l\'instant', FINISHED: 'terminé pour aujourd\'hui'};
+
+function todayShowtimes(id) {
+  const d = berlin(now()).day;
+  return (live.get(id)?.showtimes || []).map(s => ({...s, ...isoMod(s.startTime)})).filter(s => s.day === d).sort((a, b) => a.mod - b.mod);
+}
+
+/* Horaires */
+function hoursFor(day) {
+  const list = (schedule?.schedule || []).filter(s => s.date === day);
+  const op = list.find(s => s.type === 'OPERATING');
+  if (!op) return null;
+  const ex = list.find(s => s.type === 'EXTRA_HOURS');
+  return {open: isoMod(op.openingTime).mod, close: isoMod(op.closingTime).mod, early: ex ? isoMod(ex.openingTime).mod : null};
+}
+function phaseInfo() {
+  const {day, mod} = berlin(now());
+  const h = hoursFor(day);
+  if (h) {
+    const start = prefs.hotel && h.early != null ? Math.min(h.early, h.open) : h.open;
+    if (mod < start) return {phase: 'before', day, h, t0: start, mod};
+    if (mod < h.close) return {phase: 'open', day, h, t0: mod, mod};
+  }
+  const next = (schedule?.schedule || []).filter(s => s.type === 'OPERATING' && s.date > day).sort((a, b) => a.date < b.date ? -1 : 1)[0];
+  if (next) {
+    const nh = hoursFor(next.date);
+    const start = prefs.hotel && nh.early != null ? Math.min(nh.early, nh.open) : nh.open;
+    return {phase: 'closed', day: next.date, h: nh, t0: start, mod, preview: true};
+  }
+  return {phase: 'unknown', day, mod};
+}
+
+/* Météo */
+function wxAt(day, mod) {
+  const i = wxIdx.get(`${day}T${String(Math.floor(mod / 60)).padStart(2, '0')}:00`);
+  if (i == null) return null;
+  const h = weather.hourly;
+  return {t: h.temperature_2m?.[i] ?? 15, p: h.precipitation_probability?.[i] ?? 0, mm: h.precipitation?.[i] ?? 0, code: h.weather_code?.[i] ?? 0, gust: h.wind_gusts_10m?.[i] ?? 0};
+}
+const rainy = w => !!w && (w.mm >= .3 || (w.p >= 60 && w.code >= 51));
+const stormy = w => !!w && (w.code >= 95 || w.gust >= 60);
+function wxLine(P) {
+  if (!P.h) return '';
+  const from = P.phase === 'open' ? P.mod : P.t0, w = wxAt(P.day, from);
+  if (!w) return '';
+  let s = `${Math.round(w.t)}°`;
+  for (let m = from; m < P.h.close; m += 60) {
+    const x = wxAt(P.day, m), at = m === from ? 'maintenant' : 'vers ' + hhmm(Math.floor(m / 60) * 60);
+    if (stormy(x)) { s += ` · orage ${at}`; break; }
+    if (rainy(x)) { s += ` · pluie ${at}`; break; }
+  }
+  return s;
+}
+/* Heure de la pluie si elle arrive dans l'heure alors qu'il ne pleut pas (comme l'alerte push d'api.php) */
+function rainSoon(P) {
+  if (P.phase !== 'open') return null;
+  const nowW = wxAt(P.day, P.mod), next = wxAt(P.day, P.mod + 60);
+  return nowW && next && !rainy(nowW) && rainy(next) ? Math.floor((P.mod + 60) / 60) : null;
+}
+function wxBonus(e, mod, day) {
+  const w = wxAt(day, mod);
+  if (!w) return 0;
+  const indoor = keyIn(e, INDOOR);
+  let b = 0;
+  if (indoor && rainy(w)) b += 8;
+  if (!indoor && stormy(w)) b -= 15;
+  if (keyIn(e, WET)) b += w.t >= 25 ? 5 : (w.t < 17 || rainy(w)) ? -8 : 0;
+  return b;
+}
+
+/* Série du jour (serveur + relevés faits par ce téléphone) */
+function updateTrail() {
+  const {day, mod} = berlin(now());
+  let tr = cacheGet('trail');
+  if (!tr || tr.day !== day) tr = {day, pts: {}};
+  for (const id of live.keys()) {
+    if (!hasQueue(id)) continue;
+    const arr = tr.pts[id] || (tr.pts[id] = []);
+    const last = arr[arr.length - 1];
+    if (last && mod - last[0] < 3) continue;
+    arr.push([mod, waitOf(id)]);
+    if (arr.length > 240) arr.shift();
+  }
+  cacheSet('trail', tr);
+  trail = tr;
+}
+function series(id) {
+  const m = new Map();
+  for (const p of stats?.today?.[id] || []) m.set(p[0], p[1]);
+  if (trail && trail.day === berlin(now()).day) for (const p of trail.pts[id] || []) if (!m.has(p[0])) m.set(p[0], p[1]);
+  return [...m.entries()].sort((a, b) => a[0] - b[0]);
+}
+function trendOf(id) {
+  const s = series(id).filter(p => p[1] != null);
+  if (s.length < 2) return null;
+  const last = s[s.length - 1];
+  const ref = [...s].reverse().find(p => last[0] - p[0] >= 15 && last[0] - p[0] <= 45);
+  return ref ? last[1] - ref[1] : null;
+}
+function reopenedRecently(id) {
+  if (statusOf(id) !== 'OPERATING') return false;
+  const s = series(id), cut = berlin(now()).mod - 30;
+  return s.some(p => p[0] >= cut && p[1] == null);
+}
+
+/* =====================================================================
+   Prévision des files
+   ===================================================================== */
+function prior(mod, tier) { const p = interp(PRIOR, mod); return tier === 'A' ? p : tier === 'B' ? 1 - (1 - p) * .5 : 1; }
+function typicalAt(id, mod) {
+  const prof = stats?.typical?.[id];
+  if (!prof) return null;
+  const b = stats.bucket || 30, b0 = Math.floor(mod / b) * b;
+  const v0 = prof[b0], v1 = prof[b0 + b];
+  if (v0 != null && v1 != null) return v0 + (v1 - v0) * (mod - b0) / b;
+  if (v0 != null) return v0;
+  if (v1 != null) return v1;
+  let best = null, bd = 1e9;
+  for (const k in prof) { const d = Math.abs(+k + b / 2 - mod); if (d < bd) { bd = d; best = prof[k]; } }
+  return bd <= 90 ? best : null;
+}
+const hasHistory = () => (stats?.days || 0) > 0;
+
+/* Affluence du jour : rapport médian « attente actuelle / attente habituelle » sur tout le parc */
+let crowdK = null;
+function parkRatio(mod) {
+  if (!hasHistory()) return null;
+  const r = [];
+  for (const id of live.keys()) {
+    if (!hasQueue(id)) continue;
+    const w = waitOf(id), T = typicalAt(id, mod);
+    if (w != null && T != null && T >= 10) r.push(w / T);
+  }
+  return r.length >= 4 ? clamp(median(r), .5, 2) : null;
+}
+/* Temps réellement attendus / temps affichés, mesurés avec « Dans la file » puis « Fait » */
+function realFactor() {
+  const r = (prefs.samples || []).filter(s => s.posted >= 10).map(s => s.real / s.posted);
+  return r.length >= 2 ? clamp(median(r), .5, 1.2) : 1;
+}
+
+function anchorWait(id, t0, P) {
+  if (P.phase === 'open') { const w = waitOf(id); if (w != null) return w; }
+  const T = typicalAt(id, t0);
+  if (T != null) return T;
+  const tier = tierOf(ents.get(id));
+  return PEAK[tier] * prior(t0, tier);
+}
+/* Attente prévue à `mod`, ancrée sur l'attente observée w0 à t0 :
+   on part de la valeur réelle et on rejoint progressivement le profil habituel (ou générique),
+   corrigé de l'affluence du jour sur l'ensemble du parc. */
+function predict(id, mod, t0, w0) {
+  const dt = Math.max(0, mod - t0), blend = Math.exp(-dt / 90);
+  const T = typicalAt(id, mod), T0 = typicalAt(id, t0);
+  if (T != null && T0 != null) {
+    const kr = T0 >= 5 ? clamp(w0 / T0, .5, 2) : 1;
+    const k = crowdK ? clamp(.6 * kr + .4 * crowdK, .5, 2) : kr;
+    return Math.max(0, T * (1 + (k - 1) * blend) + (w0 - T0 * k) * blend);
+  }
+  const tier = tierOf(ents.get(id));
+  const Pn = Math.max(prior(t0, tier), .3), Pm = prior(mod, tier);
+  const est = .5 * w0 * Pm / Pn + .5 * PEAK[tier] * Pm;
+  return Math.max(0, w0 * blend + est * (1 - blend));
+}
+function availAt(id, arr, P) {
+  if (!hasQueue(id)) return false;
+  const st = statusOf(id);
+  if (st === 'REFURBISHMENT') return false;
+  if (P.phase !== 'open') {
+    if (!hasHistory()) return true;
+    const prof = stats.typical?.[id];
+    if (!prof) return false;
+    // Entrée anticipée hôtel : seules les attractions déjà relevées à cette heure-là ouvrent
+    if (arr < P.h.open) { const b = stats.bucket || 30; return prof[Math.floor(arr / b) * b] != null; }
+    return true;
+  }
+  if (st === 'OPERATING') return true;
+  if (st === 'DOWN') return arr >= P.t0 + 45;
+  if (st === 'CLOSED' && P.mod < P.h.open) return arr >= P.h.open; // entrée anticipée : ouvre avec le parc
+  return false;
+}
+function laterAvg(id, from, close, P, w0) {
+  let sum = 0, n = 0;
+  for (let m = from + 30; m <= close - 20; m += 30) { sum += predict(id, m, P.t0, w0); n++; }
+  return n ? sum / n : null;
+}
+
+/* =====================================================================
+   Planificateur : simule le reste de la journée et choisit à chaque étape
+   l'attraction qui fait gagner le plus de temps par rapport à « plus tard »,
+   en regardant un coup plus loin pour éviter les allers-retours.
+   Créneaux VirtualLine, spectacles choisis et pause repas sont des étapes fixes.
+   ===================================================================== */
+function posOf(e) { return e && e.lat != null ? e : null; }
+function dist(a, b) {
+  const R = 6371000, t = Math.PI / 180, dLat = (b.lat - a.lat) * t, dLon = (b.lon - a.lon) * t;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * t) * Math.cos(b.lat * t) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+function walkMin(a, b) { a = posOf(a); b = posOf(b); if (!a || !b) return 6; return Math.max(1, Math.round(dist(a, b) * 1.35 / PACES[prefs.pace])); }
+
+let gpsPos = null, gpsState = 'off', watchId = null;
+const inPark = p => p.lat > 48.256 && p.lat < 48.2715 && p.lon > 7.715 && p.lon < 7.728;
+function currentPos() {
+  if (gpsPos && Date.now() - gpsPos.ts < 5 * 60000) return {lat: gpsPos.lat, lon: gpsPos.lon, src: 'gps', name: 'ta position'};
+  const d = prefs.lastDone && ents.get(prefs.lastDone);
+  if (d && d.lat != null) return {lat: d.lat, lon: d.lon, src: 'last', name: shortName(d)};
+  return {...ENTRANCE, src: 'entrance'};
+}
+function todaySlots(day) { return (prefs.slots || []).filter(s => s.day === day); }
+const againOK = id => { const thr = prefs.again[id], w = waitOf(id); return !!thr && w != null && w <= thr; };
+const isMealPlace = e => e.type === 'RESTAURANT' && e.lat != null && !NOT_MEAL.test(e.name);
+function nearestFood(from, openOnly) {
+  let best = null, bd = 1e9;
+  for (const e of ents.values()) {
+    if (!isMealPlace(e) || (openOnly && live.has(e.id) && statusOf(e.id) !== 'OPERATING')) continue;
+    const d = posOf(from) ? dist(from, e) : 0;
+    if (d < bd) { bd = d; best = e; }
+  }
+  return best;
+}
+/* Single rider : attente relevée dans la fiche (moins de 45 min), sinon estimation */
+function srFactor(id, e) {
+  if (!prefs.single || !keyIn(e, SINGLE_RIDER)) return 1;
+  const seen = prefs.srSeen[id], w = waitOf(id);
+  if (seen && now() - seen.at < 45 * 60000 && w) return clamp(seen.w / Math.max(5, w), .1, 1);
+  return SR_FACTOR;
+}
+const stepName = s => s.kind === 'meal' ? 'Pause repas' : shortName(ents.get(s.id));
+
+/* Étapes à heure fixe : créneaux VirtualLine notés, spectacles choisis, repas.
+   Spectacles et repas tombent au moment où les files de ton programme sont au plus haut. */
+function fixedSlots(P, cands, w0, from) {
+  const out = todaySlots(P.day).filter(s => s.start + 10 >= from)
+    .map(s => ({kind: 'vl', id: s.id, start: s.start, by: s.start, slack: 5, end: s.start + 15}));
+  const musts = cands.filter(id => prefs.plan[id] === 'must');
+  const crowd = m => musts.reduce((s, id) => s + predict(id, m, P.t0, w0[id]), 0);
+  const free = (a, b) => !out.some(f => a < f.end + 5 && f.start - 15 < b);
+  const pickTime = (times, len) => {
+    let best = null, bv = -1;
+    for (const m of times) { if (!free(m, m + len)) continue; const v = crowd(m + len / 2); if (v > bv + .5) { bv = v; best = m; } }
+    return best;
+  };
+  if (P.phase !== 'closed') for (const id of Object.keys(prefs.shows)) {
+    if (!ents.has(id) || prefs.done[id] > 0 || (prefs.skip[id] || 0) > from) continue;
+    const m = pickTime(todayShowtimes(id).map(s => s.mod).filter(m => m >= from + 10 && m + 10 <= P.h.close), SHOW_MIN);
+    if (m != null) out.push({kind: 'show', id, start: m, by: m - 5, slack: 0, end: m + SHOW_MIN});
+  }
+  const M = prefs.meal;
+  if (M.on && !prefs.mealDone) {
+    const a = Math.max(M.from, from, prefs.mealSkip || 0), b = Math.max(a, M.to - M.dur);
+    if (a <= M.to - 15) {
+      const times = [];
+      for (let m = Math.ceil(a / 15) * 15; m <= b; m += 15) times.push(m);
+      const m = pickTime(times.length ? times : [a], M.dur);
+      if (m != null) out.push({kind: 'meal', id: 'meal', start: m, by: m, slack: 15, end: m + M.dur, dur: M.dur});
+    }
+  }
+  return out.sort((x, y) => x.start - y.start);
+}
+
+function computePlan(P) {
+  if (P.phase === 'unknown' || !P.h) return null;
+  const close = P.h.close, open = P.phase === 'open', RF = realFactor();
+  crowdK = open ? parkRatio(P.mod) : null;
+  const pos0 = open ? currentPos() : {...ENTRANCE, src: 'entrance'};
+  const want = new Set(Object.keys(prefs.plan));
+  if (!want.size && !Object.keys(prefs.shows).length && !todaySlots(P.day).length) return null;
+  if (open) for (const id in prefs.again) if (prefs.done[id] > 0 && againOK(id)) want.add(id);
+  const ids = [], small = [];
+  for (const id of want) {
+    if (!ents.has(id) || !hasQueue(id) || (prefs.done[id] > 0 && !(open && againOK(id)))) continue;
+    (tooSmall(id) ? small : ids).push(id);
+  }
+  const w0 = {}; ids.forEach(id => { w0[id] = anchorWait(id, P.t0, P); });
+  const unavailable = [], cands = [];
+  for (const id of ids) (availAt(id, Math.max(P.t0, P.h.open) + 45, P) ? cands : unavailable).push(id);
+  const steps = [], used = new Set();
+  let t = P.t0, pos = pos0;
+
+  // Déjà dans une file : c'est la première étape
+  const q = open && prefs.queue && ents.has(prefs.queue.id) ? prefs.queue : null;
+  if (q) {
+    const since = P.mod - (now() - q.since) / 60000;
+    const end = Math.max(P.mod + 2, since + q.posted * RF) + RIDE_MIN;
+    steps.push({kind: 'queue', id: q.id, start: t, walk: 0, arrive: since, wait: q.posted, real: q.posted * RF, end});
+    used.add(q.id); t = end; pos = ents.get(q.id);
+  }
+
+  const pending = fixedSlots(P, cands, w0, t);
+  const placeOf = (s, from) => s.kind === 'meal' ? nearestFood(from, open && s.start <= P.mod + 15) : ents.get(s.id);
+  const takeSlot = s => {
+    const place = placeOf(s, pos), ws = walkMin(pos, place), arrive = Math.max(t + ws, s.by);
+    const end = s.kind === 'meal' ? arrive + s.dur : s.kind === 'show' ? Math.max(arrive, s.start) + SHOW_MIN : arrive + 5 + RIDE_MIN;
+    steps.push({kind: s.kind, id: s.id, place: place?.id || null, start: t, walk: ws, arrive, slot: s.start, dur: s.dur, wait: s.kind === 'vl' ? 5 : 0, end, leaveAt: s.by - ws - 2});
+    t = end; pos = place || pos; if (s.kind !== 'meal') used.add(s.id); pending.shift();
+  };
+  const score = (id, tt, from, slot) => {
+    if (used.has(id) || pending.some(s => s.id === id)) return null;
+    const again = prefs.done[id] > 0, isBonus = prefs.plan[id] !== 'must' && !again;
+    const e = ents.get(id), w = walkMin(from, e), arr = tt + w;
+    if (arr > close - 3 || !availAt(id, arr, P) || (prefs.skip[id] || 0) > arr) return null;
+    const srf = srFactor(id, e);
+    const qp = predict(id, arr, P.t0, w0[id]) * srf, qr = qp * RF, end = arr + qr + RIDE_MIN;
+    if (slot && end + walkMin(e, placeOf(slot, e)) > slot.by + slot.slack) return null;
+    const later = laterAvg(id, end, close, P, w0[id]) * srf;
+    const gain = later == null ? 0 : (later - qp) * RF;
+    const wx = wxBonus(e, arr, P.day);
+    const walkCost = (ROUTE[prefs.route] || ROUTE.equilibre) * (w + Math.max(0, w - 8));
+    return {id, score: gain - walkCost - .15 * qr - (isBonus ? 12 : 0) + wx, walk: w, arrive: arr, wait: qp, real: qr, end, later, gain, bonus: isBonus, again, wx, sr: srf < 1};
+  };
+
+  let alts = null;
+  for (let guard = 0; guard < 60 && t < close; guard++) {
+    const slot = pending[0];
+    if (slot && t + walkMin(pos, placeOf(slot, pos)) >= slot.by - 4) { takeSlot(slot); continue; }
+    const musts = cands.filter(id => !used.has(id) && prefs.plan[id] === 'must' && !(prefs.done[id] > 0));
+    const needMust = musts.reduce((s, id) => s + predict(id, t, P.t0, w0[id]) * RF + RIDE_MIN + 4, 0);
+    const allowBonus = needMust < (close - t) * .85;
+    const pool = cands.filter(id => allowBonus || (prefs.plan[id] === 'must' && !(prefs.done[id] > 0)));
+    const scored = pool.map(id => score(id, t, pos, slot)).filter(Boolean).sort((a, b) => b.score - a.score);
+    // Coup d'avance : on garde le meilleur couple « cette attraction, puis la suivante ».
+    // Finir dans un coin où il reste de bonnes attractions évite les allers-retours.
+    let best = scored[0], bv = -1e9;
+    if (scored.length > 1) for (const a of scored.slice(0, 6)) {
+      used.add(a.id);
+      let nb = 0;
+      for (const id of pool) { const s = score(id, a.end, ents.get(a.id), slot); if (s && s.score > nb) nb = s.score; }
+      used.delete(a.id);
+      if (a.score + .8 * nb > bv) { bv = a.score + .8 * nb; best = a; }
+    }
+    if (!best) { if (slot) { takeSlot(slot); continue; } break; }
+    if (!alts && !steps.length) alts = scored.filter(s => s.id !== best.id).slice(0, 3);
+    steps.push({kind: 'ride', start: t, ...best});
+    used.add(best.id); t = best.end; pos = ents.get(best.id) || pos;
+  }
+  const missing = cands.filter(id => !used.has(id) && prefs.plan[id] === 'must' && !(prefs.done[id] > 0));
+  return {steps, missing, unavailable, small, pos0, w0, end: t, alts: alts || [], RF};
+}
+
+/* Heures choisies pour le repas et les spectacles : envoyées au serveur pour les notifications */
+function syncPlanned(P, plan) {
+  if (!plan || (P.phase !== 'open' && P.phase !== 'before')) return;
+  const pl = {day: P.day, meal: plan.steps.find(s => s.kind === 'meal')?.slot ?? null,
+    shows: plan.steps.filter(s => s.kind === 'show').map(s => ({id: s.id, start: s.slot}))};
+  if (JSON.stringify(pl) !== JSON.stringify(prefs.planned)) { prefs.planned = pl; savePrefs(false); }
+}
+
+/* =====================================================================
+   Rendu
+   ===================================================================== */
+let lastPlan = null, lastP = null, itinExpanded = false;
+
+function render() {
+  const P = phaseInfo();
+  lastP = P;
+  renderHeader(P);
+  const plan = computePlan(P);
+  lastPlan = plan;
+  syncPlanned(P, plan);
+  checkGpsPrompt();
+  renderNow(P, plan);
+  renderBanner(P, plan);
+  if (device.tab === 'list') renderList(P);
+  if (device.tab === 'map') renderMap(P, plan);
+  if (device.tab === 'settings') renderSettings();
+  renderInstall();
+}
+
+function renderHeader(P) {
+  let line = 'Horaires indisponibles';
+  if (P.phase === 'open') line = `Ouvert jusqu'à ${hhmm(P.h.close)} · encore ${dur(P.h.close - P.mod)}`;
+  else if (P.phase === 'before') line = `Ouvre à ${hhmm(P.h.open)}` + (P.h.early != null && P.h.early < P.h.open ? ` · hôtels ${hhmm(P.h.early)}` : '');
+  else if (P.phase === 'closed') line = `Fermé · ouvre ${fmtDay(P.day)} à ${hhmm(P.h.open)}`;
+  $('#parkLine').textContent = line;
+
+  const bits = [];
+  if (meta.fetchedAt) {
+    const age = Math.round((Date.now() - meta.fetchedAt) / 60000);
+    const warn = meta.offline || meta.stale || age > 6;
+    bits.push(`<span class="dot${warn ? ' warn' : ''}"></span><span>${meta.offline ? 'Hors ligne · ' : ''}Données de ${hhmm(berlin(meta.fetchedAt + NOW_OFFSET).mod)}${age >= 2 ? ` (il y a ${age} min)` : ''}</span>`);
+  } else bits.push('<span>Connexion aux données…</span>');
+  const wx = wxLine(P);
+  if (wx) bits.push(`<span class="wx">· ${esc(wx)}</span>`);
+  if (NOW_OFFSET) bits.push(`<span class="sim-tag">Heure simulée ${hhmm(P.mod)}</span>`);
+  $('#freshLine').innerHTML = bits.join('');
+  $('#userBtn').textContent = user ? (user.local ? 'Local' : user.name) : 'Profil';
+}
+
+const icCheck = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+const icStar = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z"/></svg>';
+const icStarHalf = '<svg viewBox="0 0 24 24"><path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 2.8v14.4l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z" fill="currentColor"/></svg>';
+const icStarOff = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z"/></svg>';
+
+function reasonFor(step, P) {
+  const q = r5(step.wait), T = typicalAt(step.id, step.arrive), e = ents.get(step.id), w = wxAt(P.day, step.arrive);
+  if (step.again) return `À refaire : la file est sous ton seuil (${prefs.again[step.id]} min).`;
+  if (step.sr) return `File single rider : vous serez séparés dans le wagon, mais l'attente tombe à ~${q} min${prefs.srSeen[step.id] ? '' : ' (estimation, relève la vraie dans la fiche)'}.`;
+  if (step.wx >= 8) return `Pluie prévue vers ${hhmm(step.arrive)} : attraction couverte, tu restes au sec.`;
+  if (step.wx > 0 && keyIn(e, WET)) return `Il fait ${Math.round(w.t)}° vers ${hhmm(step.arrive)} : le bon moment pour se mouiller.`;
+  if (P.phase !== 'open') {
+    if (step.later != null && step.later - step.wait >= 10) return `Vers ${hhmm(step.arrive)} la file est en général courte (~${q} min) ; elle monte ensuite autour de ${r5(step.later)} min en moyenne.`;
+    return `Bon enchaînement depuis l'entrée, attente estimée ~${q} min.`;
+  }
+  if (reopenedRecently(step.id)) return 'Elle vient de rouvrir après un arrêt : la file se reforme, c\'est le bon moment.';
+  if (T != null && T - step.wait >= 10) return `File plus courte que d'habitude à cette heure (${r5(T)} min en général).`;
+  if (step.later != null && step.later - step.wait >= 10) return `Plus tard dans la journée, compte plutôt ~${r5(step.later)} min : autant y aller maintenant.`;
+  if (step.walk <= 3 && step.gain < 10) return 'Juste à côté : on l\'enchaîne sans marcher, avant de changer de coin du parc.';
+  if (step.wait <= 10) return 'File courte et sur ton chemin : on l\'enchaîne pendant que les grosses attractions sont chargées.';
+  return 'Meilleur compromis entre attente et marche pour le moment.';
+}
+
+function boardHTML(P, plan, first) {
+  const e = ents.get(first.id), open = P.phase === 'open', RF = plan.RF;
+  const btn = (act, label, primary, id = first.id) => `<button class="btn${primary ? ' primary' : ''}" type="button" data-act="${act}" data-id="${esc(id)}">${primary ? icCheck : ''}${label}</button>`;
+  let eyebrow, big, small, facts = [], reason, actions = [], name = esc(stepName(first)), cls = 'low';
+  if (first.kind === 'queue') {
+    const q = prefs.queue, el = (now() - q.since) / 60000, left = Math.max(0, Math.round(q.posted * RF - el));
+    eyebrow = `Dans la file · depuis ${dur(el)}`; big = left; small = 'min restantes'; cls = wclass(left);
+    facts.push(`<span>Affiché à l'entrée : ${q.posted} min</span>`);
+    if (RF < .95) facts.push(`<span>Réel estimé ~${r5(q.posted * RF)} min</span>`);
+    reason = 'Touche « Fait » à la sortie : la page apprend l\'écart entre les temps affichés et ceux que tu attends vraiment.';
+    actions = [btn('done', 'Fait', true), btn('queue-cancel', 'Quitter la file'), btn('open', 'Fiche')];
+  } else if (first.kind === 'vl') {
+    const leave = Math.max(P.t0, first.leaveAt);
+    eyebrow = 'Créneau VirtualLine'; big = 'VL'; small = 'réservé';
+    facts.push(`<span>Créneau à <b class="num">${hhmm(first.slot)}</b></span>`, `<span>${first.walk} min à pied</span>`);
+    reason = leave <= P.mod + 1 ? 'Pars maintenant pour être à l\'heure à l\'entrée VirtualLine.' : `Pars vers ${hhmm(leave)}. D'ici là, rien d'autre ne rentre sans risquer de rater le créneau.`;
+    actions = [btn('done', 'Fait', true), btn('open', 'Fiche')];
+  } else if (first.kind === 'show') {
+    const leave = Math.max(P.t0, first.leaveAt);
+    eyebrow = `Spectacle · ${first.walk} min à pied`; big = hhmm(first.slot); small = 'début';
+    facts.push(`<span>${leave <= P.mod + 1 ? 'Pars maintenant' : `Départ vers ${hhmm(leave)}`}</span>`);
+    reason = 'Représentation choisie au moment où les files de ton programme sont au plus haut. Arrive 5 min avant pour être bien placé.';
+    actions = open ? [btn('done', 'Vu', true), btn('show-skip', 'Pas aujourd\'hui'), btn('open', 'Fiche')] : [];
+  } else if (first.kind === 'meal') {
+    const place = first.place && ents.get(first.place);
+    eyebrow = `Pause repas · ${hhmm(first.slot)}`; big = first.dur; small = 'min';
+    if (place) facts.push(`<span>${esc(shortName(place))} · ${first.walk} min à pied</span>`);
+    reason = `Vers ${hhmm(first.slot)}, les files de ton programme sont au plus haut : c'est là que manger fait perdre le moins de temps.`;
+    actions = open ? [btn('meal-done', 'Fait', true, 'meal'), btn('meal-later', 'Plus tard', false, 'meal')].concat(place ? [btn('open', 'Le resto', false, place.id)] : []) : [];
+  } else {
+    const liveW = open ? waitOf(first.id) : null, shown = liveW ?? r5(first.wait);
+    eyebrow = open ? 'Prochaine étape · temps d\'attente' : P.phase === 'before' ? `À l'ouverture (${hhmm(P.t0)}) · estimation` : `Aperçu ${fmtDay(P.day)} · estimation`;
+    big = shown; small = 'min'; cls = wclass(shown);
+    facts.push(`<span>${first.walk} min à pied${open && currentPos().src !== 'gps' ? ` depuis ${esc(currentPos().src === 'last' ? currentPos().name : 'l\'entrée')}` : ''}</span>`);
+    if (open && first.arrive - P.mod > 2) facts.push(`<span>Arrivée ${hhmm(first.arrive)}</span>`);
+    if (first.sr) facts.push(`<span>Single rider ~${r5(first.wait)} min</span>`);
+    else if (RF < .95 && shown >= 10) facts.push(`<span>Réel estimé ~${r5(shown * RF)} min</span>`);
+    const vl = vlOf(first.id);
+    if (open && vl && vl.state === 'AVAILABLE') facts.push('<span>VirtualLine ouvert</span>');
+    reason = reasonFor(first, P);
+    if (open) actions = [btn('done', 'Fait', true), btn('queue', 'Dans la file'), btn('skip', 'Plus tard')];
+  }
+  const altHtml = (first.kind === 'ride' && open && plan.alts.length) ? `<div class="alts"><span class="eyebrow">Autres bons choix</span>${plan.alts.map(a => {
+    const aw = waitOf(a.id) ?? r5(a.wait);
+    return `<button class="alt" type="button" data-act="open" data-id="${esc(a.id)}"><span class="alt-name">${esc(shortName(ents.get(a.id)))}</span><span class="alt-walk">${a.walk} min à pied</span><b class="num b-${wclass(aw)}">${aw}<small> min</small></b></button>`;
+  }).join('')}</div>` : '';
+  const nameHtml = first.kind === 'meal' ? `<div class="board-name">${name}</div>` : `<button class="board-name" type="button" data-act="open" data-id="${esc(first.id)}">${name}</button>`;
+  return `<article class="board" aria-live="polite">
+    <div class="eyebrow">${eyebrow}</div>
+    <div class="board-top">${nameHtml}
+      <div class="board-wait"><span class="big b-${cls}">${esc(big ?? '–')}</span><small>${small}</small></div></div>
+    <div class="board-facts">${facts.join('')}</div>
+    <p class="board-reason">${reason}</p>
+    ${actions.length ? `<div class="board-actions${actions.length === 2 ? ' two' : ''}">${actions.join('')}</div>` : ''}${altHtml}</article>`;
+}
+
+function renderNow(P, plan) {
+  const planCount = Object.keys(prefs.plan).length;
+  $('#onboard').hidden = planCount > 0 || prefs.onboarded || !user;
+  const box = $('#nextBox');
+  const shows = $('#showsBlock'), itinB = $('#itinBlock'), tipsB = $('#tipsBlock');
+
+  if (!schedule && !live.size) { box.innerHTML = '<div class="card"><p class="muted">Chargement des attractions et des temps d\'attente…</p></div>'; itinB.hidden = shows.hidden = tipsB.hidden = true; renderVL(P, plan); return; }
+
+  // Récap de la journée, une fois le parc fermé
+  const r = P.phase === 'closed' && prefs.day === berlin(now()).day ? recapData() : null;
+  $('#recapBox').innerHTML = r ? recapHTML(r) : '';
+
+  // Panneau principal
+  const first = plan?.steps?.[0];
+  if (P.phase === 'unknown') box.innerHTML = '<div class="card"><p>Pas d\'horaires d\'ouverture disponibles pour les prochains jours.</p></div>';
+  else if (!planCount && !first) box.innerHTML = '';
+  else if (!first) {
+    const doneN = Object.values(prefs.done).reduce((a, b) => a + b, 0);
+    box.innerHTML = P.phase === 'open' && plan && !plan.missing.length && !plan.unavailable.length
+      ? `<div class="board"><div class="eyebrow">Programme bouclé</div><div class="board-name">Bravo, tout est fait</div>
+        <p class="board-reason">${doneN} tour${doneN > 1 ? 's' : ''} au compteur. Les files les plus courtes autour de toi sont dans l'onglet Attractions (tri par attente). Pour refaire tes préférées, choisis « À refaire si… » dans leur fiche.</p></div>`
+      : `<div class="card"><p>Aucune attraction de ton programme n'est faisable pour l'instant${plan?.unavailable.length ? ' (fermées ou en panne)' : ''}. Ajoute des bonus dans l'onglet Attractions.</p></div>`;
+  } else box.innerHTML = boardHTML(P, plan, first);
+
+  // Itinéraire
+  const notes = [];
+  if (plan) {
+    if (plan.missing.length) notes.push(`Ne rentre${plan.missing.length > 1 ? 'nt' : ''} pas d'ici la fermeture : ${plan.missing.map(id => esc(shortName(ents.get(id)))).join(', ')}. Une réservation VirtualLine peut aider.`);
+    if (plan.unavailable.length) notes.push(`Indisponible${plan.unavailable.length > 1 ? 's' : ''} : ${plan.unavailable.map(id => `${esc(shortName(ents.get(id)))} (${P.phase === 'open' ? (STATUS_FR[statusOf(id)]?.toLowerCase() || 'fermée') : statusOf(id) === 'REFURBISHMENT' ? 'en rénovation' : 'pas ouverte ces derniers jours'})`).join(', ')}.`);
+    if (plan.small.length) notes.push(`Trop grand${plan.small.length > 1 ? 'es' : 'e'} pour ${prefs.height} cm : ${plan.small.map(id => `${esc(shortName(ents.get(id)))} (dès ${minCm(ents.get(id))} cm)`).join(', ')}.`);
+  }
+  if (plan && plan.steps.length > 1) {
+    itinB.hidden = false;
+    $('#itinTitle').textContent = P.phase === 'closed' ? `Aperçu · ${fmtDay(P.day)}` : 'Itinéraire conseillé';
+    $('#itinEnd').textContent = `fin ~${hhmm(plan.end)}`;
+    const rest = plan.steps.slice(1), LIMIT = 6;
+    const visible = itinExpanded ? rest : rest.slice(0, LIMIT);
+    $('#itin').innerHTML = visible.map(s => {
+      const tag = {vl: 'VirtualLine', show: 'spectacle', meal: 'repas'}[s.kind] || (s.sr ? 'single rider' : s.again ? 'à refaire' : s.bonus ? 'bonus' : '');
+      const est = s.kind === 'vl' ? 'créneau' : s.kind === 'show' ? '' : s.kind === 'meal' ? dur(s.dur) : '~' + r5(s.wait) + ' min';
+      const place = s.kind === 'meal' && s.place ? ents.get(s.place) : null, openId = s.kind === 'meal' ? s.place : s.id;
+      const sub = place ? `${esc(shortName(place))} · ${s.walk} min à pied` : `${s.walk} min à pied`;
+      return `<li><time>${hhmm(s.kind === 'show' || s.kind === 'meal' ? s.slot : s.arrive)}</time>
+        <button class="it-name" type="button" ${openId ? `data-act="open" data-id="${esc(openId)}"` : ''}>${esc(stepName(s))}${tag ? `<span class="vl"${s.bonus && s.kind === 'ride' ? ' style="color:var(--muted)"' : ''}>${tag}</span>` : ''}
+        <span class="it-sub">${sub}</span></button>
+        <span class="est">${est}</span></li>`;
+    }).join('') + (rest.length > LIMIT ? `<li class="more"><button class="btn small" type="button" data-act="itin-more">${itinExpanded ? 'Réduire' : `Voir les ${rest.length - LIMIT} étapes suivantes`}</button></li>` : '');
+    const parade = upcomingShows(P).find(s => /parade/i.test(s.name) && s.mod - P.mod <= 60 && !prefs.shows[s.id]);
+    if (parade) notes.push(`${esc(parade.name)} à ${hhmm(parade.mod)} : beaucoup de visiteurs s'arrêtent pour la regarder, souvent un bon moment pour une grosse file.`);
+    if (crowdK) notes.push(`Affluence : ${Math.abs(Math.round((crowdK - 1) * 100))} % ${crowdK >= 1 ? 'au-dessus' : 'en dessous'} d'un jour habituel, les prévisions en tiennent compte.`);
+    if (plan.RF < .95) notes.push(`Tu attends en vrai ~${Math.round(plan.RF * 100)} % des temps affichés : les horaires en tiennent compte.`);
+    notes.push(hasHistory()
+      ? `Prévisions basées sur ${stats.days} jour${stats.days > 1 ? 's' : ''} d'historique (${stats.basis}).`
+      : 'Prévisions génériques : pas encore d\'historique enregistré sur ton serveur.');
+    $('#itinNote').innerHTML = notes.join('<br>');
+  } else if (plan && notes.length && planCount) {
+    itinB.hidden = false; $('#itinTitle').textContent = 'Itinéraire conseillé'; $('#itinEnd').textContent = ''; $('#itin').innerHTML = '';
+    $('#itinNote').innerHTML = notes.join('<br>');
+  } else itinB.hidden = true;
+
+  // Spectacles
+  const up = P.phase === 'open' || P.phase === 'before' ? upcomingShows(P) : [];
+  shows.hidden = !up.length;
+  if (up.length) {
+    const pos = currentPos();
+    $('#shows').innerHTML = up.slice(0, 6).map(s => `<li><time>${hhmm(s.mod)}</time>
+      <button class="it-name" type="button" data-act="open" data-id="${esc(s.id)}">${esc(s.name)}${prefs.shows[s.id] ? '<span class="vl">choisi</span>' : ''}<span class="it-sub">${walkMin(pos, ents.get(s.id))} min à pied</span></button><span></span></li>`).join('');
+  }
+
+  // Conseils avant ouverture / la veille
+  tipsB.hidden = !(P.phase === 'before' || P.phase === 'closed') || !planCount;
+  if (!tipsB.hidden) {
+    const f = crowdForecast(P.day);
+    $('#tips').innerHTML = (f ? `<p><b>Affluence prévue :</b> les ${f.name}s relevés (${f.n}), l'attente moyenne est de ~${Math.round(f.avg)} min, ${Math.abs(Math.round(f.rel * 100))} % ${f.rel >= 0 ? 'au-dessus' : 'en dessous'} de la moyenne des derniers jours. ${f.rel <= -.1 ? 'Plutôt calme : profites-en.' : f.rel >= .1 ? 'Plutôt chargé : VirtualLine dès l\'entrée et pause repas au pic.' : 'Journée dans la moyenne.'}</p>` : '')
+      + `<p><b>Sois devant l'entrée avant ${hhmm(P.h.open)}.</b> En début de journée, les grosses attractions ont les files les plus courtes : l'itinéraire commence par elles.</p>
+      <p><b>VirtualLine dès que tu es dans le parc.</b> Gratuit, dans l'appli Europa-Park avec ton billet lié et la localisation activée. Un seul créneau à la fois par billet : re-réserve juste après l'avoir utilisé.</p>
+      <p><b>Active les notifications</b> (Réglages) : alertes de file courte, départ pour un créneau ou un spectacle, même téléphone en poche.</p>`;
+  }
+  renderVL(P, plan);
+}
+
+function upcomingShows(P) {
+  const out = [];
+  for (const e of ents.values()) {
+    if (e.type !== 'SHOW' || !live.has(e.id)) continue;
+    for (const s of todayShowtimes(e.id)) if (s.mod >= P.mod - 2 && s.mod <= P.mod + 120) out.push({id: e.id, name: e.name, mod: s.mod});
+  }
+  return out.sort((a, b) => a.mod - b.mod);
+}
+
+/* Attraction de ton programme pour laquelle un VirtualLine fait gagner le plus */
+function vlPick(P, exclude) {
+  if (!P.h) return null;
+  const gainOf = id => (laterAvg(id, P.t0, P.h.close, P, anchorWait(id, P.t0, P)) ?? 0) + (waitOf(id) ?? 0);
+  return [...live.keys()].filter(id => id !== exclude && hasQueue(id) && vlOf(id)?.state === 'AVAILABLE' && prefs.plan[id] && !(prefs.done[id] > 0))
+    .sort((a, b) => gainOf(b) - gainOf(a))[0] || null;
+}
+function renderVL(P, plan) {
+  const block = $('#vlBlock');
+  const vlIds = [...live.keys()].filter(id => vlOf(id) && hasQueue(id));
+  if (!vlIds.length || P.phase === 'unknown' || P.phase === 'closed') { block.hidden = true; return; }
+  block.hidden = false;
+  const slots = todaySlots(P.day).filter(s => s.start + 15 >= P.mod).sort((a, b) => a.start - b.start);
+  let body = '';
+  if (slots.length) {
+    const s = slots[0], e = ents.get(s.id), w = walkMin(currentPos(), e), leave = s.start - w - 2;
+    body = `<p><b>${esc(shortName(e))}</b> · créneau à <b class="num">${hhmm(s.start)}</b> · ${w} min à pied<br>
+      <span class="muted">${leave <= P.mod ? 'Pars maintenant.' : `Départ conseillé ${hhmm(leave)} (dans ${dur(leave - P.mod)}).`}</span></p>
+      <div class="row-inline"><button class="btn small primary" type="button" data-act="done" data-id="${esc(s.id)}">${icCheck}Fait</button>
+      <button class="btn small" type="button" data-act="slot-del" data-id="${esc(s.id)}">Supprimer le créneau</button></div>`;
+  } else {
+    const planned = vlIds.filter(id => prefs.plan[id] && !(prefs.done[id] > 0));
+    const pick = vlPick(P);
+    if (P.phase === 'before') body = `<p>Dès ton entrée, réserve un créneau pour une attraction à grosse file${planned.length ? ` (${planned.slice(0, 3).map(id => esc(shortName(ents.get(id)))).join(', ')}…)` : ''}. Ensuite, note-le ici : l'itinéraire s'organise autour.</p>`;
+    else if (pick) body = `<p>Réserve maintenant : <b>${esc(shortName(ents.get(pick)))}</b>${waitOf(pick) != null ? ` · file actuelle ${waitOf(pick)} min` : ''}${vlOf(pick).returnStart ? ` · prochain créneau ~${hhmm(isoMod(vlOf(pick).returnStart).mod)}` : ''}</p>`;
+    else body = `<p class="muted">Aucune attraction de ton programme n'a de VirtualLine ouvert pour l'instant.</p>`;
+    body += `<div class="row-inline"><button class="btn small primary" type="button" data-act="slot-form" data-id="${esc(pick || planned[0] || vlIds[0])}">J'ai un créneau</button>
+      <a class="btn small" href="${VL_INFO}" target="_blank" rel="noopener">Comment réserver</a></div>`;
+  }
+  const chips = vlIds.sort((a, b) => shortName(ents.get(a)).localeCompare(shortName(ents.get(b)))).map(id => {
+    const st = vlOf(id).state; const c = st === 'AVAILABLE' ? 'ok' : st === 'TEMP_FULL' ? 'full' : 'end';
+    return `<span class="chip ${c}">${esc(shortName(ents.get(id)))} · ${VL_FR[st] || 'inconnu'}</span>`;
+  }).join('');
+  block.innerHTML = `<div class="block-head"><h2>VirtualLine</h2><span class="muted">coupe-file gratuit</span></div>
+    <div class="card">${body}<div class="chips">${chips}</div></div>`;
+}
+
+function renderBanner(P, plan) {
+  const b = $('#banner');
+  let msg = null, warn = false, extra = '';
+  const first = plan?.steps?.[0];
+  if (P.phase === 'open' && (first?.kind === 'vl' || first?.kind === 'show') && first.leaveAt <= P.mod + 1) {
+    msg = `<b>Pars maintenant</b> vers ${esc(shortName(ents.get(first.id)))} : ${first.kind === 'vl' ? 'créneau VirtualLine' : 'spectacle'} à ${hhmm(first.slot)}.`;
+  } else if (gpsPrompt) {
+    const n = esc(shortName(ents.get(gpsPrompt.id)));
+    if (gpsPrompt.kind === 'enter') {
+      msg = `Tu es à <b>${n}</b>. Tu fais la queue ?`;
+      extra = `<button type="button" class="yes" data-act="queue" data-id="${esc(gpsPrompt.id)}">Oui</button>`;
+    } else {
+      msg = `Tu as fini <b>${n}</b> ?`;
+      extra = `<button type="button" class="yes" data-act="done" data-id="${esc(gpsPrompt.id)}">Fait</button>`;
+    }
+    extra += '<button type="button" data-act="prompt-no" aria-label="Non">✕</button>';
+  } else if (pendingAlert) { msg = pendingAlert; extra = '<button type="button" data-act="banner-close" aria-label="Fermer">✕</button>'; }
+  else if (rainSoon(P) && !asked.has('rain:' + rainSoon(P))) {
+    msg = `<b>Pluie annoncée vers ${rainSoon(P)} h</b> : l'itinéraire passe aux attractions couvertes.`;
+    extra = `<button type="button" data-act="dismiss" data-key="rain:${rainSoon(P)}" aria-label="Fermer">✕</button>`;
+  }
+  else if (meta.offline) { msg = 'Pas de réseau : affichage des dernières données reçues. L\'actualisation reprend automatiquement.'; warn = true; }
+  else if (meta.stale) { msg = 'La source des temps d\'attente ne répond pas : données du dernier relevé.'; warn = true; }
+  b.hidden = !msg;
+  if (msg) { b.className = 'banner' + (warn ? ' warn' : ''); b.innerHTML = `<p>${msg}</p>${extra}`; }
+}
+
+/* ---------- Liste ---------- */
+function renderList(P) {
+  document.querySelectorAll('#filterSeg button').forEach(bt => bt.setAttribute('aria-pressed', bt.dataset.filter === device.filter));
+  document.querySelectorAll('#sortSeg button').forEach(bt => bt.setAttribute('aria-pressed', bt.dataset.sort === device.sort));
+  const q = norm($('#q').value || ''), f = device.filter, pos = currentPos();
+  let arr = [...ents.values()].filter(e => {
+    if (f === 'plan') return !!prefs.plan[e.id] || !!prefs.shows[e.id];
+    if (f === 'rides') return e.type === 'ATTRACTION' && hasQueue(e.id);
+    if (f === 'shows') return e.type === 'SHOW' && todayShowtimes(e.id).length > 0;
+    if (f === 'food') return e.type === 'RESTAURANT' && live.has(e.id);
+    return false;
+  }).filter(e => !q || e.key.includes(q));
+  const info = new Map(arr.map(e => [e.id, {walk: walkMin(pos, e), wait: waitOf(e.id), next: todayShowtimes(e.id).find(s => s.mod >= P.mod - 2)}]));
+  const byName = (a, b) => a.name.localeCompare(b.name, 'fr');
+  arr.sort((a, b) => {
+    const A = info.get(a.id), B = info.get(b.id);
+    if (device.sort === 'name') return byName(a, b);
+    if (device.sort === 'walk') return A.walk - B.walk || byName(a, b);
+    if (f === 'shows') return (A.next?.mod ?? 9999) - (B.next?.mod ?? 9999) || byName(a, b);
+    const wa = A.wait ?? (a.type === 'RESTAURANT' && statusOf(a.id) === 'OPERATING' ? -1 : 999), wb = B.wait ?? (b.type === 'RESTAURANT' && statusOf(b.id) === 'OPERATING' ? -1 : 999);
+    return wa - wb || A.walk - B.walk || byName(a, b);
+  });
+  const hint = {plan: 'Étoile pleine : incontournable · demi-étoile : bonus. Touche l\'étoile pour changer.', rides: 'Ajoute des attractions à ton programme avec l\'étoile.', shows: 'Étoile : le spectacle entre dans ton itinéraire, à la meilleure représentation.', food: 'Restaurants et stands du parc.'}[f];
+  $('#listHint').textContent = hint;
+  if (!arr.length) { $('#list').innerHTML = `<li class="empty">${f === 'plan' ? 'Ton programme est vide : passe sur « Attractions » et touche les étoiles.' : 'Rien à afficher.'}</li>`; return; }
+  $('#list').innerHTML = arr.map(e => {
+    const I = info.get(e.id), st = statusOf(e.id), isRide = e.type === 'ATTRACTION' && hasQueue(e.id);
+    const meta = [`${I.walk} min à pied`];
+    let right = '', star = '<span class="star" aria-hidden="true"></span>';
+    if (isRide) {
+      if (I.wait != null) right = `<span class="pill w-${wclass(I.wait)}">${I.wait}<small>min</small></span>`;
+      else right = `<span class="pill word w-off">${STATUS_FR[st] || '—'}</span>`;
+      const tr = trendOf(e.id);
+      if (tr != null && Math.abs(tr) >= 10) meta.push(tr > 0 ? `<span class="up">↗ +${tr} min</span>` : `<span class="down">↘ ${tr} min</span>`);
+      const vl = vlOf(e.id); if (vl) meta.push(`VirtualLine ${VL_FR[vl.state] || ''}`);
+      if (reopenedRecently(e.id)) meta.push('<span class="down">vient de rouvrir</span>');
+      if (tooSmall(e.id)) meta.push(`<span class="up">dès ${minCm(e)} cm</span>`);
+      if (prefs.alerts[e.id]) meta.push(`alerte ≤ ${prefs.alerts[e.id]} min`);
+      if (prefs.again[e.id]) meta.push(`à refaire ≤ ${prefs.again[e.id]} min`);
+      if (prefs.done[e.id]) meta.push(`fait${prefs.done[e.id] > 1 ? ' ×' + prefs.done[e.id] : ''}`);
+      const p = prefs.plan[e.id];
+      star = `<button class="star ${p || ''}" type="button" data-act="star" data-id="${esc(e.id)}" aria-label="${p === 'must' ? 'Incontournable — passer en bonus' : p === 'bonus' ? 'Bonus — retirer du programme' : 'Ajouter au programme'}">${p === 'must' ? icStar : p === 'bonus' ? icStarHalf : icStarOff}</button>`;
+    } else if (e.type === 'SHOW') {
+      right = I.next ? `<span class="est">${hhmm(I.next.mod)}</span>` : '<span class="est">terminé</span>';
+      const p = prefs.shows[e.id];
+      star = `<button class="star ${p ? 'must' : ''}" type="button" data-act="show-star" data-id="${esc(e.id)}" aria-label="${p ? 'Retirer de l\'itinéraire' : 'Ajouter à l\'itinéraire'}">${p ? icStar : icStarOff}</button>`;
+      if (prefs.done[e.id]) meta.push('vu');
+    } else if (e.type === 'RESTAURANT') {
+      right = `<span class="pill word ${st === 'OPERATING' ? 'w-low' : 'w-off'}">${st === 'OPERATING' ? 'Ouvert' : 'Fermé'}</span>`;
+    }
+    return `<li class="${prefs.done[e.id] ? 'done' : ''}">${star}
+      <button class="row-main" type="button" data-act="open" data-id="${esc(e.id)}"><span class="row-name">${esc(e.name)}</span><span class="row-meta">${meta.join(' · ')}</span></button>${right}</li>`;
+  }).join('');
+}
+
+/* ---------- Carte ---------- */
+function renderMap(P, plan) {
+  const pts = [...ents.values()].filter(e => e.type === 'ATTRACTION' && e.lat != null && hasQueue(e.id));
+  if (!pts.length) { $('#mapWrap').innerHTML = '<p class="empty">Carte disponible dès le chargement des attractions.</p>'; return; }
+  const lat0 = 48.2645, cosL = Math.cos(lat0 * Math.PI / 180);
+  const lons = pts.map(p => p.lon), lats = pts.map(p => p.lat);
+  const minLon = Math.min(...lons), maxLat = Math.max(...lats);
+  const X = lon => (lon - minLon) * cosL * 111320 + 40, Y = lat => (maxLat - lat) * 110540 + 40;
+  const W = Math.ceil(X(Math.max(...lons)) + 40), H = Math.ceil(Y(Math.min(...lats)) + 40);
+  const pos = currentPos(), first = plan?.steps?.[0];
+  const next = first ? ents.get(first.kind === 'meal' ? first.place : first.id) : null;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Plan schématique des attractions avec leur temps d'attente">`;
+  for (let y = 40; y < H; y += 100) svg += `<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;
+  for (let x = 40; x < W; x += 100) svg += `<line y1="0" y2="${H}" x1="${x}" x2="${x}" stroke="var(--line)" stroke-width="1"/>`;
+  svg += `<g transform="translate(16 ${H - 18})"><line x1="0" x2="100" y1="0" y2="0" stroke="var(--muted)" stroke-width="3"/><text x="0" y="-8" font-size="15" fill="var(--muted)" font-family="var(--font-body)">100 m</text></g>`;
+  svg += `<text x="${W - 16}" y="30" text-anchor="end" font-size="16" font-weight="700" fill="var(--muted)" font-family="var(--font-body)">N ↑</text>`;
+  if (next && next.lat != null && P.phase === 'open') svg += `<line x1="${X(pos.lon)}" y1="${Y(pos.lat)}" x2="${X(next.lon)}" y2="${Y(next.lat)}" stroke="var(--accent)" stroke-width="4" stroke-dasharray="10 8" stroke-linecap="round"/>`;
+  if (next && next.type !== 'ATTRACTION' && next.lat != null) svg += `<g data-act="open" data-id="${esc(next.id)}" style="cursor:pointer"><circle cx="${X(next.lon)}" cy="${Y(next.lat)}" r="11" fill="var(--accent)" stroke="var(--surface)" stroke-width="2.5"/><text x="${X(next.lon) + 16}" y="${Y(next.lat) + 6}" font-size="16" font-weight="700" fill="var(--ink)" stroke="var(--surface)" stroke-width="4" paint-order="stroke" font-family="var(--font-body)">${esc(shortName(next))}</text></g>`;
+  const sorted = pts.sort((a, b) => (prefs.plan[a.id] ? 1 : 0) - (prefs.plan[b.id] ? 1 : 0));
+  const boxes = [], labelQueue = [];
+  for (const e of sorted) {
+    const w = waitOf(e.id), cls = wclass(w), inPlan = !!prefs.plan[e.id], isNext = next && next.id === e.id, done = prefs.done[e.id] > 0;
+    const r = inPlan ? 15 : 8, x = X(e.lon), y = Y(e.lat);
+    svg += `<g data-act="open" data-id="${esc(e.id)}" style="cursor:pointer" opacity="${done ? .45 : 1}">`;
+    if (isNext) svg += `<circle cx="${x}" cy="${y}" r="${r + 8}" fill="none" stroke="var(--accent)" stroke-width="4"/>`;
+    svg += `<circle cx="${x}" cy="${y}" r="${r}" fill="var(--w-${cls})" stroke="var(--surface)" stroke-width="2.5"/>`;
+    boxes.push({x: x - r, y: y - r, w: 2 * r, h: 2 * r});
+    if (inPlan) {
+      svg += `<text x="${x}" y="${y + 5.5}" text-anchor="middle" font-size="15" font-weight="800" fill="var(--surface)" font-family="var(--font-display)">${done ? '✓' : (w ?? '–')}</text>`;
+      labelQueue.push({e, x, y, r, rank: isNext ? 0 : prefs.plan[e.id] === 'must' ? 1 : 2, done});
+    }
+    svg += '</g>';
+  }
+  // Étiquettes : à droite, sinon à gauche, au-dessus ou en dessous, sans chevauchement
+  const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+  labelQueue.sort((a, b) => a.rank - b.rank);
+  for (const L of labelQueue) {
+    const text = shortName(L.e), th = 18;
+    const tw = [...text].reduce((s, ch) => s + (/[A-Z]/.test(ch) ? 11.5 : /[ il'.,-]/.test(ch) ? 5 : 9), 6);
+    const options = [
+      {x: L.x + L.r + 5, y: L.y - th / 2}, {x: L.x - L.r - 5 - tw, y: L.y - th / 2},
+      {x: L.x - tw / 2, y: L.y - L.r - 4 - th}, {x: L.x - tw / 2, y: L.y + L.r + 4}
+    ];
+    const spot = options.map(o => ({...o, w: tw, h: th})).find(o => o.x >= 4 && o.x + o.w <= W - 4 && o.y >= 4 && o.y + o.h <= H - 4 && !boxes.some(b => hit(o, b)));
+    if (!spot) continue;
+    boxes.push(spot);
+    svg += `<text x="${spot.x}" y="${spot.y + 14}" font-size="16" font-weight="700" fill="var(--ink)" opacity="${L.done ? .5 : 1}" stroke="var(--surface)" stroke-width="4" paint-order="stroke" font-family="var(--font-body)" data-act="open" data-id="${esc(L.e.id)}" style="cursor:pointer">${esc(text)}</text>`;
+  }
+  const others = groupMembers(), people = others.concat(pos.src === 'gps' ? [pos] : []), meet = meetingPoint(people);
+  if (meet) svg += `<g data-act="open" data-id="${esc(meet.id)}" style="cursor:pointer"><rect x="${X(meet.lon) - 13}" y="${Y(meet.lat) - 13}" width="26" height="26" rx="4" transform="rotate(45 ${X(meet.lon)} ${Y(meet.lat)})" fill="none" stroke="var(--ink)" stroke-width="3"/></g>`;
+  for (const o of others) {
+    const x = X(o.lon), y = Y(o.lat), old = Date.now() - o.ts > 10 * 60000;
+    svg += `<g opacity="${old ? .5 : 1}"><circle cx="${x}" cy="${y}" r="10" fill="var(--ink)" stroke="var(--surface)" stroke-width="3"/>
+      <text x="${x + 15}" y="${y + 6}" font-size="16" font-weight="700" fill="var(--ink)" stroke="var(--surface)" stroke-width="4" paint-order="stroke" font-family="var(--font-body)">${esc(o.nick)}</text></g>`;
+  }
+  if (pos.lat != null) {
+    const x = X(pos.lon), y = Y(pos.lat);
+    svg += `<circle cx="${x}" cy="${y}" r="18" fill="var(--accent)" opacity=".18"/><circle cx="${x}" cy="${y}" r="8" fill="var(--accent)" stroke="var(--surface)" stroke-width="3"/>`;
+  }
+  svg += '</svg>';
+  $('#mapWrap').innerHTML = svg;
+  const group = others.length ? ` Groupe : ${others.map(o => `${o.nick} (${walkMin(pos, o)} min, il y a ${Math.round((Date.now() - o.ts) / 60000)} min)`).join(', ')}.${meet ? ` Point de rencontre conseillé (losange) : ${shortName(meet)}.` : ''}` : device.share ? ' Personne d\'autre ne partage sa position pour l\'instant.' : '';
+  $('#mapNote').textContent = `Point violet : ${pos.src === 'gps' ? 'ta position GPS' : pos.src === 'last' ? `dernière attraction faite (${pos.name})` : 'entrée principale (active la position dans Réglages)'}. Gros points : ton programme.${group} Plan schématique, nord en haut.`;
+}
+
+/* ---------- Réglages ---------- */
+let calData = null, calLoading = false;
+function loadCalendar() {
+  if (calData || calLoading || meta.source !== 'serveur') return;
+  calLoading = true;
+  getJSON(`${SERVER}?r=calendar`).then(j => { calData = j.days || []; }).catch(() => { calData = []; })
+    .finally(() => { calLoading = false; if (!$('#sheet').open) render(); });
+}
+/* Affluence habituelle d'un jour de la semaine, d'après les jours relevés */
+const weekdayFmt = new Intl.DateTimeFormat('fr-FR', {weekday: 'long', timeZone: 'UTC'});
+function crowdForecast(day) {
+  if (!calData || calData.length < 5) return null;
+  const wd = new Date(day + 'T12:00:00Z').getUTCDay();
+  const same = calData.filter(d => new Date(d.day + 'T12:00:00Z').getUTCDay() === wd).slice(-6);
+  if (!same.length) return null;
+  const avg = x => x.reduce((s, d) => s + d.avg, 0) / x.length;
+  const a = avg(same);
+  return {avg: a, rel: a / avg(calData.slice(-28)) - 1, n: same.length, name: weekdayFmt.format(new Date(day + 'T12:00:00Z'))};
+}
+const MEAL_FROM = [660, 690, 720, 750], MEAL_TO = [780, 810, 840, 870, 900];
+function renderSettings() {
+  const vals = Object.values(prefs.plan);
+  const doneN = Object.keys(prefs.done).length, showN = Object.keys(prefs.shows).length;
+  $('#userSummary').textContent = !user ? 'Aucun profil choisi.' : user.local ? 'Profil local : ton programme reste sur ce téléphone (serveur injoignable au moment du choix).' : `Connecté en tant que ${user.name}. Tout est enregistré sur le serveur à chaque changement.`;
+  $('#copyRow').hidden = !remote();
+  if (remote()) fetchUsers().then(list => {
+    const sel = $('#copyFrom'), others = list.filter(u => u.id !== user.id);
+    const v = sel.value;
+    sel.innerHTML = others.length ? others.map(u => `<option value="${esc(u.id)}">${esc(u.name)}</option>`).join('') : '<option value="">Aucun autre profil</option>';
+    if (others.some(u => u.id === v)) sel.value = v;
+  }).catch(() => { $('#copyRow').hidden = true; });
+  $('#planSummary').textContent = `${vals.filter(v => v === 'must').length} incontournables · ${vals.filter(v => v === 'bonus').length} bonus${showN ? ` · ${showN} spectacle${showN > 1 ? 's' : ''}` : ''} · ${doneN} fait${doneN > 1 ? 's' : ''} aujourd'hui`;
+  $('#mealChk').checked = !!prefs.meal.on;
+  document.querySelectorAll('#mealDurSeg button').forEach(bt => bt.setAttribute('aria-pressed', +bt.dataset.mealDur === prefs.meal.dur));
+  $('#mealFrom').innerHTML = MEAL_FROM.map(m => `<option value="${m}" ${m === prefs.meal.from ? 'selected' : ''}>${hhmm(m)}</option>`).join('');
+  $('#mealTo').innerHTML = MEAL_TO.map(m => `<option value="${m}" ${m === prefs.meal.to ? 'selected' : ''}>${hhmm(m)}</option>`).join('');
+  document.querySelectorAll('#paceSeg button').forEach(bt => bt.setAttribute('aria-pressed', bt.dataset.pace === prefs.pace));
+  document.querySelectorAll('#routeSeg button').forEach(bt => bt.setAttribute('aria-pressed', bt.dataset.route === prefs.route));
+  if (document.activeElement !== $('#heightIn')) $('#heightIn').value = prefs.height || '';
+  $('#hotelChk').checked = !!prefs.hotel;
+  $('#singleChk').checked = !!prefs.single;
+  $('#shareChk').checked = !!device.share;
+  if (document.activeElement !== $('#nickIn')) { $('#nickIn').value = device.nick; $('#nickIn').placeholder = shareNick(); }
+  $('#gpsStatus').textContent = {off: 'Désactivée : les distances partent de la dernière attraction marquée « faite », ou de l\'entrée.', wait: 'Recherche de ta position…', on: 'Active : les distances partent de l\'endroit où tu es. La page te demande aussi si tu fais la queue en arrivant à une attraction.', out: 'Active, mais tu n\'es pas dans le parc : les distances partent de l\'entrée.', denied: 'Refusée par le navigateur. Autorise la localisation pour ce site dans les réglages du téléphone.', unavailable: 'Indisponible (la page doit être servie en HTTPS).'}[gpsState] || '';
+  $('#gpsBtn').textContent = device.gps ? 'Désactiver la position' : 'Utiliser ma position';
+  renderPushStatus();
+  renderCrowd();
+  $('#versionLine').textContent = `Version ${APP_VERSION} · les mises à jour arrivent toutes seules à l'ouverture de l'appli.`;
+  const src = meta.source === 'serveur' ? 'via ton serveur (cache + historique)' : meta.source === 'direct' ? 'en direct depuis themeparks.wiki (api.php injoignable, pas d\'historique)' : 'aucune pour l\'instant';
+  const n = (prefs.samples || []).length, RF = realFactor();
+  $('#dataStatus').innerHTML = `Source : ${src}.<br>Historique : ${hasHistory() ? `${stats.days} jour${stats.days > 1 ? 's' : ''} (base ${esc(stats.basis)})` : 'aucun pour l\'instant. Lance le cron de collecte (voir README) : dès la veille, les prévisions se basent sur les vraies files.'}<br>
+    Temps réels : ${n >= 2 ? `tu attends ~${Math.round(RF * 100)} % des temps affichés (${n} mesures).` : 'touche « Dans la file » en entrant dans une file, puis « Fait » à la sortie : après deux mesures, l\'itinéraire utilise tes vrais temps.'}`;
+}
+function renderCrowd() {
+  const P = lastP || phaseInfo(), k = P.phase === 'open' ? parkRatio(P.mod) : null;
+  $('#crowdStatus').textContent = k ? `Aujourd'hui : ${Math.abs(Math.round((k - 1) * 100))} % ${k >= 1 ? 'au-dessus' : 'en dessous'} d'un jour habituel.` : 'Attente moyenne des attractions entre 11 h et 16 h, jour par jour (historique de ton serveur).';
+  loadCalendar();
+  const days = (calData || []).slice(-21);
+  if (!days.length) { $('#calendar').innerHTML = calData ? '<span>Pas encore assez d\'historique.</span>' : ''; return; }
+  const max = Math.max(...days.map(d => d.avg), 1);
+  const byWd = {};
+  for (const d of calData) { const wd = new Date(d.day + 'T12:00:00Z').getUTCDay(); (byWd[wd] = byWd[wd] || []).push(d.avg); }
+  const wdNames = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
+  const ranking = Object.entries(byWd).map(([wd, a]) => [wd, a.reduce((s, x) => s + x, 0) / a.length]).sort((a, b) => a[1] - b[1]);
+  $('#calendar').innerHTML = days.map(d => `<div class="cal-row"><span>${shortDayFmt.format(new Date(d.day + 'T12:00:00Z'))}</span><i style="--c:var(--w-${wclass(d.avg)});width:${Math.max(4, d.avg / max * 100)}%"></i><b>${Math.round(d.avg)}′</b></div>`).join('')
+    + (ranking.length >= 3 ? `<span>Jours les plus calmes : ${ranking.slice(0, 3).map(([wd, v]) => `${wdNames[wd]} (${Math.round(v)}′)`).join(', ')}.</span>` : '');
+}
+
+/* ---------- Fiche détaillée ---------- */
+function chartSVG(id, P) {
+  const h = P.h || {open: 540, close: 1080};
+  const x0 = Math.min(h.open, h.early ?? h.open), x1 = h.close;
+  const s = series(id).filter(p => p[0] >= x0 - 15 && p[0] <= x1 + 15 && (P.phase !== 'open' || p[0] <= P.mod + 1));
+  const prof = stats?.typical?.[id] || {};
+  const typ = Object.entries(prof).map(([k, v]) => [+k + (stats.bucket || 30) / 2, v]).filter(p => p[0] >= x0 && p[0] <= x1).sort((a, b) => a[0] - b[0]);
+  const vals = s.filter(p => p[1] != null).map(p => p[1]).concat(typ.map(p => p[1]));
+  if (!vals.length) return '<p class="muted">Pas encore de relevé pour cette attraction aujourd\'hui. La courbe se remplit au fil des actualisations.</p>';
+  const ymax = Math.max(30, Math.ceil(Math.max(...vals) / 15) * 15);
+  const W = 340, H = 140, L = 30, R = 10, T = 10, B = 22;
+  const X = m => L + (clamp(m, x0, x1) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  let g = '';
+  for (const v of [0, ymax / 2, ymax]) g += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${Y(v) + 3.5}" text-anchor="end">${Math.round(v)}</text>`;
+  for (let m = Math.ceil(x0 / 120) * 120; m <= x1; m += 120) g += `<text x="${X(m)}" y="${H - 6}" text-anchor="middle">${m / 60}h</text>`;
+  if (typ.length > 1) g += `<polyline points="${typ.map(p => `${X(p[0])},${Y(p[1])}`).join(' ')}" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 4"/>`;
+  const segs = []; let cur = [];
+  for (const p of s) { if (p[1] == null) { if (cur.length) segs.push(cur); cur = []; } else cur.push(p); }
+  if (cur.length) segs.push(cur);
+  for (const seg of segs) {
+    if (seg.length > 1) g += `<path d="M${X(seg[0][0])},${Y(0)} ${seg.map(p => `L${X(p[0])},${Y(p[1])}`).join(' ')} L${X(seg[seg.length - 1][0])},${Y(0)}Z" fill="var(--accent)" opacity=".12"/>`;
+    g += `<polyline points="${seg.map(p => `${X(p[0])},${Y(p[1])}`).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+  const lastPt = [...s].reverse().find(p => p[1] != null);
+  if (lastPt) g += `<circle cx="${X(lastPt[0])}" cy="${Y(lastPt[1])}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>`;
+  if (P.phase === 'open') g += `<line x1="${X(P.mod)}" x2="${X(P.mod)}" y1="${T}" y2="${H - B}" stroke="var(--ink)" stroke-width="1" opacity=".35"/>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Attente au fil de la journée">${g}</svg>
+    <div class="legend"><span><i style="--c:var(--accent)"></i>aujourd'hui</span>${typ.length > 1 ? '<span><i style="--c:var(--muted)"></i>habituel (pointillés)</span>' : ''}</div>`;
+}
+
+const thresholdSelect = (selId, id, cur, values, none) => `<select id="${selId}" data-id="${esc(id)}">${[''].concat(values).map(v => `<option value="${v}" ${String(cur || '') === String(v) ? 'selected' : ''}>${v === '' ? none : v + ' min'}</option>`).join('')}</select>`;
+function openSheet(id) {
+  const e = ents.get(id); if (!e) return;
+  const P = lastP || phaseInfo();
+  const st = statusOf(id), w = waitOf(id), pos = currentPos(), wk = walkMin(pos, e);
+  const isRide = e.type === 'ATTRACTION' && hasQueue(id);
+  let body = '';
+  if (isRide) {
+    const T = P.phase === 'open' ? typicalAt(id, P.mod) : null, vl = vlOf(id), p = prefs.plan[id], cm = minCm(e);
+    body += `<div class="stats">
+      <div class="stat"><span>Attente</span><b class="${w != null ? '' : 'muted'}">${w != null ? w + '′' : (STATUS_FR[st] || '—')}</b></div>
+      <div class="stat"><span>D'habitude</span><b>${T != null ? r5(T) + '′' : '—'}</b></div>
+      <div class="stat"><span>À pied</span><b>${wk}′</b></div></div>`;
+    const tags = [cm ? `Taille mini accompagné : ${cm} cm (indicatif)${tooSmall(id) ? ' · <b>trop petit pour ton groupe</b>' : ''}` : '', keyIn(e, INDOOR) ? 'Couverte' : '', keyIn(e, WET) ? 'On en ressort mouillé' : ''].filter(Boolean);
+    if (tags.length) body += `<p class="muted">${tags.join(' · ')}</p>`;
+    if (vl) body += `<p>VirtualLine : <b>${VL_FR[vl.state] || 'état inconnu'}</b>${vl.state === 'AVAILABLE' && vl.returnStart ? ` · créneau proposé vers ${hhmm(isoMod(vl.returnStart).mod)}` : ''}</p>`;
+    body += chartSVG(id, P);
+    body += `<div class="set"><span class="eyebrow">Dans mon programme</span>
+      <div class="seg" role="group" aria-label="Programme">
+        <button type="button" data-act="plan" data-val="must" data-id="${esc(id)}" aria-pressed="${p === 'must'}">Incontournable</button>
+        <button type="button" data-act="plan" data-val="bonus" data-id="${esc(id)}" aria-pressed="${p === 'bonus'}">Bonus</button>
+        <button type="button" data-act="plan" data-val="" data-id="${esc(id)}" aria-pressed="${!p}">Non</button></div></div>`;
+    const inQueue = prefs.queue?.id === id;
+    body += `<div class="row-inline">
+      <button class="btn primary" type="button" data-act="done" data-id="${esc(id)}">${icCheck}${prefs.done[id] ? `Refait (${prefs.done[id]}×)` : 'Marquer fait'}</button>
+      ${P.phase === 'open' && !inQueue ? `<button class="btn" type="button" data-act="queue" data-id="${esc(id)}">Je suis dans la file</button>` : ''}
+      ${inQueue ? `<button class="btn" type="button" data-act="queue-cancel" data-id="${esc(id)}">Quitter la file</button>` : ''}
+      ${prefs.done[id] ? `<button class="btn" type="button" data-act="undone" data-id="${esc(id)}">Annuler « fait »</button>` : ''}</div>`;
+    body += `<label class="field">M'alerter quand l'attente passe sous…${thresholdSelect('alertSel', id, prefs.alerts[id], [5, 10, 15, 20, 30, 45], 'Pas d\'alerte')}</label>`;
+    if (prefs.single && keyIn(e, SINGLE_RIDER)) {
+      const seen = prefs.srSeen[id], fresh = seen && now() - seen.at < 45 * 60000;
+      body += `<label class="field">File single rider relevée à l'entrée (min)<input id="srIn" data-id="${esc(id)}" type="number" inputmode="numeric" min="0" max="180" value="${fresh ? seen.w : ''}" placeholder="Estimation : ~${w != null ? r5(w * SR_FACTOR) : '?'} min"></label>`;
+    }
+    body += `<label class="field">À refaire si l'attente passe sous…${thresholdSelect('againSel', id, prefs.again[id], [5, 10, 15, 20, 30], 'Une fois suffit')}</label>`;
+    if (vl) body += slotForm(id, P);
+  } else if (e.type === 'SHOW') {
+    const times = todayShowtimes(id), planned = lastPlan?.steps.find(s => s.kind === 'show' && s.id === id);
+    body += `<p>${wk} min à pied${planned ? ` · prévu dans ton itinéraire à <b>${hhmm(planned.slot)}</b>` : ''}</p>${times.length ? `<div class="showtimes">${times.map(s => `<span class="chip ${s.mod >= P.mod ? 'ok' : 'end'}">${hhmm(s.mod)}</span>`).join('')}</div>` : '<p class="muted">Pas de représentation annoncée aujourd\'hui.</p>'}
+      <div class="row-inline"><button class="btn${prefs.shows[id] ? '' : ' primary'}" type="button" data-act="show-star" data-id="${esc(id)}">${prefs.shows[id] ? 'Retirer de mon itinéraire' : 'Ajouter à mon itinéraire'}</button>
+      ${prefs.shows[id] && !prefs.done[id] ? `<button class="btn" type="button" data-act="done" data-id="${esc(id)}">${icCheck}Vu</button>` : ''}</div>`;
+  } else {
+    body += `<p>${st === 'OPERATING' ? 'Ouvert' : 'Fermé pour l\'instant'} · ${wk} min à pied</p>`;
+  }
+  $('#sheet').innerHTML = `<div class="sheet-in">
+    <div class="sheet-head"><div><div class="eyebrow">${{ATTRACTION: 'Attraction', SHOW: 'Spectacle', RESTAURANT: 'Restauration'}[e.type] || ''}${isRide && st !== 'OPERATING' ? ' · ' + STATUS_FR[st] : ''}</div>
+      <h2 class="sheet-title" id="sheetTitle">${esc(e.name)}</h2></div>
+      <button class="icon-btn" type="button" data-act="sheet-close" aria-label="Fermer">✕</button></div>${body}</div>`;
+  const dlg = $('#sheet');
+  if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
+  dlg.dataset.id = id;
+}
+function slotForm(id, P) {
+  const vlIds = [...live.keys()].filter(x => vlOf(x) && hasQueue(x));
+  const suggested = hhmm(Math.ceil((P.phase === 'open' ? P.mod + 60 : (P.h?.open ?? 600) + 60) / 5) * 5);
+  return `<div class="set"><span class="eyebrow">J'ai réservé un créneau VirtualLine</span>
+    <div class="row-inline">
+      <label class="field" style="flex:1">Attraction<select id="slotRide">${vlIds.map(x => `<option value="${esc(x)}" ${x === id ? 'selected' : ''}>${esc(shortName(ents.get(x)))}</option>`).join('')}</select></label>
+      <label class="field">Début du créneau<input id="slotTime" type="time" value="${suggested}" step="300"></label>
+    </div>
+    <button class="btn" type="button" data-act="slot-save">Enregistrer le créneau</button></div>`;
+}
+
+/* ---------- Toast ---------- */
+let toastTimer = null, toastUndo = null;
+function toast(text, undo) {
+  const t = $('#toast');
+  toastUndo = undo || null;
+  t.innerHTML = `<span>${esc(text)}</span>${undo ? '<button type="button" data-act="undo">Annuler</button>' : ''}`;
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; toastUndo = null; }, 6000);
+}
+/* Change l'état, l'enregistre et propose « Annuler » qui remet la version d'avant */
+function withUndo(text, change) {
+  const before = JSON.stringify(prefs);
+  change();
+  savePrefs();
+  toast(text, () => { prefs = withDefaults(JSON.parse(before)); savePrefs(); render(); });
+  render();
+}
+
+/* =====================================================================
+   Actions
+   ===================================================================== */
+function applyPreset(name) {
+  const ps = PRESETS[name]; if (!ps) return;
+  const plan = {};
+  for (const e of ents.values()) {
+    if (e.type !== 'ATTRACTION' || e.transport) continue;
+    if (ps.must.some(k => e.key.includes(k))) plan[e.id] = 'must';
+    else if (ps.bonus.some(k => e.key.includes(k))) plan[e.id] = 'bonus';
+  }
+  withUndo(`${Object.keys(plan).length} attractions ajoutées au programme`, () => { prefs.plan = plan; prefs.onboarded = true; });
+}
+function markDone(id) {
+  const P = lastP || phaseInfo(), day = berlin(now()).day;
+  const hadSlot = prefs.slots.some(s => s.id === id && s.day === day);
+  withUndo(`${shortName(ents.get(id))} : ${ents.get(id)?.type === 'SHOW' ? 'vu' : 'fait'}`, () => {
+    const q = prefs.queue;
+    let real = null;
+    if (q && q.id === id) {
+      const el = (now() - q.since) / 60000;
+      if (el >= 3 && el <= 240) real = Math.max(0, Math.round(el - 4));
+      if (real != null && q.posted > 0) prefs.samples = (prefs.samples || []).concat([{id, posted: q.posted, real, t: Date.now()}]).slice(-40);
+    }
+    const sr = srFactor(id, ents.get(id)), w = q && q.id === id ? q.posted : waitOf(id);
+    prefs.log = (prefs.log || []).concat([{id, t: berlin(now()).mod, w: w != null && sr < 1 ? Math.round(w * sr) : w, real}]);
+    prefs.queue = null;
+    prefs.done[id] = (prefs.done[id] || 0) + 1;
+    prefs.lastDone = id;
+    prefs.slots = prefs.slots.filter(s => !(s.id === id && s.day === day));
+    delete prefs.skip[id];
+  });
+  gpsPrompt = null;
+  // Un seul créneau VirtualLine à la fois : le suivant se réserve dès que celui-ci est utilisé
+  if (hadSlot && P.phase === 'open') {
+    const pick = vlPick(P, id);
+    pendingAlert = `<b>Re-réserve un VirtualLine</b> dans l'appli Europa-Park${pick ? ` : <b>${esc(shortName(ents.get(pick)))}</b> est le plus intéressant${waitOf(pick) != null ? ` (file ${waitOf(pick)} min)` : ''}` : ''}. Puis note-le avec « J'ai un créneau ».`;
+    renderBanner(P, lastPlan);
+  }
+}
+function startQueue(id) {
+  const step = lastPlan?.steps.find(s => s.id === id);
+  asked.add('enter:' + id); gpsPrompt = null;
+  withUndo(`Dans la file : ${shortName(ents.get(id))}`, () => {
+    prefs.queue = {id, since: now(), posted: waitOf(id) ?? r5(step?.wait ?? 0)};
+  });
+  if ($('#sheet').open) $('#sheet').close();
+}
+
+let pendingAlert = null;
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-act], [data-tab], [data-filter], [data-sort], [data-pace], [data-route], [data-meal-dur]');
+  if (!el) return;
+  if (el.dataset.tab && !el.dataset.act) { switchTab(el.dataset.tab); return; }
+  if (el.dataset.filter) { device.filter = el.dataset.filter; saveDevice(); renderList(lastP || phaseInfo()); return; }
+  if (el.dataset.sort) { device.sort = el.dataset.sort; saveDevice(); renderList(lastP || phaseInfo()); return; }
+  if (el.dataset.pace) { prefs.pace = el.dataset.pace; savePrefs(); render(); return; }
+  if (el.dataset.route) { prefs.route = el.dataset.route; savePrefs(); render(); return; }
+  if (el.dataset.mealDur) { prefs.meal.dur = +el.dataset.mealDur; savePrefs(); render(); return; }
+  const id = el.dataset.id, act = el.dataset.act;
+  switch (act) {
+    case 'open': if (id) openSheet(id); break;
+    case 'goto': prefs.onboarded = true; device.filter = 'rides'; saveDevice(); savePrefs(); switchTab(el.dataset.tab); break;
+    case 'preset': applyPreset(el.dataset.preset); break;
+    case 'clear-plan': withUndo('Programme vidé', () => { prefs.plan = {}; prefs.shows = {}; }); break;
+    case 'star': {
+      const cur = prefs.plan[id];
+      if (!cur) prefs.plan[id] = 'must'; else if (cur === 'must') prefs.plan[id] = 'bonus'; else delete prefs.plan[id];
+      prefs.onboarded = true; savePrefs(); render(); break;
+    }
+    case 'show-star':
+      if (prefs.shows[id]) delete prefs.shows[id]; else { prefs.shows[id] = true; delete prefs.skip[id]; }
+      prefs.onboarded = true; savePrefs(); render();
+      if ($('#sheet').open) openSheet(id);
+      toast(prefs.shows[id] ? 'Spectacle ajouté : l\'itinéraire choisit la meilleure représentation' : 'Spectacle retiré de l\'itinéraire');
+      break;
+    case 'show-skip': withUndo(`${shortName(ents.get(id))} : pas aujourd'hui`, () => { prefs.skip[id] = 9999; }); break;
+    case 'plan':
+      if (el.dataset.val) prefs.plan[id] = el.dataset.val; else delete prefs.plan[id];
+      prefs.onboarded = true; savePrefs(); render(); openSheet(id); break;
+    case 'done': markDone(id); if ($('#sheet').open) $('#sheet').close(); break;
+    case 'undone':
+      delete prefs.done[id]; if (prefs.lastDone === id) prefs.lastDone = null; savePrefs(); render(); openSheet(id); break;
+    case 'skip': {
+      const P = lastP || phaseInfo();
+      withUndo(`${shortName(ents.get(id))} : on y revient dans 30 min minimum`, () => { prefs.skip[id] = P.mod + 30; });
+      break;
+    }
+    case 'queue': startQueue(id); break;
+    case 'queue-cancel': withUndo('Sorti de la file', () => { prefs.queue = null; }); if ($('#sheet').open) $('#sheet').close(); break;
+    case 'meal-done': withUndo('Pause repas : faite', () => { prefs.mealDone = true; }); break;
+    case 'meal-later': {
+      const P = lastP || phaseInfo();
+      withUndo('Repas décalé d\'au moins 30 min', () => { prefs.mealSkip = P.mod + 30; });
+      break;
+    }
+    case 'dismiss': asked.add(el.dataset.key); render(); break;
+    case 'prompt-no': if (gpsPrompt) asked.add(gpsPrompt.key); gpsPrompt = null; render(); break;
+    case 'slot-form': openSheet(id); setTimeout(() => $('#slotTime')?.focus(), 50); break;
+    case 'slot-save': {
+      const rid = $('#slotRide').value, tv = $('#slotTime').value;
+      if (!rid || !/^\d{2}:\d{2}$/.test(tv)) { toast('Indique l\'heure de début du créneau'); break; }
+      const [hh, mm] = tv.split(':').map(Number);
+      const P = lastP || phaseInfo(), day = P.phase === 'closed' ? P.day : berlin(now()).day;
+      prefs.slots = prefs.slots.filter(s => s.day !== day).concat([{id: rid, start: hh * 60 + mm, day}]);
+      prefs.onboarded = true; pendingAlert = null; savePrefs();
+      $('#sheet').close(); toast(`Créneau VirtualLine enregistré : ${shortName(ents.get(rid))} à ${tv}`); render(); break;
+    }
+    case 'slot-del': withUndo('Créneau supprimé', () => { prefs.slots = prefs.slots.filter(s => s.id !== id); }); break;
+    case 'sheet-close': $('#sheet').close(); break;
+    case 'banner-close': pendingAlert = null; render(); break;
+    case 'itin-more': itinExpanded = !itinExpanded; render(); break;
+    case 'undo': if (toastUndo) { const u = toastUndo; toastUndo = null; $('#toast').hidden = true; u(); } break;
+    case 'gps': if (device.gps) stopGps(true); else { device.gps = true; saveDevice(); startGps(); } renderSettings(); break;
+    case 'push-on': enablePush(); break;
+    case 'help': openHelp(el.dataset.section); break;
+    case 'recap': openRecap(); break;
+    case 'recap-share': shareRecap(); break;
+    case 'help-close': $('#help').close(); break;
+    case 'check-update':
+      toast('Recherche d\'une mise à jour…');
+      Promise.resolve(navigator.serviceWorker?.getRegistration()).then(reg => reg?.update()).catch(() => {}).finally(() => location.reload());
+      break;
+    case 'install':
+      if (installEvt) { installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; renderInstall(); }); }
+      break;
+    case 'install-hide': device.installHidden = true; saveDevice(); renderInstall(); break;
+    case 'push-test':
+      fetch(`${SERVER}?r=push-test&u=${encodeURIComponent(user.id)}`, {method: 'POST'}).then(r => r.json())
+        .then(j => toast(j.sent ? 'Notification envoyée' : 'Aucun téléphone abonné pour ce profil')).catch(() => toast('Serveur injoignable'));
+      break;
+    case 'switch-user': openLogin(false); break;
+    case 'login': selectUser({id, name: el.dataset.name}); break;
+    case 'login-local': selectUser({id: 'local', name: 'Ce téléphone', local: true}); break;
+    case 'login-close': $('#login').close(); break;
+    case 'copy-plan': {
+      const from = $('#copyFrom').value, name = $('#copyFrom').selectedOptions[0]?.textContent;
+      if (!from) break;
+      getJSON(`${SERVER}?r=state&u=${encodeURIComponent(from)}`).then(j => {
+        const s = j.state || {};
+        withUndo(`Programme de ${name} copié`, () => {
+          prefs.plan = Object.assign({}, s.plan); prefs.shows = Object.assign({}, s.shows); prefs.again = Object.assign({}, s.again);
+          if (s.meal) prefs.meal = Object.assign({}, DEFAULTS.meal, s.meal);
+          prefs.onboarded = true;
+        });
+      }).catch(() => toast('Impossible de lire ce profil'));
+      break;
+    }
+    case 'reset': {
+      if (el.dataset.armed !== '1') { el.dataset.armed = '1'; el.textContent = 'Confirmer la remise à zéro'; el.classList.add('primary'); setTimeout(() => { el.dataset.armed = ''; el.textContent = 'Remettre à zéro'; el.classList.remove('primary'); }, 4000); break; }
+      Object.assign(prefs, {done: {}, skip: {}, slots: [], alerted: {}, lastDone: null, mealDone: false, mealSkip: 0, queue: null, planned: null, srSeen: {}, log: []});
+      savePrefs();
+      el.dataset.armed = ''; el.textContent = 'Remettre à zéro'; el.classList.remove('primary');
+      toast('Journée remise à zéro'); render(); break;
+    }
+  }
+});
+document.addEventListener('change', ev => {
+  const t = ev.target;
+  if (t.id === 'alertSel' || t.id === 'againSel') {
+    const id = t.dataset.id, v = t.value, map = t.id === 'alertSel' ? prefs.alerts : prefs.again;
+    if (v) { map[id] = +v; delete prefs.alerted[id]; delete prefs.alerted['r:' + id]; } else delete map[id];
+    savePrefs();
+    toast(t.id === 'alertSel' ? (v ? `Alerte : ${shortName(ents.get(id))} sous ${v} min` : 'Alerte supprimée') : (v ? `À refaire dès que la file passe sous ${v} min` : 'Une fois suffit'));
+    if (v && !pushOn && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+    checkAlerts(); render();
+  }
+  if (t.id === 'hotelChk') { prefs.hotel = t.checked; savePrefs(); render(); }
+  if (t.id === 'mealChk') { prefs.meal.on = t.checked; savePrefs(); render(); }
+  if (t.id === 'mealFrom' || t.id === 'mealTo') {
+    prefs.meal[t.id === 'mealFrom' ? 'from' : 'to'] = +t.value;
+    if (prefs.meal.to - prefs.meal.from < prefs.meal.dur) toast('Fenêtre plus courte que le repas : il sera placé au plus tôt');
+    savePrefs(); render();
+  }
+  if (t.id === 'singleChk') { prefs.single = t.checked; savePrefs(); render(); }
+  if (t.id === 'srIn') {
+    const id = t.dataset.id, v = t.value === '' ? null : clamp(Math.round(+t.value), 0, 180);
+    if (v == null) delete prefs.srSeen[id]; else prefs.srSeen[id] = {w: v, at: now()};
+    savePrefs(); render(); toast(v == null ? 'Estimation single rider rétablie' : `Single rider : ${v} min, pris en compte 45 min`);
+  }
+  if (t.id === 'shareChk') {
+    device.share = t.checked; saveDevice();
+    if (device.share && !device.gps) { device.gps = true; saveDevice(); startGps(); }
+    if (device.share && gpsPos) postWhere(gpsPos);
+    if (!device.share) postWhere(null);
+    renderSettings();
+  }
+  if (t.id === 'nickIn') { device.nick = t.value.trim().slice(0, 24); saveDevice(); if (device.share && gpsPos) postWhere(gpsPos); }
+  if (t.id === 'heightIn') { prefs.height = clamp(Math.round(+t.value || 0), 0, 220); savePrefs(); render(); }
+});
+document.addEventListener('submit', ev => {
+  if (ev.target.id === 'newUser') { ev.preventDefault(); createUser($('#newName').value); }
+});
+$('#q').addEventListener('input', () => renderList(lastP || phaseInfo()));
+$('#sheet').addEventListener('click', ev => { if (ev.target === $('#sheet')) $('#sheet').close(); });
+$('#sheet').addEventListener('close', () => render());
+$('#login').addEventListener('cancel', ev => { if ($('#login').dataset.force) ev.preventDefault(); });
+$('#refreshBtn').addEventListener('click', () => refresh(true));
+
+function switchTab(tab) {
+  if (!['now', 'list', 'map', 'settings'].includes(tab)) tab = 'now';
+  device.tab = tab; saveDevice();
+  document.querySelectorAll('[data-tab-panel]').forEach(p => { p.hidden = p.dataset.tabPanel !== tab; });
+  document.querySelectorAll('.tabbar [data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tab));
+  try { history.replaceState(null, '', location.search + '#' + tab); } catch (e) {}
+  window.scrollTo(0, 0);
+  render();
+}
+
+/* ---------- Alertes de seuil (page ouverte) ----------
+   Téléphone en poche, c'est le serveur qui envoie les notifications push (api.php, collect). */
+async function notify(title, body) {
+  try { navigator.vibrate?.([220, 120, 220]); } catch (e) {}
+  if (pushOn || !('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    if (reg) { await reg.showNotification(title, {body, icon: 'icon-192.png', tag: 'ep-alert'}); return; }
+  } catch (e) {}
+  try { new Notification(title, {body}); } catch (e) {}
+}
+function checkAlerts() {
+  const hits = [];
+  const check = (key, id, thr, label) => {
+    const w = waitOf(id);
+    if (w == null || w > thr || Date.now() - (prefs.alerted[key] || 0) < 30 * 60000) return;
+    prefs.alerted[key] = Date.now();
+    hits.push(`${label}${shortName(ents.get(id))} : ${w} min`);
+  };
+  for (const [id, thr] of Object.entries(prefs.alerts)) check(id, id, thr, '');
+  for (const [id, thr] of Object.entries(prefs.again)) if (prefs.done[id] > 0) check('r:' + id, id, thr, 'À refaire · ');
+  if (!hits.length) return;
+  savePrefs(false);
+  pendingAlert = `<b>File courte</b> · ${hits.map(esc).join(' · ')}`;
+  notify('File courte', hits.join('\n'));
+}
+
+/* ---------- Notifications push ---------- */
+let pushOn = false;
+const b64uToBytes = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0));
+const bytesToB64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+async function subscribePush(silent) {
+  const reg = await navigator.serviceWorker.ready;
+  const {key} = await getJSON(`${SERVER}?r=push-key`);
+  let sub = await reg.pushManager.getSubscription();
+  // Clé du serveur changée : l'ancien abonnement ne marche plus
+  if (sub && sub.options?.applicationServerKey && bytesToB64u(sub.options.applicationServerKey) !== key) { await sub.unsubscribe(); sub = null; }
+  if (!sub) {
+    if (silent) return;
+    sub = await reg.pushManager.subscribe({userVisibleOnly: true, applicationServerKey: b64uToBytes(key)});
+  }
+  const r = await fetch(`${SERVER}?r=push-sub&u=${encodeURIComponent(user.id)}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(sub.toJSON())});
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  pushOn = true;
+}
+async function enablePush() {
+  if (!remote()) { toast('Choisis un profil enregistré sur le serveur pour recevoir les notifications'); return; }
+  if (isIOS && !standalone()) { toast('Sur iPhone : ajoute d\'abord la page à l\'écran d\'accueil, puis ouvre-la depuis l\'icône'); return; }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) { toast('Notifications push non prises en charge par ce navigateur'); return; }
+  try {
+    if (await Notification.requestPermission() !== 'granted') { toast('Notifications refusées : autorise-les dans les réglages du téléphone'); renderSettings(); return; }
+    await subscribePush(false);
+    toast('Notifications activées sur ce téléphone');
+  } catch (e) { toast('Activation impossible : ' + e.message); }
+  renderSettings();
+}
+function renderPushStatus() {
+  const np = 'Notification' in window ? Notification.permission : 'unsupported';
+  let txt;
+  if (pushOn) txt = 'Actives sur ce téléphone, même page fermée : files sous tes seuils, attractions à refaire, réouvertures, départ pour un créneau VirtualLine, un spectacle ou le repas.';
+  else if (np === 'denied') txt = 'Bloquées dans le navigateur : autorise-les dans les réglages du téléphone.';
+  else if (isIOS && !standalone()) txt = 'Sur iPhone (iOS 16.4 ou plus), ajoute la page à l\'écran d\'accueil puis ouvre-la depuis l\'icône pour les activer.';
+  else if (!('PushManager' in window)) txt = 'Push non pris en charge ici : alertes par vibration, page ouverte seulement.';
+  else txt = 'Reçois les alertes téléphone en poche : files courtes, réouvertures, départ pour un créneau ou un spectacle.';
+  $('#pushStatus').textContent = txt + (serverPushSubs > 1 ? ` ${serverPushSubs} téléphones abonnés pour ce profil.` : '');
+  $('#pushBtn').hidden = pushOn || np === 'denied';
+  $('#pushTest').hidden = !pushOn;
+}
+
+/* ---------- Récap de la journée ---------- */
+function recapData() {
+  const log = (prefs.log || []).filter(l => ents.has(l.id));
+  if (!log.length) return null;
+  const rides = log.filter(l => ents.get(l.id).type === 'ATTRACTION');
+  let prev = ENTRANCE, m = 0;
+  for (const l of log) { const e = ents.get(l.id); if (e.lat != null) { m += dist(prev, e) * 1.35; prev = e; } }
+  m += dist(prev, ENTRANCE) * 1.35;
+  let queue = 0, gained = 0, best = null;
+  for (const l of rides) {
+    const w = l.real ?? l.w;
+    if (w == null) continue;
+    queue += w;
+    // Gain : attente moyenne relevée ce jour-là sur l'attraction, moins celle qu'on a eue
+    const vals = series(l.id).map(p => p[1]).filter(v => v != null);
+    if (vals.length >= 6 && l.w != null) {
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+      gained += avg - l.w;
+      if (!best || avg - l.w > best.g) best = {id: l.id, g: avg - l.w, w: l.w, avg};
+    }
+  }
+  const counts = {};
+  for (const l of rides) counts[l.id] = (counts[l.id] || 0) + 1;
+  const fav = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  return {rides: rides.length, distinct: Object.keys(counts).length, shows: log.length - rides.length, km: m / 1000, queue, gained,
+    best: best && best.g >= 10 ? best : null, fav: fav && fav[1] > 1 ? fav : null, from: log[0].t, to: log[log.length - 1].t};
+}
+const km = x => x.toFixed(1).replace('.', ',');
+function recapHTML(r) {
+  const lines = [];
+  if (r.gained >= 10) lines.push(`Tu as attendu environ <b>${dur(r.gained)} de moins</b> que l'attente moyenne de la journée sur ces attractions.`);
+  if (r.best) lines.push(`Meilleur coup : <b>${esc(shortName(ents.get(r.best.id)))}</b> à ${r.best.w} min (${Math.round(r.best.avg)} en moyenne).`);
+  if (r.fav) lines.push(`Préférée : <b>${esc(shortName(ents.get(r.fav[0])))}</b> ×${r.fav[1]}.`);
+  if (r.shows) lines.push(`${r.shows} spectacle${r.shows > 1 ? 's' : ''} vu${r.shows > 1 ? 's' : ''}.`);
+  return `<article class="card"><div class="eyebrow">Ta journée · ${hhmm(r.from)} – ${hhmm(r.to)}</div>
+    <div class="stats"><div class="stat"><span>Tours</span><b>${r.rides}</b></div><div class="stat"><span>Dans les files</span><b>${dur(r.queue)}</b></div><div class="stat"><span>À pied</span><b>≈ ${km(r.km)} km</b></div></div>
+    ${lines.length ? `<p>${lines.join(' ')}</p>` : ''}
+    <div class="row-inline"><button class="btn small primary" type="button" data-act="recap-share">Partager</button></div></article>`;
+}
+function openRecap() {
+  const r = recapData();
+  $('#sheet').innerHTML = `<div class="sheet-in"><div class="sheet-head"><div><div class="eyebrow">${esc(fmtDay(berlin(now()).day))}</div><h2 class="sheet-title" id="sheetTitle">Récap de ma journée</h2></div>
+    <button class="icon-btn" type="button" data-act="sheet-close" aria-label="Fermer">✕</button></div>
+    ${r ? recapHTML(r) : '<p class="muted">Rien d\'enregistré aujourd\'hui : touche « Fait » à la sortie de chaque attraction, le récap se remplit tout seul.</p>'}</div>`;
+  const dlg = $('#sheet');
+  if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
+}
+function shareRecap() {
+  const r = recapData();
+  if (!r) return;
+  const text = `Europa-Park, ${fmtDay(berlin(now()).day)} : ${r.rides} tours (${r.distinct} attractions), ${dur(r.queue)} dans les files, ≈ ${km(r.km)} km à pied`
+    + (r.gained >= 10 ? `, ${dur(r.gained)} d'attente gagnée` : '') + (r.fav ? `. Préférée : ${shortName(ents.get(r.fav[0]))} ×${r.fav[1]}` : '') + '.';
+  if (navigator.share) navigator.share({title: 'Ma journée à Europa-Park', text}).catch(() => {});
+  else navigator.clipboard?.writeText(text).then(() => toast('Récap copié')).catch(() => toast(text));
+}
+
+/* ---------- Groupe : positions partagées ---------- */
+let where = [], lastShare = 0;
+const shareNick = () => (device.nick || (remote() ? user.name : '') || 'Moi').slice(0, 24);
+const groupMembers = () => where.filter(x => x.device !== device.id && x.lat != null && Date.now() - x.ts < 20 * 60000);
+function postWhere(pos) {
+  lastShare = Date.now();
+  fetch(`${SERVER}?r=where`, {method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({device: device.id, nick: shareNick(), lat: pos ? pos.lat : null, lon: pos ? pos.lon : null})})
+    .then(r => r.ok ? r.json() : null).then(j => { if (Array.isArray(j)) { where = j; if (device.tab === 'map') scheduleRender(); } }).catch(() => {});
+}
+/* Point de rencontre : l'attraction la plus proche du centre du groupe */
+function meetingPoint(people) {
+  if (people.length < 2) return null;
+  const c = {lat: people.reduce((s, p) => s + p.lat, 0) / people.length, lon: people.reduce((s, p) => s + p.lon, 0) / people.length};
+  let best = null, bd = 1e9;
+  for (const e of ents.values()) {
+    if (e.type !== 'ATTRACTION' || e.transport || e.lat == null || !hasQueue(e.id)) continue;
+    const d = dist(c, e);
+    if (d < bd) { bd = d; best = e; }
+  }
+  return best;
+}
+
+/* ---------- Aide ---------- */
+function openHelp(section) {
+  const dlg = $('#help');
+  $('#helpVersion').textContent = `Version ${APP_VERSION}`;
+  if (section) { const d = $('#help-' + section); if (d) d.open = true; }
+  if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
+  if (section) $('#help-' + section)?.scrollIntoView({block: 'start'});
+}
+$('#help').addEventListener('click', ev => { if (ev.target === $('#help')) $('#help').close(); });
+
+/* ---------- Installation sur l'écran d'accueil ----------
+   Android (Chrome, Edge, Samsung) : bouton « Installer » via beforeinstallprompt.
+   iPhone : pas d'invite possible, on explique Partager → Sur l'écran d'accueil. */
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderInstall(); });
+window.addEventListener('appinstalled', () => { installEvt = null; toast('EP Live est installée : ouvre-la depuis ton écran d\'accueil'); renderInstall(); });
+function installHTML() {
+  if (installEvt) return `<p>Ajoute EP Live à ton écran d'accueil : elle s'ouvre en plein écran, reste utilisable quand le réseau du parc sature, et peut t'envoyer des notifications.</p>
+    <div class="row-inline"><button class="btn primary" type="button" data-act="install">Installer l'appli</button>`;
+  if (isIOS) return `<p>Dans Safari, touche <b>Partager</b> (le carré avec une flèche vers le haut), puis <b>Sur l'écran d'accueil</b>. Ouvre ensuite EP Live depuis l'icône : c'est indispensable pour recevoir les notifications (iOS 16.4 ou plus).</p>
+    <div class="row-inline">`;
+  return `<p>Dans le menu du navigateur (⋮), choisis <b>Installer l'application</b> ou <b>Ajouter à l'écran d'accueil</b>.</p><div class="row-inline">`;
+}
+function renderInstall() {
+  const card = $('#installCard'), set = $('#installSet'), installed = standalone();
+  card.hidden = installed || device.installHidden || !(installEvt || isIOS);
+  if (!card.hidden) card.innerHTML = `<div class="eyebrow">Installer l'appli</div>${installHTML()}<button class="btn" type="button" data-act="install-hide">Plus tard</button></div>`;
+  set.innerHTML = `<h2>Application</h2>${installed ? '<p class="muted">Installée sur ce téléphone.</p>' : installHTML() + '</div>'}`;
+}
+
+/* ---------- Position ---------- */
+const asked = new Set();          // questions déjà posées (« tu fais la queue ? »)
+let gpsPrompt = null, nearRide = null;
+function checkGpsPrompt() {
+  gpsPrompt = null;
+  const P = lastP;
+  if (!gpsPos || !P || P.phase !== 'open' || Date.now() - gpsPos.ts > 5 * 60000) return;
+  const q = prefs.queue;
+  if (q) {
+    const e = ents.get(q.id), key = `leave:${q.id}:${q.since}`;
+    if (e?.lat != null && dist(gpsPos, e) > 120 && (now() - q.since) / 60000 >= 6 && !asked.has(key)) gpsPrompt = {kind: 'leave', id: q.id, key};
+    return;
+  }
+  if (gpsPos.acc > 50) return;
+  let best = null, bd = 60;
+  for (const id of Object.keys(prefs.plan)) {
+    const e = ents.get(id);
+    if (!e || e.lat == null || prefs.done[id] > 0 || statusOf(id) !== 'OPERATING') continue;
+    const d = dist(gpsPos, e);
+    if (d < bd) { bd = d; best = id; }
+  }
+  if (!best) { nearRide = null; return; }
+  if (nearRide?.id !== best) nearRide = {id: best, since: Date.now()};
+  // Proposé tout de suite pour l'étape conseillée, après 2 min sur place pour les autres
+  const isNext = lastPlan?.steps?.[0]?.id === best;
+  if ((isNext || Date.now() - nearRide.since >= 120000) && !asked.has('enter:' + best)) gpsPrompt = {kind: 'enter', id: best, key: 'enter:' + best};
+}
+function startGps() {
+  if (!navigator.geolocation || !window.isSecureContext) { gpsState = 'unavailable'; device.gps = false; saveDevice(); return; }
+  gpsState = 'wait';
+  if (watchId != null) navigator.geolocation.clearWatch(watchId);
+  watchId = navigator.geolocation.watchPosition(p => {
+    const q = {lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy, ts: Date.now()};
+    if (q.acc < 150 && inPark(q)) {
+      gpsPos = q; gpsState = 'on';
+      // Position transmise au serveur (au plus toutes les 2 min) pour calculer l'heure de départ des notifications
+      if (!prefs.pos || q.ts - prefs.pos.ts > 120000) { prefs.pos = {lat: q.lat, lon: q.lon, ts: q.ts}; savePrefs(false); }
+      if (device.share && Date.now() - lastShare > 60000) postWhere(q);
+    } else { gpsPos = null; gpsState = 'out'; }
+    scheduleRender();
+  }, err => {
+    gpsState = err.code === 1 ? 'denied' : 'unavailable';
+    if (err.code === 1) { device.gps = false; saveDevice(); }
+    scheduleRender();
+  }, {enableHighAccuracy: true, maximumAge: 30000, timeout: 30000});
+}
+function stopGps(byUser) {
+  if (watchId != null) navigator.geolocation.clearWatch(watchId);
+  watchId = null; gpsPos = null;
+  if (byUser) { device.gps = false; gpsState = 'off'; saveDevice(); render(); }
+}
+let renderQueued = false;
+function scheduleRender() { if (renderQueued) return; renderQueued = true; setTimeout(() => { renderQueued = false; if (!$('#sheet').open) render(); else renderHeader(phaseInfo()); }, 400); }
+
+/* =====================================================================
+   Réseau
+   ===================================================================== */
+async function getJSON(url, ms = 10000) {
+  const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
+  try {
+    const r = await fetch(url, {signal: c.signal, cache: 'no-store'});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+async function fetchStatic(route, path) {
+  try { return await getJSON(`${SERVER}?r=${route}`); } catch (e) { return await getJSON(DIRECT + path); }
+}
+async function loadStatic() {
+  let ch = cacheGet('children');
+  if (!ch || Date.now() - ch.at > 3 * 864e5) {
+    try { ch = {at: Date.now(), data: await fetchStatic('children', '/children')}; cacheSet('children', ch); } catch (e) {}
+  }
+  if (ch) ingestChildren(ch.data);
+  let sc = cacheGet('schedule');
+  if (!sc || Date.now() - sc.at > 6 * 36e5) {
+    try { sc = {at: Date.now(), data: await fetchStatic('schedule', '/schedule')}; cacheSet('schedule', sc); } catch (e) {}
+  }
+  if (sc) schedule = sc.data;
+}
+let busy = false;
+async function refresh() {
+  if (busy) return;
+  busy = true; $('#refreshBtn').classList.add('spin');
+  try {
+    try {
+      const uq = remote() ? `&u=${encodeURIComponent(user.id)}&since=${prefs.updatedAt || 0}` : '';
+      const b = await getJSON(`${SERVER}?r=bundle${uq}`);
+      if (!b || !b.live) throw new Error('réponse invalide');
+      ingestLive(b.live); stats = b.stats || null;
+      meta = {fetchedAt: Date.parse(b.fetchedAt) || Date.now(), source: 'serveur', stale: !!b.stale, offline: false};
+      if (b.weather) { ingestWeather(b.weather); cacheSet('weather', {at: Date.now(), data: b.weather}); }
+      handleUserInfo(b.user);
+      if (Array.isArray(b.where)) where = b.where;
+      if (!calData) loadCalendar();
+    } catch (e1) {
+      const l = await getJSON(DIRECT + '/live');
+      ingestLive(l);
+      meta = {fetchedAt: Date.now(), source: 'direct', stale: false, offline: false};
+      const wc = cacheGet('weather');
+      if (!wc || Date.now() - wc.at > 36e5) getJSON(WEATHER_URL, 6000).then(w => { ingestWeather(w); cacheSet('weather', {at: Date.now(), data: w}); }).catch(() => {});
+    }
+    cacheSet('live', {meta, live: {liveData: [...live.values()]}, stats});
+    if (!ents.size || [...ents.values()].every(e => e.lat == null)) { await loadStatic(); ingestLive({liveData: [...live.values()]}); }
+    updateTrail();
+    checkAlerts();
+  } catch (e) {
+    meta.offline = true;
+  } finally {
+    busy = false; $('#refreshBtn').classList.remove('spin');
+    if (!$('#sheet').open) render(); else { renderHeader(phaseInfo()); renderBanner(phaseInfo(), lastPlan); }
+  }
+}
+function restoreFromCache() {
+  const ch = cacheGet('children'); if (ch) ingestChildren(ch.data);
+  const sc = cacheGet('schedule'); if (sc) schedule = sc.data;
+  const lv = cacheGet('live');
+  if (lv) { ingestLive(lv.live); stats = lv.stats; meta = Object.assign({}, lv.meta, {offline: false}); }
+  const wc = cacheGet('weather'); if (wc) ingestWeather(wc.data);
+  trail = cacheGet('trail');
+}
+
+/* =====================================================================
+   Démarrage
+   ===================================================================== */
+(async function init() {
+  restoreFromCache();
+  if (user) rolloverDay();
+  const initialTab = (location.hash || '').slice(1) || device.tab || 'now';
+  device.tab = ['now', 'list', 'map', 'settings'].includes(initialTab) ? initialTab : 'now';
+  document.querySelectorAll('[data-tab-panel]').forEach(p => { p.hidden = p.dataset.tabPanel !== device.tab; });
+  document.querySelectorAll('.tabbar [data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === device.tab));
+  // Nouvelle version depuis la dernière ouverture sur ce téléphone : on le signale une fois
+  if (device.seenVersion !== APP_VERSION) {
+    if (device.seenVersion || user || loadJSON('ep-planner-v1')) pendingAlert = `<b>Nouvelle version de l'appli.</b> <button type="button" class="yes" data-act="help" data-section="news">Voir les nouveautés</button>`;
+    device.seenVersion = APP_VERSION; saveDevice();
+  }
+  render();
+  if (!user) openLogin(true);
+  await loadStatic();
+  render();
+  await refresh();
+  setInterval(() => { if (!document.hidden) refresh(); }, REFRESH_MS);
+  setInterval(() => { if (!document.hidden && !$('#sheet').open) { if (user) rolloverDay(); render(); } }, 30000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { stopGps(false); pushState(true); return; }
+    if (device.gps) startGps();
+    if (Date.now() - (meta.fetchedAt || 0) > 60000) refresh(); else render();
+  });
+  if (device.gps) startGps();
+  if ('serviceWorker' in navigator && window.isSecureContext) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.ready.then(reg => reg.pushManager?.getSubscription()).then(s => {
+      pushOn = !!s && Notification.permission === 'granted';
+      // Rattache l'abonnement de ce téléphone au profil actuel (et à la clé actuelle du serveur)
+      if (pushOn && remote()) subscribePush(true).catch(() => {});
+    }).catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>

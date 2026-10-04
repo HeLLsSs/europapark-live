@@ -1,0 +1,9 @@
+# Données générées par api.php (cache + historique)
+www/data/*
+!www/data/.htaccess
+
+.DS_Store
+*.swp
+
+# Fichiers de l'IDE
+.idea/

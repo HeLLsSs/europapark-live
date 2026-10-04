@@ -1,0 +1,6 @@
+# /etc/cron.d/europapark — chaque minute de 8 h à 20 h 59 : collecte les temps d'attente
+# (un point d'historique toutes les 4 min au plus) et envoie les notifications push
+# (files courtes, réouvertures, départ VirtualLine, spectacles, repas).
+# Tourne en www-data, comme PHP-FPM, pour que la page puisse toujours écrire dans data/.
+# Installation : sudo cp deploy/cron/europapark /etc/cron.d/europapark && sudo chmod 644 /etc/cron.d/europapark
+* 8-20 * * * www-data /usr/bin/php /var/www/europapark/www/api.php collect >/dev/null 2>&1
