@@ -198,7 +198,21 @@ dialog.sheet::backdrop{background:rgba(5,12,10,.45)}
 .showtimes{display:flex;flex-wrap:wrap;gap:6px}
 
 /* Carte Leaflet */
-#lmap{height:min(68vh,560px);background:var(--sunk)}
+#lmap{height:calc(100dvh - 260px - env(safe-area-inset-bottom,0px));min-height:340px;background:var(--sunk)}
+.map-wrap.full{position:fixed;inset:0;z-index:70;border:0;border-radius:0}
+.map-wrap.full #lmap{height:100dvh}
+.map-ctl{display:flex;flex-direction:column;gap:6px}
+.map-ctl button{width:42px;height:42px;border-radius:10px;border:0;background:var(--surface);color:var(--ink);box-shadow:0 1px 5px rgba(0,0,0,.35);display:grid;place-items:center;font-size:18px;cursor:pointer}
+.map-ctl button svg{width:22px;height:22px}
+.map-ctl button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.mk.poi{background:var(--surface);color:var(--ink);font-size:12px;border-width:1.5px}
+.mk.car{background:var(--surface);font-size:15px;border-color:var(--accent)}
+.chip.toggle{border:0;cursor:pointer}
+.chip.toggle[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.stars{display:inline-flex;gap:2px}
+.stars button{border:0;background:transparent;font-size:1.5rem;line-height:1;padding:4px 2px;color:var(--line);cursor:pointer}
+.stars button[aria-pressed="true"]{color:var(--accent)}
+.banner .stars button{font-size:1.35rem;padding:2px 1px}
 .mk{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:var(--c,var(--w-off));color:#fff;font:800 14px/1 var(--font-display);
   border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);font-variant-numeric:tabular-nums}
 .mk.next{box-shadow:0 0 0 4px var(--accent),0 1px 4px rgba(0,0,0,.35)}
@@ -220,6 +234,7 @@ dialog.sheet::backdrop{background:rgba(5,12,10,.45)}
 .cal{display:flex;flex-direction:column;gap:3px;font-size:.8rem;color:var(--muted)}
 .cal-row{display:grid;grid-template-columns:5.2rem 1fr 2.6rem;gap:8px;align-items:center}
 .cal-row i{display:block;height:8px;border-radius:4px;background:var(--c)}
+.cal-row.fc{grid-template-columns:5.2rem 1fr 6.4rem}
 .cal-row b{font:700 .95rem var(--font-display);text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
 button.board-name{border:0;background:none;color:inherit;padding:0;text-align:left}
 .banner .yes{color:var(--accent)}
@@ -249,14 +264,14 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <div class="strip-row">
       <div class="strip-text">
         <div class="eyebrow" id="parkName">Europa-Park Live</div>
-        <div class="park-line" id="parkLine">Chargement…</div>
+        <div class="park-line" id="parkLine" data-i18n="loading">Chargement…</div>
         <div class="fresh" id="freshLine"></div>
       </div>
-      <button class="icon-btn" type="button" data-act="help" aria-label="Aide">
+      <button class="icon-btn" type="button" data-act="help" aria-label="Aide" data-i18n-attr="aria-label:help">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01" stroke-width="3"/></svg>
       </button>
-      <button class="user-btn" id="userBtn" type="button" data-act="switch-user" aria-label="Changer de profil">Profil</button>
-      <button class="icon-btn" id="refreshBtn" type="button" aria-label="Actualiser les temps d'attente">
+      <button class="user-btn" id="userBtn" type="button" data-act="switch-user" aria-label="Changer de profil" data-i18n-attr="aria-label:switchUser" data-i18n="profile">Profil</button>
+      <button class="icon-btn" id="refreshBtn" type="button" aria-label="Actualiser les temps d'attente" data-i18n-attr="aria-label:refresh">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
       </button>
     </div>
@@ -269,28 +284,28 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <section class="tab" id="tab-now" data-tab-panel="now">
       <div id="installCard" class="card" hidden></div>
       <div id="onboard" class="card" hidden>
-        <div class="eyebrow">Ton programme</div>
-        <p>Choisis une base, tu pourras ensuite cocher ou retirer chaque attraction dans l'onglet Attractions.</p>
+        <div class="eyebrow" data-i18n="onb.title">Ton programme</div>
+        <p data-i18n="onb.text">Choisis une base, tu pourras ensuite cocher ou retirer chaque attraction dans l'onglet Attractions.</p>
         <div class="row-inline">
-          <button class="btn primary" data-act="preset" data-preset="sensations" type="button">Sensations fortes</button>
-          <button class="btn" data-act="preset" data-preset="famille" type="button">En famille</button>
-          <button class="btn" data-act="goto" data-tab="list" type="button">Je choisis moi-même</button>
+          <button class="btn primary" data-act="preset" data-preset="sensations" type="button" data-i18n="preset.thrills">Sensations fortes</button>
+          <button class="btn" data-act="preset" data-preset="famille" type="button" data-i18n="preset.family">En famille</button>
+          <button class="btn" data-act="goto" data-tab="list" type="button" data-i18n="onb.self">Je choisis moi-même</button>
         </div>
       </div>
       <div id="recapBox"></div>
       <div id="nextBox"></div>
       <section class="block" id="vlBlock" hidden></section>
       <section class="block" id="itinBlock" hidden>
-        <div class="block-head"><h2 id="itinTitle">Itinéraire conseillé</h2><span class="muted num" id="itinEnd"></span></div>
+        <div class="block-head"><h2 id="itinTitle" data-i18n="itin.title">Itinéraire conseillé</h2><span class="muted num" id="itinEnd"></span></div>
         <ol class="itin" id="itin"></ol>
         <p class="note" id="itinNote"></p>
       </section>
       <section class="block" id="showsBlock" hidden>
-        <div class="block-head"><h2>Spectacles à venir</h2><span class="muted">2 prochaines heures</span></div>
+        <div class="block-head"><h2 data-i18n="shows.title">Spectacles à venir</h2><span class="muted" data-i18n="shows.next2h">2 prochaines heures</span></div>
         <ol class="itin" id="shows"></ol>
       </section>
       <section class="block" id="tipsBlock" hidden>
-        <h2>Pour bien démarrer</h2>
+        <h2 data-i18n="tips.title">Pour bien démarrer</h2>
         <div class="card" id="tips"></div>
       </section>
     </section>
@@ -298,17 +313,17 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <!-- ATTRACTIONS -->
     <section class="tab" id="tab-list" data-tab-panel="list" hidden>
       <div class="controls">
-        <div class="seg" id="filterSeg" role="group" aria-label="Filtrer">
-          <button type="button" data-filter="plan">Mon plan</button>
-          <button type="button" data-filter="rides">Attractions</button>
-          <button type="button" data-filter="shows">Spectacles</button>
-          <button type="button" data-filter="food">Restos</button>
+        <div class="seg" id="filterSeg" role="group" aria-label="Filtrer" data-i18n-attr="aria-label:filter">
+          <button type="button" data-filter="plan" data-i18n="filter.plan">Mon plan</button>
+          <button type="button" data-filter="rides" data-i18n="filter.rides">Attractions</button>
+          <button type="button" data-filter="shows" data-i18n="filter.shows">Spectacles</button>
+          <button type="button" data-filter="food" data-i18n="filter.food">Restos</button>
         </div>
-        <input class="search" id="q" type="search" placeholder="Rechercher (ex. Voltron)" autocomplete="off" aria-label="Rechercher">
-        <div class="sortline"><span>Trier</span>
-          <div class="seg" id="sortSeg" role="group" aria-label="Trier">
-            <button type="button" data-sort="wait">Attente</button>
-            <button type="button" data-sort="walk">Distance</button>
+        <input class="search" id="q" type="search" placeholder="Rechercher (ex. Voltron)" autocomplete="off" aria-label="Rechercher" data-i18n-attr="placeholder:search.ph;aria-label:search">
+        <div class="sortline"><span data-i18n="sort">Trier</span>
+          <div class="seg" id="sortSeg" role="group" aria-label="Trier" data-i18n-attr="aria-label:sort">
+            <button type="button" data-sort="wait" data-i18n="sort.wait">Attente</button>
+            <button type="button" data-sort="walk" data-i18n="sort.walk">Distance</button>
             <button type="button" data-sort="name">A–Z</button>
           </div>
         </div>
@@ -320,144 +335,159 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <!-- CARTE -->
     <section class="tab" id="tab-map" data-tab-panel="map" hidden>
       <div class="legend">
-        <span><i style="--c:var(--accent)"></i>toi</span>
-        <span><i style="--c:var(--ink)"></i>groupe</span>
+        <span><i style="--c:var(--accent)"></i><span data-i18n="legend.you">toi</span></span>
+        <span><i style="--c:var(--ink)"></i><span data-i18n="legend.group">groupe</span></span>
         <span><i style="--c:var(--w-low)"></i>≤ 10 min</span>
         <span><i style="--c:var(--w-mid)"></i>15–25</span>
         <span><i style="--c:var(--w-high)"></i>30–45</span>
         <span><i style="--c:var(--w-peak)"></i>50+</span>
-        <span><i style="--c:var(--w-off)"></i>fermé</span>
+        <span><i style="--c:var(--w-off)"></i><span data-i18n="legend.closed">fermé</span></span>
       </div>
+      <div class="chips" id="poiChips"></div>
       <div class="map-wrap" id="mapWrap"></div>
       <p class="note" id="mapNote"></p>
+      <div class="card" id="mapTools"></div>
     </section>
 
     <!-- RÉGLAGES -->
     <section class="tab" id="tab-settings" data-tab-panel="settings" hidden>
       <div class="card">
         <div class="set">
-          <h2>Profil</h2>
-          <p class="muted" id="userSummary"></p>
-          <div class="row-inline"><button class="btn small" data-act="switch-user" type="button">Changer de profil</button></div>
-          <div class="row-inline" id="copyRow">
-            <label class="field" style="flex:1">Copier le programme de<select id="copyFrom"></select></label>
-            <button class="btn small" data-act="copy-plan" type="button">Copier</button>
+          <h2>Langue / Language / Sprache</h2>
+          <div class="seg" id="langSeg" role="group" aria-label="Langue / Language / Sprache">
+            <button type="button" data-lang="fr" lang="fr">Français</button>
+            <button type="button" data-lang="en" lang="en">English</button>
+            <button type="button" data-lang="de" lang="de">Deutsch</button>
           </div>
         </div>
         <div class="set">
-          <h2>Mon programme</h2>
+          <h2 data-i18n="profile">Profil</h2>
+          <p class="muted" id="userSummary"></p>
+          <div class="row-inline"><button class="btn small" data-act="switch-user" type="button" data-i18n="switchUser">Changer de profil</button></div>
+          <div class="row-inline" id="copyRow">
+            <label class="field" style="flex:1"><span data-i18n="set.copyFrom">Copier le programme de</span><select id="copyFrom"></select></label>
+            <button class="btn small" data-act="copy-plan" type="button" data-i18n="set.copy">Copier</button>
+          </div>
+        </div>
+        <div class="set">
+          <h2 data-i18n="set.plan">Mon programme</h2>
           <p class="muted" id="planSummary"></p>
           <div class="row-inline">
-            <button class="btn small" data-act="preset" data-preset="sensations" type="button">Sensations fortes</button>
-            <button class="btn small" data-act="preset" data-preset="famille" type="button">En famille</button>
-            <button class="btn small" data-act="clear-plan" type="button">Vider</button>
+            <button class="btn small" data-act="preset" data-preset="sensations" type="button" data-i18n="preset.thrills">Sensations fortes</button>
+            <button class="btn small" data-act="preset" data-preset="famille" type="button" data-i18n="preset.family">En famille</button>
+            <button class="btn small" data-act="clear-plan" type="button" data-i18n="set.clear">Vider</button>
           </div>
         </div>
         <div class="set">
-          <label class="toggle"><span><b>Pause repas</b><br><span class="muted">Placée quand les files sont au plus haut, près d'un resto ouvert</span></span>
+          <label class="toggle"><span><b data-i18n="meal">Pause repas</b><br><span class="muted" data-i18n="set.mealHint">Placée quand les files sont au plus haut, près d'un resto ouvert</span></span>
             <input type="checkbox" id="mealChk"></label>
-          <div class="seg" id="mealDurSeg" role="group" aria-label="Durée du repas">
+          <div class="seg" id="mealDurSeg" role="group" aria-label="Durée du repas" data-i18n-attr="aria-label:set.mealDur">
             <button type="button" data-meal-dur="30">30 min</button>
             <button type="button" data-meal-dur="45">45 min</button>
             <button type="button" data-meal-dur="60">1 h</button>
           </div>
           <div class="row-inline">
-            <label class="field" style="flex:1">Pas avant<select id="mealFrom"></select></label>
-            <label class="field" style="flex:1">Fini avant<select id="mealTo"></select></label>
+            <label class="field" style="flex:1"><span data-i18n="set.mealFrom">Pas avant</span><select id="mealFrom"></select></label>
+            <label class="field" style="flex:1"><span data-i18n="set.mealTo">Fini avant</span><select id="mealTo"></select></label>
           </div>
         </div>
         <div class="set">
-          <h2>Priorité de l'itinéraire</h2>
-          <div class="seg" id="routeSeg" role="group" aria-label="Priorité de l'itinéraire">
-            <button type="button" data-route="marche">Moins de marche</button>
-            <button type="button" data-route="equilibre">Équilibré</button>
-            <button type="button" data-route="attente">Moins d'attente</button>
+          <h2 data-i18n="set.route">Priorité de l'itinéraire</h2>
+          <div class="seg" id="routeSeg" role="group" aria-label="Priorité de l'itinéraire" data-i18n-attr="aria-label:set.route">
+            <button type="button" data-route="marche" data-i18n="route.walk">Moins de marche</button>
+            <button type="button" data-route="equilibre" data-i18n="route.balanced">Équilibré</button>
+            <button type="button" data-route="attente" data-i18n="route.wait">Moins d'attente</button>
           </div>
         </div>
         <div class="set">
-          <label class="toggle"><span><b>Single rider accepté</b><br><span class="muted">File séparée sur Blue Fire, Voltron, CanCan, Arthur (à vérifier sur place) : souvent bien plus courte, mais vous êtes séparés dans le wagon</span></span>
+          <label class="toggle"><span><b data-i18n="set.sr">Single rider accepté</b><br><span class="muted" data-i18n="set.srHint">File séparée sur Blue Fire, Voltron, CanCan, Arthur (à vérifier sur place) : souvent bien plus courte, mais vous êtes séparés dans le wagon</span></span>
             <input type="checkbox" id="singleChk"></label>
         </div>
         <div class="set">
-          <h2>Rythme de marche</h2>
-          <div class="seg" id="paceSeg" role="group" aria-label="Rythme de marche">
-            <button type="button" data-pace="enfants">Avec enfants</button>
-            <button type="button" data-pace="normal">Normal</button>
-            <button type="button" data-pace="rapide">Rapide</button>
+          <h2 data-i18n="set.pace">Rythme de marche</h2>
+          <div class="seg" id="paceSeg" role="group" aria-label="Rythme de marche" data-i18n-attr="aria-label:set.pace">
+            <button type="button" data-pace="enfants" data-i18n="pace.kids">Avec enfants</button>
+            <button type="button" data-pace="normal" data-i18n="pace.normal">Normal</button>
+            <button type="button" data-pace="rapide" data-i18n="pace.fast">Rapide</button>
           </div>
         </div>
         <div class="set">
-          <label class="field">Taille du plus petit du groupe (cm)
-            <input id="heightIn" type="number" inputmode="numeric" min="0" max="220" step="1" placeholder="Pas de limite"></label>
-          <p class="muted">Tailles minimales accompagné, indicatives : vérifie toujours le panneau à l'entrée.</p>
+          <label class="field"><span data-i18n="set.height">Taille du plus petit du groupe (cm)</span>
+            <input id="heightIn" type="number" inputmode="numeric" min="0" max="220" step="1" placeholder="Pas de limite" data-i18n-attr="placeholder:set.noLimit"></label>
+          <p class="muted" data-i18n="set.heightHint">Tailles minimales accompagné, indicatives : vérifie toujours le panneau à l'entrée.</p>
         </div>
         <div class="set">
-          <label class="toggle"><span><b>Je dors dans un hôtel du parc</b><br><span class="muted">Entrée anticipée dès l'horaire hôtel (souvent 8:30, certaines attractions seulement)</span></span>
+          <label class="toggle"><span><b data-i18n="set.hotel">Je dors dans un hôtel du parc</b><br><span class="muted" data-i18n="set.hotelHint">Entrée anticipée dès l'horaire hôtel (souvent 8:30, certaines attractions seulement)</span></span>
             <input type="checkbox" id="hotelChk"></label>
         </div>
         <div class="set">
-          <h2>Ma position</h2>
+          <h2 data-i18n="set.position">Ma position</h2>
           <p class="muted" id="gpsStatus"></p>
-          <div class="row-inline"><button class="btn small" id="gpsBtn" data-act="gps" type="button">Utiliser ma position</button></div>
-          <label class="toggle"><span><b>Partager ma position avec le groupe</b><br><span class="muted">Visible sur la carte de ceux qui utilisent l'appli, jusqu'à 20 min après ton dernier point</span></span>
+          <div class="row-inline"><button class="btn small" id="gpsBtn" data-act="gps" type="button" data-i18n="gps.enable">Utiliser ma position</button></div>
+          <label class="toggle"><span><b data-i18n="set.share">Partager ma position avec le groupe</b><br><span class="muted" data-i18n="set.shareHint">Visible sur la carte de ceux qui utilisent l'appli, jusqu'à 20 min après ton dernier point</span></span>
             <input type="checkbox" id="shareChk"></label>
-          <label class="field">Mon prénom sur la carte<input id="nickIn" maxlength="24" autocomplete="given-name"></label>
+          <label class="field"><span data-i18n="set.nick">Mon prénom sur la carte</span><input id="nickIn" maxlength="24" autocomplete="given-name"></label>
         </div>
         <div class="set" id="installSet"></div>
         <div class="set">
-          <h2>Notifications</h2>
+          <h2 data-i18n="set.notif">Notifications</h2>
           <p class="muted" id="pushStatus"></p>
           <div class="row-inline">
-            <button class="btn small" id="pushBtn" data-act="push-on" type="button">Activer les notifications</button>
-            <button class="btn small" id="pushTest" data-act="push-test" type="button" hidden>Tester</button>
+            <button class="btn small" id="pushBtn" data-act="push-on" type="button" data-i18n="set.pushOn">Activer les notifications</button>
+            <button class="btn small" id="pushTest" data-act="push-test" type="button" hidden data-i18n="set.pushTest">Tester</button>
           </div>
         </div>
         <div class="set">
-          <h2>Affluence</h2>
+          <h2 data-i18n="set.crowd">Affluence</h2>
           <p class="muted" id="crowdStatus"></p>
           <div class="cal" id="calendar"></div>
         </div>
         <div class="set">
-          <h2>Données</h2>
+          <h2 data-i18n="fc.title">Quel jour venir ?</h2>
+          <p class="muted" id="fcHint"></p>
+          <div class="cal" id="forecast"></div>
+        </div>
+        <div class="set">
+          <h2 data-i18n="set.data">Données</h2>
           <p class="muted" id="dataStatus"></p>
         </div>
         <div class="set">
-          <h2>Aide et mises à jour</h2>
+          <h2 data-i18n="set.help">Aide et mises à jour</h2>
           <p class="muted" id="versionLine"></p>
           <div class="row-inline">
-            <button class="btn small" data-act="help" type="button">Comment ça marche</button>
-            <button class="btn small" data-act="help" data-section="news" type="button">Nouveautés</button>
-            <button class="btn small" data-act="recap" type="button">Récap de ma journée</button>
-            <button class="btn small" data-act="check-update" type="button">Mettre à jour</button>
+            <button class="btn small" data-act="help" type="button" data-i18n="help.title">Comment ça marche</button>
+            <button class="btn small" data-act="help" data-section="news" type="button" data-i18n="help.news">Nouveautés</button>
+            <button class="btn small" data-act="recap" type="button" data-i18n="recap.title">Récap de ma journée</button>
+            <button class="btn small" data-act="check-update" type="button" data-i18n="set.update">Mettre à jour</button>
           </div>
         </div>
         <div class="set">
-          <h2>Nouvelle journée</h2>
-          <p class="muted">Remet à zéro les attractions faites, les créneaux VirtualLine, le repas et les alertes envoyées. Ton programme est conservé.</p>
-          <div class="row-inline"><button class="btn small" id="resetBtn" data-act="reset" type="button">Remettre à zéro</button></div>
+          <h2 data-i18n="set.newDay">Nouvelle journée</h2>
+          <p class="muted" data-i18n="set.newDayHint">Remet à zéro les attractions faites, les créneaux VirtualLine, le repas et les alertes envoyées. Ton programme est conservé.</p>
+          <div class="row-inline"><button class="btn small" id="resetBtn" data-act="reset" type="button" data-i18n="reset">Remettre à zéro</button></div>
         </div>
       </div>
-      <p class="note">Temps d'attente : ceux annoncés par le parc, relayés par themeparks.wiki. Météo : Open-Meteo. Page non officielle, sans lien avec Europa-Park.</p>
+      <p class="note" data-i18n="set.credits">Temps d'attente : ceux annoncés par le parc, relayés par themeparks.wiki. Météo : Open-Meteo. Page non officielle, sans lien avec Europa-Park.</p>
     </section>
   </main>
 </div>
 
 <nav class="tabbar" aria-label="Navigation">
   <div class="tabbar-in" role="tablist">
-    <button type="button" role="tab" data-tab="now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Maintenant</button>
-    <button type="button" role="tab" data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="3"/></svg>Attractions</button>
-    <button type="button" role="tab" data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 3 6.2v13.6L9 17.6l6 2.2 6-2.2V4.2L15 6.4 9 4Z"/><path d="M9 4v13.6M15 6.4V20"/></svg>Carte</button>
-    <button type="button" role="tab" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Réglages</button>
+    <button type="button" role="tab" data-tab="now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span data-i18n="tab.now">Maintenant</span></button>
+    <button type="button" role="tab" data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="3"/></svg><span data-i18n="tab.list">Attractions</span></button>
+    <button type="button" role="tab" data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 3 6.2v13.6L9 17.6l6 2.2 6-2.2V4.2L15 6.4 9 4Z"/><path d="M9 4v13.6M15 6.4V20"/></svg><span data-i18n="tab.map">Carte</span></button>
+    <button type="button" role="tab" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span data-i18n="tab.settings">Réglages</span></button>
   </div>
 </nav>
 
 <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle"></dialog>
 <dialog class="sheet" id="help" aria-labelledby="helpTitle"><div class="sheet-in help">
-  <div class="sheet-head"><div><div class="eyebrow">Aide</div><h2 class="sheet-title" id="helpTitle">Comment ça marche</h2></div>
-    <button class="icon-btn" type="button" data-act="help-close" aria-label="Fermer">✕</button></div>
-  <p class="muted">EP Live te dit à chaque instant quelle attraction faire maintenant, et prévoit le reste de ta journée pour attendre et marcher le moins possible.</p>
+  <div class="sheet-head"><div><div class="eyebrow" data-i18n="help">Aide</div><h2 class="sheet-title" id="helpTitle" data-i18n="help.title">Comment ça marche</h2></div>
+    <button class="icon-btn" type="button" data-act="help-close" aria-label="Fermer" data-i18n-attr="aria-label:close">✕</button></div>
+  <p class="muted" data-i18n="help.intro">EP Live te dit à chaque instant quelle attraction faire maintenant, et prévoit le reste de ta journée pour attendre et marcher le moins possible.</p>
 
-  <details id="help-start" open><summary>Démarrer en 4 étapes</summary>
+  <details id="help-start" data-i18n-html="help.start" open><summary>Démarrer en 4 étapes</summary>
     <ol>
       <li><b>Installe l'appli</b> sur l'écran d'accueil (voir « Installer l'appli »).</li>
       <li><b>Choisis ton profil</b> : ton pseudo, sans mot de passe. Tout est enregistré sur le serveur.</li>
@@ -466,7 +496,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     </ol>
   </details>
 
-  <details id="help-install"><summary>Installer l'appli</summary>
+  <details id="help-install" data-i18n-html="help.install"><summary>Installer l'appli</summary>
     <ul>
       <li><b>Android</b> : bouton <b>Installer l'appli</b> dans l'onglet Maintenant ou dans Réglages, sinon menu ⋮ → <i>Installer l'application</i>.</li>
       <li><b>iPhone</b> : dans <b>Safari</b>, touche <b>Partager</b> (carré avec une flèche) → <b>Sur l'écran d'accueil</b>. Ouvre ensuite l'appli depuis l'icône : indispensable pour les notifications (iOS 16.4 ou plus).</li>
@@ -474,7 +504,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <p>Installée, elle s'ouvre en plein écran et reste utilisable quand le réseau du parc sature.</p>
   </details>
 
-  <details id="help-now"><summary>L'écran Maintenant</summary>
+  <details id="help-now" data-i18n-html="help.now"><summary>L'écran Maintenant</summary>
     <p>Le grand panneau montre la <b>prochaine étape</b> : l'attente affichée, le temps de marche et pourquoi c'est le bon moment. En dessous : trois autres bons choix, puis l'itinéraire du reste de la journée avec les heures d'arrivée.</p>
     <table>
       <tr><td>Dans la file</td><td>Tu entres dans la queue : un minuteur démarre, l'itinéraire part de la fin de cette attraction.</td></tr>
@@ -485,7 +515,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <p>Une erreur ? Le toast en bas propose toujours <b>Annuler</b>.</p>
   </details>
 
-  <details id="help-colors"><summary>Les couleurs des temps</summary>
+  <details id="help-colors" data-i18n-html="help.colors"><summary>Les couleurs des temps</summary>
     <ul>
       <li><b style="color:var(--w-low)">Vert</b> : 10 min ou moins</li>
       <li><b style="color:var(--w-mid)">Jaune</b> : 15 à 25 min</li>
@@ -496,7 +526,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <p>Dans la liste, ↗ / ↘ indique que la file a monté ou baissé d'au moins 10 min ces 30 dernières minutes.</p>
   </details>
 
-  <details id="help-route"><summary>Comment l'itinéraire est choisi</summary>
+  <details id="help-route" data-i18n-html="help.route"><summary>Comment l'itinéraire est choisi</summary>
     <ul>
       <li><b>Gain</b> : l'appli compare l'attente prévue à ton arrivée avec l'attente moyenne plus tard dans la journée. Une grosse attraction peu chargée maintenant passe devant.</li>
       <li><b>Prévisions</b> : elle part de l'attente actuelle et rejoint le profil habituel de l'attraction, tiré de l'historique du serveur et corrigé de l'affluence du jour.</li>
@@ -509,21 +539,22 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <p>Le calcul est refait toutes les 2 minutes et à chaque bouton touché.</p>
   </details>
 
-  <details id="help-vl"><summary>VirtualLine (coupe-file gratuit)</summary>
+  <details id="help-vl" data-i18n-html="help.vl"><summary>VirtualLine (coupe-file gratuit)</summary>
     <ol>
       <li>La carte VirtualLine indique l'attraction où un créneau fait gagner le plus.</li>
       <li>Réserve dans l'<b>appli officielle Europa-Park</b> (billet lié, localisation activée, un seul créneau à la fois).</li>
       <li>Note-le avec <b>J'ai un créneau</b> : l'itinéraire s'organise autour et te dit quand partir.</li>
       <li>Après <b>Fait</b>, l'appli te dit quoi re-réserver tout de suite.</li>
     </ol>
+    <p>Quand le créneau proposé est connu, un bouton <b>J'ai réservé 15:20</b> le note en un geste. <b>Ouvrir l'appli</b> lance l'appli officielle (sur iPhone : sa fiche App Store, avec « Ouvrir »). Avec les notifications, tu es prévenu quand une file virtuelle s'ouvre sur une attraction de ton programme, si tu n'as pas déjà un créneau. La réservation elle-même se fait toujours dans l'appli officielle : il n'existe pas d'accès public.</p>
   </details>
 
-  <details id="help-fixed"><summary>Repas et spectacles</summary>
+  <details id="help-fixed" data-i18n-html="help.fixed"><summary>Repas et spectacles</summary>
     <p><b>Pause repas</b> (Réglages) : l'appli la place dans ta fenêtre horaire, au moment où les files sont au plus haut, et indique le resto ouvert le plus proche. <i>Plus tard</i> la décale de 30 min, <i>Fait</i> la retire.</p>
     <p><b>Spectacles</b> : mets une étoile sur un spectacle (Attractions → Spectacles). L'appli choisit la représentation qui fait perdre le moins de temps de file et te prévient quand partir (5 min d'avance).</p>
   </details>
 
-  <details id="help-notif"><summary>Notifications</summary>
+  <details id="help-notif" data-i18n-html="help.notif"><summary>Notifications</summary>
     <p>Une fois activées dans Réglages, elles arrivent même appli fermée :</p>
     <ul>
       <li><b>File courte</b> : sous le seuil choisi dans la fiche (« M'alerter sous… »).</li>
@@ -537,16 +568,20 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <p>Pendant que tu es « dans la file », les alertes de file courte sont mises en pause.</p>
   </details>
 
-  <details id="help-map"><summary>La carte</summary>
+  <details id="help-map" data-i18n-html="help.map"><summary>La carte</summary>
     <p>Fond OpenStreetMap : allées, bâtiments et lacs du parc. Pince pour zoomer. Les grosses pastilles sont ton programme, avec l'attente en direct et sa couleur ; les petites, les autres attractions. Le pointillé violet mène à la prochaine étape. Toucher une pastille ouvre sa fiche.</p>
     <p>Les zones déjà affichées restent en mémoire : la carte s'ouvre même quand le réseau sature. Sans aucune donnée en mémoire, l'appli affiche un plan simplifié.</p>
+    <p><b>Boutons de la carte</b> : ⤢ plein écran ; ◎ te recentre et te suit pendant que tu marches (déplacer la carte arrête le suivi) ; 🗺 revient à tout le parc ; 🚻 montre les toilettes les plus proches ; 🚗 ta voiture.</p>
+    <p><b>Points pratiques</b> : au-dessus de la carte, affiche ou masque toilettes, eau potable, casiers, distributeurs et parkings (OpenStreetMap, parfois incomplet).</p>
+    <p><b>Hors ligne</b> : sous la carte, « Télécharger la carte » enregistre tout le parc sur le téléphone. À faire la veille en wifi.</p>
+    <p><b>Ta voiture</b> : enregistre ta place en arrivant (position GPS ou nom du parking). Le soir, l'appli affiche le temps de marche et l'itinéraire pour y retourner, et toute la famille la voit.</p>
   </details>
 
-  <details id="help-gps"><summary>Position GPS</summary>
+  <details id="help-gps" data-i18n-html="help.gps"><summary>Position GPS</summary>
     <p>Avec la position activée, les temps de marche partent de l'endroit où tu es. En arrivant à une attraction du programme, l'appli demande « Tu fais la queue ? », et « Tu as fini ? » quand tu t'éloignes. Sans GPS, les distances partent de la dernière attraction faite, ou de l'entrée.</p>
   </details>
 
-  <details id="help-group"><summary>En groupe</summary>
+  <details id="help-group" data-i18n-html="help.group"><summary>En groupe</summary>
     <ul>
       <li><b>Un profil commun</b> (ex. « Groupe ») choisi par tout le monde : un « Fait » sur un téléphone arrive sur les autres en 2 minutes au plus, et tout le monde reçoit les notifications.</li>
       <li><b>Un profil chacun</b> : Réglages → « Copier le programme de… » reprend le programme d'un autre.</li>
@@ -555,25 +590,27 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <p class="muted">Une position partagée est visible par tous ceux qui utilisent l'appli sur ce serveur, et disparaît 20 min après le dernier point. Décoche le partage pour l'effacer tout de suite.</p>
   </details>
 
-  <details id="help-sr"><summary>Single rider</summary>
+  <details id="help-sr" data-i18n-html="help.sr"><summary>Single rider</summary>
     <p>Certaines attractions ont une file « single rider » pour compléter les places vides : beaucoup plus courte, mais le groupe est séparé dans le wagon. Signalée sur Blue Fire, Voltron, CanCan et Arthur, <b>à vérifier sur place</b> (elle peut être fermée certains jours).</p>
     <p>Active-la dans <b>Réglages → Single rider accepté</b>. L'appli compte alors la moitié de l'attente normale. Dès que tu vois la vraie attente single rider à l'entrée, note-la dans la fiche de l'attraction : elle est prise en compte pendant 45 min.</p>
   </details>
 
-  <details id="help-recap"><summary>Récap de la journée</summary>
+  <details id="help-recap" data-i18n-html="help.recap"><summary>Récap de la journée</summary>
     <p>Chaque « Fait » est noté. Le soir, l'onglet Maintenant affiche ta journée : nombre de tours, temps passé dans les files, distance à pied (estimée entre les attractions), attente gagnée par rapport à la moyenne de la journée, meilleur coup et attraction préférée. Bouton <b>Partager</b> pour l'envoyer au groupe. À tout moment : Réglages → <i>Récap de ma journée</i>.</p>
+    <p><b>Notes</b> : après chaque « Fait », l'appli te demande une note de 1 à 5 étoiles (aussi dans la fiche). 4 ou 5 étoiles ajoutent l'attraction à « À refaire » si rien n'est réglé. Le récap affiche vos préférées, et la liste montre la note moyenne de tous les profils.</p>
   </details>
 
-  <details id="help-crowd"><summary>Affluence</summary>
+  <details id="help-crowd" data-i18n-html="help.crowd"><summary>Affluence</summary>
     <p>Pendant la journée, l'appli compare les files actuelles aux files habituelles à la même heure et en tient compte (« Affluence : +20 % »). La veille, l'aperçu indique l'affluence habituelle de ce jour de la semaine, d'après les jours enregistrés par le serveur. Réglages → Affluence montre les derniers jours et les jours les plus calmes.</p>
+    <p><b>Quel jour venir ?</b> (Réglages) : affluence prévue des prochains jours d'ouverture, de calme à très chargé, d'après ton historique (ou le jour de la semaine) et les vacances scolaires et jours fériés des régions d'où viennent les visiteurs (Bade-Wurtemberg, Alsace, Suisse… pour Europa-Park).</p>
   </details>
 
-  <details id="help-sync"><summary>Profil, coupure, changement de téléphone</summary>
+  <details id="help-sync" data-i18n-html="help.sync"><summary>Profil, coupure, changement de téléphone</summary>
     <p>Chaque changement est envoyé au serveur une seconde plus tard. Si le téléphone s'éteint ou que tu en changes, ouvre l'appli et choisis ton pseudo : tu reprends exactement où tu en étais (programme, faits, créneaux, file en cours). Le bouton avec ton pseudo, en haut, permet de changer de profil.</p>
     <p>Sans réseau, l'appli affiche les dernières données reçues (bandeau orange) et envoie tes changements dès le retour du réseau.</p>
   </details>
 
-  <details id="help-tips"><summary>Bon à savoir</summary>
+  <details id="help-tips" data-i18n-html="help.tips"><summary>Bon à savoir</summary>
     <ul>
       <li><b>Batterie</b> : GPS et 4G toute la journée vident vite un téléphone. Prends une batterie externe. Sans GPS, l'appli marche très bien en touchant « Fait » à chaque sortie.</li>
       <li><b>Réseau</b> : la 4G sature parfois aux heures de pointe. L'appli garde les dernières données et se resynchronise toute seule.</li>
@@ -587,7 +624,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     </ul>
   </details>
 
-  <details id="help-faq"><summary>Problèmes fréquents</summary>
+  <details id="help-faq" data-i18n-html="help.faq"><summary>Problèmes fréquents</summary>
     <table>
       <tr><td>Pas de notification</td><td>iPhone : l'appli doit être ouverte depuis l'icône de l'écran d'accueil. Vérifie Réglages → Notifications → <i>Tester</i>, et que le mode Concentration ne les bloque pas.</td></tr>
       <tr><td>Distances bizarres</td><td>Active la position, ou touche « Fait » après chaque attraction : sans ça, l'appli croit que tu es encore à l'entrée.</td></tr>
@@ -597,7 +634,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     </table>
   </details>
 
-  <details id="help-news"><summary>Nouveautés</summary>
+  <details id="help-news" data-i18n-html="help.newsList"><summary>Nouveautés</summary>
     <p class="muted" id="helpVersion"></p>
     <ul>
       <li><b>Profils</b> : un pseudo par personne, tout est enregistré sur le serveur et se retrouve après une coupure ou sur un autre téléphone.</li>
@@ -615,6 +652,11 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
       <li><b>Heures creuses et de pointe</b> de chaque attraction dans sa fiche.</li>
       <li><b>Durée réelle</b> de chaque attraction et <b>temps de file partagés</b> entre profils.</li>
       <li><b>Dernier appel</b> avant la fermeture.</li>
+      <li><b>Langues</b> : français, anglais et allemand (Réglages).</li>
+      <li><b>Carte</b> en plein écran, bouton pour te recentrer et te suivre, carte téléchargeable pour le hors-ligne.</li>
+      <li><b>Toilettes, eau, casiers, distributeurs, parkings</b> sur la carte, et la place de ta <b>voiture</b>.</li>
+      <li><b>VirtualLine</b> : créneau noté en un geste, bouton vers l'appli officielle, notification quand une file virtuelle s'ouvre.</li>
+      <li><b>Notes</b> des attractions, écart affiché / réel <b>par attraction</b>, calendrier <b>« Quel jour venir ? »</b>.</li>
     </ul>
     <p>Les mises à jour arrivent toutes seules à la prochaine ouverture de l'appli.</p>
   </details>
@@ -622,6 +664,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
 <dialog class="sheet" id="login" aria-labelledby="loginTitle"></dialog>
 <div class="toast" id="toast" role="status" hidden></div>
 
+<script src="i18n.js"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -635,7 +678,7 @@ const PACES = {enfants: 55, normal: 75, rapide: 90}; // mètres par minute
 // Poids d'une minute de marche face à une minute de file gagnée.
 // Au-delà de 8 min de trajet, chaque minute compte double : on ne traverse le parc que si ça vaut vraiment le coup.
 const ROUTE = {attente: 1, equilibre: 1.6, marche: 2.4};
-const APP_VERSION = '2026.10.06';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
+const APP_VERSION = '2026.10.06.2';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
 const PEAK = {A: 45, B: 20, C: 8};
 // Courbe générique de remplissage d'un parc sur la journée (multiplicateur), minute du jour -> facteur
 const PRIOR = [[480,.4],[540,.45],[600,.75],[660,.95],[720,1],[900,.95],[960,.85],[1020,.65],[1050,.5],[1080,.3],[1140,.2]];
@@ -650,7 +693,7 @@ const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
 /* Parc de l'instance : parks.json, choisi côté serveur par EP_PARK (api.php?r=config).
    Les listes contiennent des morceaux de nom normalisé (voir norm()). */
 let PARK, PARK_ID, DIRECT, TZ, ENTRANCE, BOUNDS, WEATHER_URL, TIER_A, TIER_B, PRESETS, TRANSPORT, INDOOR, WET, SINGLE_RIDER, MIN_CM, RIDE_MINS, VQ;
-let partsFmt, dayFmt;
+let partsFmt, dayFmt, shortDayFmt, weekdayFmt, kmFmt;
 function applyPark(cfg) {
   PARK = cfg; PARK_ID = cfg.id; TZ = cfg.tz;
   DIRECT = 'https://api.themeparks.wiki/v1/entity/' + PARK_ID;
@@ -665,8 +708,16 @@ function applyPark(cfg) {
   MIN_CM = cfg.minCm || {}; RIDE_MINS = cfg.rideMin || {};
   VQ = cfg.virtualQueue || null;
   partsFmt = new Intl.DateTimeFormat('en-GB', {timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23'});
-  dayFmt = new Intl.DateTimeFormat('fr-FR', {weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ});
+  applyFormats();
   document.querySelector('#parkName').textContent = cfg.name + (cfg.place ? ' · ' + cfg.place : '');
+}
+/* Formats de date et de nombre de la langue choisie (dayFmt : fuseau du parc) */
+function applyFormats() {
+  const loc = t('locale');
+  if (TZ) dayFmt = new Intl.DateTimeFormat(loc, {weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ});
+  shortDayFmt = new Intl.DateTimeFormat(loc, {weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC'});
+  weekdayFmt = new Intl.DateTimeFormat(loc, {weekday: 'long', timeZone: 'UTC'});
+  kmFmt = new Intl.NumberFormat(loc, {minimumFractionDigits: 1, maximumFractionDigits: 1});
 }
 /* Config du parc : celle du serveur, sinon la dernière connue, sinon le premier parc de parks.json */
 async function bootPark() {
@@ -707,7 +758,6 @@ const isoMod = iso => berlin(Date.parse(iso));
 function hhmm(mod) { mod = Math.round(mod); return String(Math.floor(mod / 60) % 24).padStart(2, '0') + ':' + String(((mod % 60) + 60) % 60).padStart(2, '0'); }
 function dur(min) { min = Math.max(0, Math.round(min)); const h = Math.floor(min / 60), m = min % 60; return h ? `${h} h ${String(m).padStart(2, '0')}` : `${m} min`; }
 const fmtDay = d => dayFmt.format(new Date(d + 'T12:00:00Z'));
-const shortDayFmt = new Intl.DateTimeFormat('fr-FR', {weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC'});
 function interp(pts, x) {
   if (x <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) if (x <= pts[i][0]) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; return y0 + (y1 - y0) * (x - x0) / (x1 - x0); }
@@ -726,7 +776,7 @@ function saveJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } ca
 const cacheGet = k => loadJSON('ep-cache-' + k), cacheSet = (k, v) => saveJSON('ep-cache-' + k, v);
 
 const DEFAULTS = {plan:{}, shows:{}, again:{}, done:{}, skip:{}, slots:[], alerts:{}, alerted:{}, pace:'normal', hotel:false,
-  route:'equilibre', meal:{on:true, dur:45, from:690, to:840}, mealDone:false, mealSkip:0, height:0, queue:null, samples:[], planned:null, pos:null, single:false, srSeen:{}, log:[],
+  route:'equilibre', meal:{on:true, dur:45, from:690, to:840}, mealDone:false, mealSkip:0, height:0, queue:null, samples:[], planned:null, pos:null, single:false, srSeen:{}, log:[], ratings:{}, car:null,
   day:null, lastDone:null, onboarded:false, updatedAt:0};
 function withDefaults(st) {
   const p = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), st || {});
@@ -734,6 +784,8 @@ function withDefaults(st) {
   return p;
 }
 let device = Object.assign({gps: false, filter: 'plan', sort: 'wait', tab: 'now', share: false, nick: ''}, loadJSON('ep-device'));
+// Langue : choisie dans Réglages (device.lang), sinon celle du téléphone
+LANG = pickLang(device.lang || navigator.language);
 if (!device.id) device.id = Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, '0')).join('');
 let user = loadJSON('ep-user');     // {id, name} ou {id:'local', local:true}
 let prefs = withDefaults(user ? loadJSON('ep-state-' + user.id) : null);
@@ -744,6 +796,14 @@ function savePrefs(touch = true) {
   if (touch) prefs.updatedAt = Date.now();
   if (user) saveJSON('ep-state-' + user.id, prefs);
   scheduleSync();
+}
+
+/* Langue transmise au serveur avec l'état du profil, pour le texte des notifications push */
+function syncLang() { if (user && prefs.lang !== LANG) { prefs.lang = LANG; savePrefs(false); } }
+function setLang(lang) {
+  device.lang = LANG = pickLang(lang); saveDevice();
+  applyI18n(); applyFormats(); syncLang();
+  render();
 }
 
 function rolloverDay() {
@@ -815,10 +875,11 @@ async function selectUser(u) {
   prefs = withDefaults(st);
   saveJSON('ep-state-' + u.id, prefs);
   rolloverDay();
+  syncLang();
   if (!u.local && !fromServer) { syncDirty = true; pushState(); }
   if (pushOn && !u.local) subscribePush(true).catch(() => {});
   $('#login').close();
-  toast(u.local ? 'Profil local : rien n\'est enregistré sur le serveur' : `Bonjour ${u.name} !`);
+  toast(u.local ? t('toast.localProfile') : t('toast.hello', {name: u.name}));
   usersCache = null;
   render();
   refresh();
@@ -832,13 +893,13 @@ async function openLogin(force) {
   const dlg = $('#login');
   dlg.dataset.force = force ? '1' : '';
   dlg.innerHTML = `<div class="sheet-in">
-    <div class="sheet-head"><div><div class="eyebrow">Profil</div><h2 class="sheet-title" id="loginTitle">Qui es-tu ?</h2></div>
-      ${force ? '' : '<button class="icon-btn" type="button" data-act="login-close" aria-label="Fermer">✕</button>'}</div>
-    <p class="muted">Ton programme et ta journée sont enregistrés sous ton pseudo. Sur un autre téléphone ou après une coupure, choisis-le simplement dans la liste.</p>
-    <div class="user-list" id="userList"><p class="muted">Chargement des profils…</p></div>
+    <div class="sheet-head"><div><div class="eyebrow">${t('profile')}</div><h2 class="sheet-title" id="loginTitle">${t('login.title')}</h2></div>
+      ${force ? '' : `<button class="icon-btn" type="button" data-act="login-close" aria-label="${t('close')}">✕</button>`}</div>
+    <p class="muted">${t('login.intro')}</p>
+    <div class="user-list" id="userList"><p class="muted">${t('login.loading')}</p></div>
     <form id="newUser" class="row-inline" autocomplete="off">
-      <label class="field" style="flex:1">Nouveau pseudo<input id="newName" maxlength="24" autocomplete="nickname" required></label>
-      <button class="btn primary" type="submit">Créer</button></form>
+      <label class="field" style="flex:1">${t('login.newName')}<input id="newName" maxlength="24" autocomplete="nickname" required></label>
+      <button class="btn primary" type="submit">${t('login.create')}</button></form>
     <p class="note" id="loginErr"></p></div>`;
   if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
   try {
@@ -846,23 +907,23 @@ async function openLogin(force) {
     const list = await fetchUsers();
     $('#userList').innerHTML = list.length
       ? list.map(u => `<button class="btn${user?.id === u.id ? ' primary' : ''}" type="button" data-act="login" data-id="${esc(u.id)}" data-name="${esc(u.name)}">${esc(u.name)}</button>`).join('')
-      : '<p class="muted">Aucun profil pour l\'instant : crée le tien.</p>';
+      : `<p class="muted">${t('login.none')}</p>`;
   } catch (e) {
-    $('#userList').innerHTML = `<p class="muted">Serveur injoignable : les profils ne sont pas disponibles.</p>
-      <button class="btn" type="button" data-act="login-local">Continuer sur ce téléphone seulement</button>`;
+    $('#userList').innerHTML = `<p class="muted">${t('login.offline')}</p>
+      <button class="btn" type="button" data-act="login-local">${t('login.local')}</button>`;
   }
 }
 async function createUser(name) {
   name = name.trim();
   const err = $('#loginErr');
-  if (!/^[\p{L}\p{N} _.'-]{2,24}$/u.test(name)) { err.textContent = 'De 2 à 24 caractères : lettres, chiffres, espace, point, tiret, apostrophe.'; return; }
+  if (!/^[\p{L}\p{N} _.'-]{2,24}$/u.test(name)) { err.textContent = t('login.invalid'); return; }
   try {
-    const r = await fetch(`${SERVER}?r=user`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name})});
+    const r = await fetch(`${SERVER}?r=user&lang=${LANG}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name})});
     const j = await r.json().catch(() => ({}));
-    if (r.status === 409) { err.textContent = j.error || 'Ce pseudo existe déjà : choisis-le dans la liste.'; return; }
+    if (r.status === 409) { err.textContent = j.error || t('login.exists'); return; }
     if (!r.ok) throw new Error(j.error || 'HTTP ' + r.status);
     selectUser({id: j.id, name: j.name});
-  } catch (e) { err.textContent = 'Impossible de créer le profil : ' + e.message; }
+  } catch (e) { err.textContent = t('login.createFail', {msg: e.message}); }
 }
 
 /* =====================================================================
@@ -909,8 +970,6 @@ function shortName(e) {
 function rideMin(e) { if (e) for (const k in RIDE_MINS) if (e.key.includes(k)) return RIDE_MINS[k]; return RIDE_MIN; }
 function minCm(e) { if (!e) return 0; for (const k in MIN_CM) if (e.key.includes(k)) return MIN_CM[k]; return 0; }
 const tooSmall = id => prefs.height > 0 && minCm(ents.get(id)) > prefs.height;
-const STATUS_FR = {OPERATING: 'Ouverte', DOWN: 'En panne', CLOSED: 'Fermée', REFURBISHMENT: 'En rénovation', UNKNOWN: 'Inconnu'};
-const VL_FR = {AVAILABLE: 'ouvert', TEMP_FULL: 'complet pour l\'instant', FINISHED: 'terminé pour aujourd\'hui'};
 
 function todayShowtimes(id) {
   const d = berlin(now()).day;
@@ -957,9 +1016,9 @@ function wxLine(P) {
   if (!w) return '';
   let s = `${Math.round(w.t)}°`;
   for (let m = from; m < P.h.close; m += 60) {
-    const x = wxAt(P.day, m), at = m === from ? 'maintenant' : 'vers ' + hhmm(Math.floor(m / 60) * 60);
-    if (stormy(x)) { s += ` · orage ${at}`; break; }
-    if (rainy(x)) { s += ` · pluie ${at}`; break; }
+    const x = wxAt(P.day, m), at = m === from ? t('wx.now') : t('wx.at', {time: hhmm(Math.floor(m / 60) * 60)});
+    if (stormy(x)) { s += ' · ' + t('wx.storm', {at}); break; }
+    if (rainy(x)) { s += ' · ' + t('wx.rain', {at}); break; }
   }
   return s;
 }
@@ -1032,6 +1091,7 @@ function typicalAt(id, mod) {
   return bd <= 90 ? best : null;
 }
 const hasHistory = () => (stats?.days || 0) > 0;
+const basisName = () => t('basis')[stats.basis] ?? stats.basis;
 
 /* Affluence du jour : rapport médian « attente actuelle / attente habituelle » sur tout le parc */
 let crowdK = null;
@@ -1047,9 +1107,17 @@ function parkRatio(mod) {
 }
 /* Temps réellement attendus / temps affichés, mesurés avec « Dans la file » puis « Fait » */
 let pooled = null;   // {f, n} : écart mesuré par tous les profils du serveur (api.php, bundle)
-function realFactor() {
-  const r = (prefs.samples || []).filter(s => s.posted >= 10).map(s => s.real / s.posted);
-  if (r.length >= 2) return clamp(median(r), .5, 1.2);
+/* Sans id : écart moyen. Avec id : celui de l'attraction dès qu'il y a assez de mesures
+   (2 à toi, ou 3 de tous les profils), sinon l'écart moyen. */
+function realFactor(id) {
+  const ratio = s => s.real / s.posted, mine = (prefs.samples || []).filter(s => s.posted >= 10);
+  if (id) {
+    const own = mine.filter(s => s.id === id);
+    if (own.length >= 2) return clamp(median(own.map(ratio)), .4, 1.2);
+    const pr = pooled?.rides?.[id];
+    if (pr && pr.n >= 3) return clamp(pr.f, .4, 1.2);
+  }
+  if (mine.length >= 2) return clamp(median(mine.map(ratio)), .5, 1.2);
   return pooled && pooled.n >= 2 ? clamp(pooled.f, .5, 1.2) : 1;
 }
 
@@ -1169,7 +1237,7 @@ function srFactor(id, e) {
   if (seen && now() - seen.at < 45 * 60000 && w) return clamp(seen.w / Math.max(5, w), .1, 1);
   return SR_FACTOR;
 }
-const stepName = s => s.kind === 'meal' ? 'Pause repas' : shortName(ents.get(s.id));
+const stepName = s => s.kind === 'meal' ? t('meal') : shortName(ents.get(s.id));
 
 /* Étapes à heure fixe : créneaux VirtualLine notés, spectacles choisis, repas.
    Spectacles et repas tombent au moment où les files de ton programme sont au plus haut. */
@@ -1225,8 +1293,8 @@ function computePlan(P) {
   const q = open && prefs.queue && ents.has(prefs.queue.id) ? prefs.queue : null;
   if (q) {
     const since = P.mod - (now() - q.since) / 60000;
-    const end = Math.max(P.mod + 2, since + q.posted * RF) + rideMin(ents.get(q.id));
-    steps.push({kind: 'queue', id: q.id, start: t, walk: 0, arrive: since, wait: q.posted, real: q.posted * RF, end});
+    const rq = realFactor(q.id), end = Math.max(P.mod + 2, since + q.posted * rq) + rideMin(ents.get(q.id));
+    steps.push({kind: 'queue', id: q.id, start: t, walk: 0, arrive: since, wait: q.posted, real: q.posted * rq, end});
     used.add(q.id); t = end; pos = ents.get(q.id);
   }
 
@@ -1244,10 +1312,10 @@ function computePlan(P) {
     const e = ents.get(id), w = walkMin(from, e), arr = tt + w;
     if (arr > close - 3 || !availAt(id, arr, P) || (prefs.skip[id] || 0) > arr) return null;
     const srf = srFactor(id, e);
-    const qp = predict(id, arr, P.t0, w0[id]) * srf, qr = qp * RF, end = arr + qr + rideMin(e);
+    const rf = realFactor(id), qp = predict(id, arr, P.t0, w0[id]) * srf, qr = qp * rf, end = arr + qr + rideMin(e);
     if (slot && end + walkMin(e, placeOf(slot, e)) > slot.by + slot.slack) return null;
     const later = laterAvg(id, end, close, P, w0[id]) * srf;
-    const gain = later == null ? 0 : (later - qp) * RF;
+    const gain = later == null ? 0 : (later - qp) * rf;
     const wx = wxBonus(e, arr, P.day);
     const walkCost = (ROUTE[prefs.route] || ROUTE.equilibre) * (w + Math.max(0, w - 8));
     return {id, score: gain - walkCost - .15 * qr - (isBonus ? 12 : 0) + wx, walk: w, arrive: arr, wait: qp, real: qr, end, later, gain, bonus: isBonus, again, wx, sr: srf < 1};
@@ -1305,29 +1373,29 @@ function render() {
   renderNow(P, plan);
   renderBanner(P, plan);
   if (device.tab === 'list') renderList(P);
-  if (device.tab === 'map') renderMap(P, plan);
+  if (device.tab === 'map') { renderPoiChips(); renderMap(P, plan); renderMapTools(); }
   if (device.tab === 'settings') renderSettings();
   renderInstall();
 }
 
 function renderHeader(P) {
-  let line = 'Horaires indisponibles';
-  if (P.phase === 'open') line = `Ouvert jusqu'à ${hhmm(P.h.close)} · encore ${dur(P.h.close - P.mod)}`;
-  else if (P.phase === 'before') line = `Ouvre à ${hhmm(P.h.open)}` + (P.h.early != null && P.h.early < P.h.open ? ` · hôtels ${hhmm(P.h.early)}` : '');
-  else if (P.phase === 'closed') line = `Fermé · ouvre ${fmtDay(P.day)} à ${hhmm(P.h.open)}`;
+  let line = t('hdr.noHours');
+  if (P.phase === 'open') line = t('hdr.open', {close: hhmm(P.h.close), left: dur(P.h.close - P.mod)});
+  else if (P.phase === 'before') line = t('hdr.opens', {open: hhmm(P.h.open)}) + (P.h.early != null && P.h.early < P.h.open ? t('hdr.hotels', {early: hhmm(P.h.early)}) : '');
+  else if (P.phase === 'closed') line = t('hdr.closed', {day: fmtDay(P.day), open: hhmm(P.h.open)});
   $('#parkLine').textContent = line;
 
   const bits = [];
   if (meta.fetchedAt) {
     const age = Math.round((Date.now() - meta.fetchedAt) / 60000);
     const warn = meta.offline || meta.stale || age > 6;
-    bits.push(`<span class="dot${warn ? ' warn' : ''}"></span><span>${meta.offline ? 'Hors ligne · ' : ''}Données de ${hhmm(berlin(meta.fetchedAt + NOW_OFFSET).mod)}${age >= 2 ? ` (il y a ${age} min)` : ''}</span>`);
-  } else bits.push('<span>Connexion aux données…</span>');
+    bits.push(`<span class="dot${warn ? ' warn' : ''}"></span><span>${meta.offline ? t('hdr.offline') : ''}${t('hdr.data', {time: hhmm(berlin(meta.fetchedAt + NOW_OFFSET).mod)})}${age >= 2 ? t('hdr.ago', {age}) : ''}</span>`);
+  } else bits.push(`<span>${t('hdr.connecting')}</span>`);
   const wx = wxLine(P);
   if (wx) bits.push(`<span class="wx">· ${esc(wx)}</span>`);
-  if (NOW_OFFSET) bits.push(`<span class="sim-tag">Heure simulée ${hhmm(P.mod)}</span>`);
+  if (NOW_OFFSET) bits.push(`<span class="sim-tag">${t('hdr.sim', {time: hhmm(P.mod)})}</span>`);
   $('#freshLine').innerHTML = bits.join('');
-  $('#userBtn').textContent = user ? (user.local ? 'Local' : user.name) : 'Profil';
+  $('#userBtn').textContent = user ? (user.local ? t('user.local') : user.name) : t('profile');
 }
 
 const icCheck = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
@@ -1337,20 +1405,20 @@ const icStarOff = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 
 function reasonFor(step, P) {
   const q = r5(step.wait), T = typicalAt(step.id, step.arrive), e = ents.get(step.id), w = wxAt(P.day, step.arrive);
-  if (step.again) return `À refaire : la file est sous ton seuil (${prefs.again[step.id]} min).`;
-  if (step.sr) return `File single rider : vous serez séparés dans le wagon, mais l'attente tombe à ~${q} min${prefs.srSeen[step.id] ? '' : ' (estimation, relève la vraie dans la fiche)'}.`;
-  if (step.wx >= 8) return `Pluie prévue vers ${hhmm(step.arrive)} : attraction couverte, tu restes au sec.`;
-  if (step.wx > 0 && keyIn(e, WET)) return `Il fait ${Math.round(w.t)}° vers ${hhmm(step.arrive)} : le bon moment pour se mouiller.`;
+  if (step.again) return t('reason.again', {thr: prefs.again[step.id]});
+  if (step.sr) return t('reason.sr', {q, est: prefs.srSeen[step.id] ? '' : t('reason.srEst')});
+  if (step.wx >= 8) return t('reason.rain', {time: hhmm(step.arrive)});
+  if (step.wx > 0 && keyIn(e, WET)) return t('reason.wet', {t: Math.round(w.t), time: hhmm(step.arrive)});
   if (P.phase !== 'open') {
-    if (step.later != null && step.later - step.wait >= 10) return `Vers ${hhmm(step.arrive)} la file est en général courte (~${q} min) ; elle monte ensuite autour de ${r5(step.later)} min en moyenne.`;
-    return `Bon enchaînement depuis l'entrée, attente estimée ~${q} min.`;
+    if (step.later != null && step.later - step.wait >= 10) return t('reason.earlyShort', {time: hhmm(step.arrive), q, later: r5(step.later)});
+    return t('reason.fromEntrance', {q});
   }
-  if (reopenedRecently(step.id)) return 'Elle vient de rouvrir après un arrêt : la file se reforme, c\'est le bon moment.';
-  if (T != null && T - step.wait >= 10) return `File plus courte que d'habitude à cette heure (${r5(T)} min en général).`;
-  if (step.later != null && step.later - step.wait >= 10) return `Plus tard dans la journée, compte plutôt ~${r5(step.later)} min : autant y aller maintenant.`;
-  if (step.walk <= 3 && step.gain < 10) return 'Juste à côté : on l\'enchaîne sans marcher, avant de changer de coin du parc.';
-  if (step.wait <= 10) return 'File courte et sur ton chemin : on l\'enchaîne pendant que les grosses attractions sont chargées.';
-  return 'Meilleur compromis entre attente et marche pour le moment.';
+  if (reopenedRecently(step.id)) return t('reason.reopened');
+  if (T != null && T - step.wait >= 10) return t('reason.shorter', {typ: r5(T)});
+  if (step.later != null && step.later - step.wait >= 10) return t('reason.later', {later: r5(step.later)});
+  if (step.walk <= 3 && step.gain < 10) return t('reason.nearby');
+  if (step.wait <= 10) return t('reason.shortOnWay');
+  return t('reason.best');
 }
 
 function boardHTML(P, plan, first) {
@@ -1358,46 +1426,46 @@ function boardHTML(P, plan, first) {
   const btn = (act, label, primary, id = first.id) => `<button class="btn${primary ? ' primary' : ''}" type="button" data-act="${act}" data-id="${esc(id)}">${primary ? icCheck : ''}${label}</button>`;
   let eyebrow, big, small, facts = [], reason, actions = [], name = esc(stepName(first)), cls = 'low';
   if (first.kind === 'queue') {
-    const q = prefs.queue, el = (now() - q.since) / 60000, left = Math.max(0, Math.round(q.posted * RF - el));
-    eyebrow = `Dans la file · depuis ${dur(el)}`; big = left; small = 'min restantes'; cls = wclass(left);
-    facts.push(`<span>Affiché à l'entrée : ${q.posted} min</span>`);
-    if (RF < .95) facts.push(`<span>Réel estimé ~${r5(q.posted * RF)} min</span>`);
-    reason = 'Touche « Fait » à la sortie : la page apprend l\'écart entre les temps affichés et ceux que tu attends vraiment.';
-    actions = [btn('done', 'Fait', true), btn('queue-cancel', 'Quitter la file'), btn('open', 'Fiche')];
+    const q = prefs.queue, rq = realFactor(q.id), el = (now() - q.since) / 60000, left = Math.max(0, Math.round(q.posted * rq - el));
+    eyebrow = t('board.inQueue', {d: dur(el)}); big = left; small = t('board.minLeft'); cls = wclass(left);
+    facts.push(`<span>${t('board.posted', {w: q.posted})}</span>`);
+    if (rq < .95) facts.push(`<span>${t('board.realEst', {w: r5(q.posted * rq)})}</span>`);
+    reason = t('board.queueReason');
+    actions = [btn('done', t('act.done'), true), btn('queue-cancel', t('act.leaveQueue')), btn('open', t('act.details'))];
   } else if (first.kind === 'vl') {
     const leave = Math.max(P.t0, first.leaveAt);
-    eyebrow = `Créneau ${VQ.name}`; big = 'VL'; small = 'réservé';
-    facts.push(`<span>Créneau à <b class="num">${hhmm(first.slot)}</b></span>`, `<span>${first.walk} min à pied</span>`);
-    reason = leave <= P.mod + 1 ? `Pars maintenant pour être à l'heure à l'entrée ${VQ.name}.` : `Pars vers ${hhmm(leave)}. D'ici là, rien d'autre ne rentre sans risquer de rater le créneau.`;
-    actions = [btn('done', 'Fait', true), btn('open', 'Fiche')];
+    eyebrow = t('board.vlSlot', {vl: VQ.name}); big = 'VL'; small = t('board.booked');
+    facts.push(`<span>${t('board.slotAt', {time: hhmm(first.slot)})}</span>`, `<span>${t('walk', {n: first.walk})}</span>`);
+    reason = leave <= P.mod + 1 ? t('board.vlGoNow', {vl: VQ.name}) : t('board.vlLeaveAt', {time: hhmm(leave)});
+    actions = [btn('done', t('act.done'), true), btn('open', t('act.details'))];
   } else if (first.kind === 'show') {
     const leave = Math.max(P.t0, first.leaveAt);
-    eyebrow = `Spectacle · ${first.walk} min à pied`; big = hhmm(first.slot); small = 'début';
-    facts.push(`<span>${leave <= P.mod + 1 ? 'Pars maintenant' : `Départ vers ${hhmm(leave)}`}</span>`);
-    reason = 'Représentation choisie au moment où les files de ton programme sont au plus haut. Arrive 5 min avant pour être bien placé.';
-    actions = open ? [btn('done', 'Vu', true), btn('show-skip', 'Pas aujourd\'hui'), btn('open', 'Fiche')] : [];
+    eyebrow = t('board.show', {n: first.walk}); big = hhmm(first.slot); small = t('board.start');
+    facts.push(`<span>${leave <= P.mod + 1 ? t('goNow') : t('board.leaveAt', {time: hhmm(leave)})}</span>`);
+    reason = t('board.showReason');
+    actions = open ? [btn('done', t('act.seen'), true), btn('show-skip', t('act.notToday')), btn('open', t('act.details'))] : [];
   } else if (first.kind === 'meal') {
     const place = first.place && ents.get(first.place);
-    eyebrow = `Pause repas · ${hhmm(first.slot)}`; big = first.dur; small = 'min';
-    if (place) facts.push(`<span>${esc(shortName(place))} · ${first.walk} min à pied</span>`);
-    reason = `Vers ${hhmm(first.slot)}, les files de ton programme sont au plus haut : c'est là que manger fait perdre le moins de temps.`;
-    actions = open ? [btn('meal-done', 'Fait', true, 'meal'), btn('meal-later', 'Plus tard', false, 'meal')].concat(place ? [btn('open', 'Le resto', false, place.id)] : []) : [];
+    eyebrow = t('board.meal', {time: hhmm(first.slot)}); big = first.dur; small = 'min';
+    if (place) facts.push(`<span>${esc(shortName(place))} · ${t('walk', {n: first.walk})}</span>`);
+    reason = t('board.mealReason', {time: hhmm(first.slot)});
+    actions = open ? [btn('meal-done', t('act.done'), true, 'meal'), btn('meal-later', t('act.later'), false, 'meal')].concat(place ? [btn('open', t('act.restaurant'), false, place.id)] : []) : [];
   } else {
     const liveW = open ? waitOf(first.id) : null, shown = liveW ?? r5(first.wait);
-    eyebrow = open ? 'Prochaine étape · temps d\'attente' : P.phase === 'before' ? `À l'ouverture (${hhmm(P.t0)}) · estimation` : `Aperçu ${fmtDay(P.day)} · estimation`;
+    eyebrow = open ? t('board.next') : P.phase === 'before' ? t('board.atOpening', {time: hhmm(P.t0)}) : t('board.preview', {day: fmtDay(P.day)});
     big = shown; small = 'min'; cls = wclass(shown);
-    facts.push(`<span>${first.walk} min à pied${open && currentPos().src !== 'gps' ? ` depuis ${esc(currentPos().src === 'last' ? currentPos().name : 'l\'entrée')}` : ''}</span>`);
-    if (open && first.arrive - P.mod > 2) facts.push(`<span>Arrivée ${hhmm(first.arrive)}</span>`);
-    if (first.sr) facts.push(`<span>Single rider ~${r5(first.wait)} min</span>`);
-    else if (RF < .95 && shown >= 10) facts.push(`<span>Réel estimé ~${r5(shown * RF)} min</span>`);
+    facts.push(`<span>${t('walk', {n: first.walk})}${open && currentPos().src !== 'gps' ? t('board.from', {place: esc(currentPos().src === 'last' ? currentPos().name : t('board.entrance'))}) : ''}</span>`);
+    if (open && first.arrive - P.mod > 2) facts.push(`<span>${t('board.arrive', {time: hhmm(first.arrive)})}</span>`);
+    if (first.sr) facts.push(`<span>${t('board.sr', {w: r5(first.wait)})}</span>`);
+    else if (realFactor(first.id) < .95 && shown >= 10) facts.push(`<span>${t('board.realEst', {w: r5(shown * realFactor(first.id))})}</span>`);
     const vl = vlOf(first.id);
-    if (open && vl && vl.state === 'AVAILABLE') facts.push(`<span>${esc(VQ.name)} ouvert</span>`);
+    if (open && vl && vl.state === 'AVAILABLE') facts.push(`<span>${t('board.vlOpen', {vl: esc(VQ.name)})}</span>`);
     reason = reasonFor(first, P);
-    if (open) actions = [btn('done', 'Fait', true), btn('queue', 'Dans la file'), btn('skip', 'Plus tard')];
+    if (open) actions = [btn('done', t('act.done'), true), btn('queue', t('act.inQueue')), btn('skip', t('act.later'))];
   }
-  const altHtml = (first.kind === 'ride' && open && plan.alts.length) ? `<div class="alts"><span class="eyebrow">Autres bons choix</span>${plan.alts.map(a => {
+  const altHtml = (first.kind === 'ride' && open && plan.alts.length) ? `<div class="alts"><span class="eyebrow">${t('board.alts')}</span>${plan.alts.map(a => {
     const aw = waitOf(a.id) ?? r5(a.wait);
-    return `<button class="alt" type="button" data-act="open" data-id="${esc(a.id)}"><span class="alt-name">${esc(shortName(ents.get(a.id)))}</span><span class="alt-walk">${a.walk} min à pied</span><b class="num b-${wclass(aw)}">${aw}<small> min</small></b></button>`;
+    return `<button class="alt" type="button" data-act="open" data-id="${esc(a.id)}"><span class="alt-name">${esc(shortName(ents.get(a.id)))}</span><span class="alt-walk">${t('walk', {n: a.walk})}</span><b class="num b-${wclass(aw)}">${aw}<small> min</small></b></button>`;
   }).join('')}</div>` : '';
   const nameHtml = first.kind === 'meal' ? `<div class="board-name">${name}</div>` : `<button class="board-name" type="button" data-act="open" data-id="${esc(first.id)}">${name}</button>`;
   return `<article class="board" aria-live="polite">
@@ -1415,57 +1483,57 @@ function renderNow(P, plan) {
   const box = $('#nextBox');
   const shows = $('#showsBlock'), itinB = $('#itinBlock'), tipsB = $('#tipsBlock');
 
-  if (!schedule && !live.size) { box.innerHTML = '<div class="card"><p class="muted">Chargement des attractions et des temps d\'attente…</p></div>'; itinB.hidden = shows.hidden = tipsB.hidden = true; renderVL(P, plan); return; }
+  if (!schedule && !live.size) { box.innerHTML = `<div class="card"><p class="muted">${t('now.loading')}</p></div>`; itinB.hidden = shows.hidden = tipsB.hidden = true; renderVL(P, plan); return; }
 
   // Récap de la journée, une fois le parc fermé
   const r = P.phase === 'closed' && prefs.day === berlin(now()).day ? recapData() : null;
-  $('#recapBox').innerHTML = r ? recapHTML(r) : '';
+  const carTime = prefs.car && P.h && prefs.day === berlin(now()).day && (P.phase === 'closed' || (P.phase === 'open' && P.h.close - P.mod <= 30));
+  $('#recapBox').innerHTML = (carTime ? `<div class="card"><p><b>🚗 ${t('car.back')}</b> · ${t('car.walk', {min: carWalk()})}</p>
+    <div class="row-inline"><a class="btn small primary" href="${esc(carRoute())}" target="_blank" rel="noopener">${t('car.route')}</a></div></div>` : '') + (r ? recapHTML(r) : '');
 
   // Panneau principal
   const first = plan?.steps?.[0];
-  if (P.phase === 'unknown') box.innerHTML = '<div class="card"><p>Pas d\'horaires d\'ouverture disponibles pour les prochains jours.</p></div>';
+  if (P.phase === 'unknown') box.innerHTML = `<div class="card"><p>${t('now.noHours')}</p></div>`;
   else if (!planCount && !first) box.innerHTML = '';
   else if (!first) {
     const doneN = Object.values(prefs.done).reduce((a, b) => a + b, 0);
     box.innerHTML = P.phase === 'open' && plan && !plan.missing.length && !plan.unavailable.length
-      ? `<div class="board"><div class="eyebrow">Programme bouclé</div><div class="board-name">Bravo, tout est fait</div>
-        <p class="board-reason">${doneN} tour${doneN > 1 ? 's' : ''} au compteur. Les files les plus courtes autour de toi sont dans l'onglet Attractions (tri par attente). Pour refaire tes préférées, choisis « À refaire si… » dans leur fiche.</p></div>`
-      : `<div class="card"><p>Aucune attraction de ton programme n'est faisable pour l'instant${plan?.unavailable.length ? ' (fermées ou en panne)' : ''}. Ajoute des bonus dans l'onglet Attractions.</p></div>`;
+      ? `<div class="board"><div class="eyebrow">${t('now.allDoneEyebrow')}</div><div class="board-name">${t('now.allDone')}</div>
+        <p class="board-reason">${t('now.allDoneText', {n: doneN})}</p></div>`
+      : `<div class="card"><p>${t('now.noneFeasible', {extra: plan?.unavailable.length ? t('now.closedOrDown') : ''})}</p></div>`;
   } else box.innerHTML = boardHTML(P, plan, first);
 
   // Itinéraire
   const notes = [];
   if (plan) {
-    if (plan.missing.length) notes.push(`Ne rentre${plan.missing.length > 1 ? 'nt' : ''} pas d'ici la fermeture : ${plan.missing.map(id => esc(shortName(ents.get(id)))).join(', ')}. Une réservation VirtualLine peut aider.`);
-    if (plan.unavailable.length) notes.push(`Indisponible${plan.unavailable.length > 1 ? 's' : ''} : ${plan.unavailable.map(id => `${esc(shortName(ents.get(id)))} (${P.phase === 'open' ? (STATUS_FR[statusOf(id)]?.toLowerCase() || 'fermée') : statusOf(id) === 'REFURBISHMENT' ? 'en rénovation' : 'pas ouverte ces derniers jours'})`).join(', ')}.`);
-    if (plan.small.length) notes.push(`Trop grand${plan.small.length > 1 ? 'es' : 'e'} pour ${prefs.height} cm : ${plan.small.map(id => `${esc(shortName(ents.get(id)))} (dès ${minCm(ents.get(id))} cm)`).join(', ')}.`);
+    if (plan.missing.length) notes.push(t('note.missing', {n: plan.missing.length, list: plan.missing.map(id => esc(shortName(ents.get(id)))).join(', ')}));
+    if (plan.unavailable.length) notes.push(t('note.unavailable', {n: plan.unavailable.length, list: plan.unavailable.map(id => `${esc(shortName(ents.get(id)))} (${P.phase === 'open' ? (t('statusInline')[statusOf(id)] || t('statusInline').CLOSED) : statusOf(id) === 'REFURBISHMENT' ? t('statusInline').REFURBISHMENT : t('note.notOpenLately')})`).join(', ')}));
+    if (plan.small.length) notes.push(t('note.small', {n: plan.small.length, h: prefs.height, list: plan.small.map(id => `${esc(shortName(ents.get(id)))} (${t('note.fromCm', {cm: minCm(ents.get(id))})})`).join(', ')}));
   }
   if (plan && plan.steps.length > 1) {
     itinB.hidden = false;
-    $('#itinTitle').textContent = P.phase === 'closed' ? `Aperçu · ${fmtDay(P.day)}` : 'Itinéraire conseillé';
-    $('#itinEnd').textContent = `fin ~${hhmm(plan.end)}`;
+    $('#itinTitle').textContent = P.phase === 'closed' ? t('itin.preview', {day: fmtDay(P.day)}) : t('itin.title');
+    $('#itinEnd').textContent = t('itin.end', {time: hhmm(plan.end)});
     const rest = plan.steps.slice(1), LIMIT = 6;
     const visible = itinExpanded ? rest : rest.slice(0, LIMIT);
     $('#itin').innerHTML = visible.map(s => {
-      const tag = {vl: VQ?.name, show: 'spectacle', meal: 'repas'}[s.kind] || (s.sr ? 'single rider' : s.again ? 'à refaire' : s.bonus ? 'bonus' : '');
-      const est = s.kind === 'vl' ? 'créneau' : s.kind === 'show' ? '' : s.kind === 'meal' ? dur(s.dur) : '~' + r5(s.wait) + ' min';
+      const tag = {vl: VQ?.name, show: t('tag.show'), meal: t('tag.meal')}[s.kind] || (s.sr ? t('tag.sr') : s.again ? t('tag.again') : s.bonus ? t('tag.bonus') : '');
+      const est = s.kind === 'vl' ? t('tag.slot') : s.kind === 'show' ? '' : s.kind === 'meal' ? dur(s.dur) : '~' + r5(s.wait) + ' min';
       const place = s.kind === 'meal' && s.place ? ents.get(s.place) : null, openId = s.kind === 'meal' ? s.place : s.id;
-      const sub = place ? `${esc(shortName(place))} · ${s.walk} min à pied` : `${s.walk} min à pied`;
+      const sub = place ? `${esc(shortName(place))} · ${t('walk', {n: s.walk})}` : t('walk', {n: s.walk});
       return `<li><time>${hhmm(s.kind === 'show' || s.kind === 'meal' ? s.slot : s.arrive)}</time>
         <button class="it-name" type="button" ${openId ? `data-act="open" data-id="${esc(openId)}"` : ''}>${esc(stepName(s))}${tag ? `<span class="vl"${s.bonus && s.kind === 'ride' ? ' style="color:var(--muted)"' : ''}>${tag}</span>` : ''}
         <span class="it-sub">${sub}</span></button>
         <span class="est">${est}</span></li>`;
-    }).join('') + (rest.length > LIMIT ? `<li class="more"><button class="btn small" type="button" data-act="itin-more">${itinExpanded ? 'Réduire' : `Voir les ${rest.length - LIMIT} étapes suivantes`}</button></li>` : '');
+    }).join('') + (rest.length > LIMIT ? `<li class="more"><button class="btn small" type="button" data-act="itin-more">${itinExpanded ? t('itin.less') : t('itin.more', {n: rest.length - LIMIT})}</button></li>` : '');
     const parade = upcomingShows(P).find(s => /parade/i.test(s.name) && s.mod - P.mod <= 60 && !prefs.shows[s.id]);
-    if (parade) notes.push(`${esc(parade.name)} à ${hhmm(parade.mod)} : beaucoup de visiteurs s'arrêtent pour la regarder, souvent un bon moment pour une grosse file.`);
-    if (crowdK) notes.push(`Affluence : ${Math.abs(Math.round((crowdK - 1) * 100))} % ${crowdK >= 1 ? 'au-dessus' : 'en dessous'} d'un jour habituel, les prévisions en tiennent compte.`);
-    if (plan.RF < .95) notes.push(`On attend en vrai ~${Math.round(plan.RF * 100)} % des temps affichés : les horaires en tiennent compte.`);
-    notes.push(hasHistory()
-      ? `Prévisions basées sur ${stats.days} jour${stats.days > 1 ? 's' : ''} d'historique (${stats.basis}).`
-      : 'Prévisions génériques : pas encore d\'historique enregistré sur ton serveur.');
+    if (parade) notes.push(t('note.parade', {name: esc(parade.name), time: hhmm(parade.mod)}));
+    if (crowdK) notes.push(t('note.crowd', {pct: Math.abs(Math.round((crowdK - 1) * 100)), dir: crowdK >= 1 ? t('above') : t('below')}));
+    if (plan.RF < .95) notes.push(t('note.real', {pct: Math.round(plan.RF * 100)}));
+    notes.push(hasHistory() ? t('note.history', {n: stats.days, basis: basisName()}) : t('note.generic'));
     $('#itinNote').innerHTML = notes.join('<br>');
   } else if (plan && notes.length && planCount) {
-    itinB.hidden = false; $('#itinTitle').textContent = 'Itinéraire conseillé'; $('#itinEnd').textContent = ''; $('#itin').innerHTML = '';
+    itinB.hidden = false; $('#itinTitle').textContent = t('itin.title'); $('#itinEnd').textContent = ''; $('#itin').innerHTML = '';
     $('#itinNote').innerHTML = notes.join('<br>');
   } else itinB.hidden = true;
 
@@ -1475,17 +1543,20 @@ function renderNow(P, plan) {
   if (up.length) {
     const pos = currentPos();
     $('#shows').innerHTML = up.slice(0, 6).map(s => `<li><time>${hhmm(s.mod)}</time>
-      <button class="it-name" type="button" data-act="open" data-id="${esc(s.id)}">${esc(s.name)}${prefs.shows[s.id] ? '<span class="vl">choisi</span>' : ''}<span class="it-sub">${walkMin(pos, ents.get(s.id))} min à pied</span></button><span></span></li>`).join('');
+      <button class="it-name" type="button" data-act="open" data-id="${esc(s.id)}">${esc(s.name)}${prefs.shows[s.id] ? `<span class="vl">${t('tag.chosen')}</span>` : ''}<span class="it-sub">${t('walk', {n: walkMin(pos, ents.get(s.id))})}</span></button><span></span></li>`).join('');
   }
 
   // Conseils avant ouverture / la veille
   tipsB.hidden = !(P.phase === 'before' || P.phase === 'closed') || !planCount;
   if (!tipsB.hidden) {
-    const f = crowdForecast(P.day);
-    $('#tips').innerHTML = (f ? `<p><b>Affluence prévue :</b> les ${f.name}s relevés (${f.n}), l'attente moyenne est de ~${Math.round(f.avg)} min, ${Math.abs(Math.round(f.rel * 100))} % ${f.rel >= 0 ? 'au-dessus' : 'en dessous'} de la moyenne des derniers jours. ${f.rel <= -.1 ? 'Plutôt calme : profites-en.' : f.rel >= .1 ? 'Plutôt chargé : VirtualLine dès l\'entrée et pause repas au pic.' : 'Journée dans la moyenne.'}</p>` : '')
-      + `<p><b>Sois devant l'entrée avant ${hhmm(P.h.open)}.</b> En début de journée, les grosses attractions ont les files les plus courtes : l'itinéraire commence par elles.</p>
-      <p><b>VirtualLine dès que tu es dans le parc.</b> Gratuit, dans l'appli Europa-Park avec ton billet lié et la localisation activée. Un seul créneau à la fois par billet : re-réserve juste après l'avoir utilisé.</p>
-      <p><b>Active les notifications</b> (Réglages) : alertes de file courte, départ pour un créneau ou un spectacle, même téléphone en poche.</p>`;
+    const f = crowdForecast(P.day), fd = fcData?.days?.find(d => d.day === P.day);
+    loadForecast();
+    $('#tips').innerHTML = (f ? `<p>${t('tips.forecast', {name: f.name, n: f.n, avg: Math.round(f.avg), pct: Math.abs(Math.round(f.rel * 100)), dir: f.rel >= 0 ? t('above') : t('below'),
+      verdict: f.rel <= -.1 ? t('tips.calm') : f.rel >= .1 ? t('tips.busy') : t('tips.average')})}</p>` : '')
+      + (fd ? `<p>${t('fc.tip', {level: esc(t('fc.levels')[fd.level - 1]), why: fd.why.length ? ' (' + esc(fcWhy(fd)) + ')' : ''})}</p>` : '')
+      + `<p>${t('tips.early', {time: hhmm(P.h.open)})}</p>
+      <p>${t('tips.vl')}</p>
+      <p>${t('tips.notif')}</p>`;
   }
   renderVL(P, plan);
 }
@@ -1506,6 +1577,14 @@ function vlPick(P, exclude) {
   return [...live.keys()].filter(id => id !== exclude && hasQueue(id) && vlOf(id)?.state === 'AVAILABLE' && prefs.plan[id] && !(prefs.done[id] > 0))
     .sort((a, b) => gainOf(b) - gainOf(a))[0] || null;
 }
+/* Lien vers l'appli officielle du parc : ouverte directement sur Android (sinon Play Store), fiche App Store sur iPhone */
+function vqAppLink() {
+  if (isIOS && VQ?.appIos) return VQ.appIos;
+  const pkg = VQ?.appAndroid;
+  if (!pkg) return null;
+  const store = `https://play.google.com/store/apps/details?id=${pkg}`;
+  return /Android/i.test(navigator.userAgent) ? `intent://#Intent;package=${pkg};S.browser_fallback_url=${encodeURIComponent(store)};end` : store;
+}
 function renderVL(P, plan) {
   const block = $('#vlBlock');
   const vlIds = [...live.keys()].filter(id => vlOf(id) && hasQueue(id));
@@ -1515,24 +1594,27 @@ function renderVL(P, plan) {
   let body = '';
   if (slots.length) {
     const s = slots[0], e = ents.get(s.id), w = walkMin(currentPos(), e), leave = s.start - w - 2;
-    body = `<p><b>${esc(shortName(e))}</b> · créneau à <b class="num">${hhmm(s.start)}</b> · ${w} min à pied<br>
-      <span class="muted">${leave <= P.mod ? 'Pars maintenant.' : `Départ conseillé ${hhmm(leave)} (dans ${dur(leave - P.mod)}).`}</span></p>
-      <div class="row-inline"><button class="btn small primary" type="button" data-act="done" data-id="${esc(s.id)}">${icCheck}Fait</button>
-      <button class="btn small" type="button" data-act="slot-del" data-id="${esc(s.id)}">Supprimer le créneau</button></div>`;
+    body = `<p><b>${esc(shortName(e))}</b> · ${t('vl.slotAt', {time: hhmm(s.start)})} · ${t('walk', {n: w})}<br>
+      <span class="muted">${leave <= P.mod ? t('vl.goNow') : t('vl.leaveAt', {time: hhmm(leave), in: dur(leave - P.mod)})}</span></p>
+      <div class="row-inline"><button class="btn small primary" type="button" data-act="done" data-id="${esc(s.id)}">${icCheck}${t('act.done')}</button>
+      <button class="btn small" type="button" data-act="slot-del" data-id="${esc(s.id)}">${t('vl.delete')}</button></div>`;
   } else {
     const planned = vlIds.filter(id => prefs.plan[id] && !(prefs.done[id] > 0));
     const pick = vlPick(P);
-    if (P.phase === 'before') body = `<p>Dès ton entrée, réserve un créneau pour une attraction à grosse file${planned.length ? ` (${planned.slice(0, 3).map(id => esc(shortName(ents.get(id)))).join(', ')}…)` : ''}. Ensuite, note-le ici : l'itinéraire s'organise autour.</p>`;
-    else if (pick) body = `<p>Réserve maintenant : <b>${esc(shortName(ents.get(pick)))}</b>${waitOf(pick) != null ? ` · file actuelle ${waitOf(pick)} min` : ''}${vlOf(pick).returnStart ? ` · prochain créneau ~${hhmm(isoMod(vlOf(pick).returnStart).mod)}` : ''}</p>`;
-    else body = `<p class="muted">Aucune attraction de ton programme n'a de ${esc(VQ.name)} ouvert pour l'instant.</p>`;
-    body += `<div class="row-inline"><button class="btn small primary" type="button" data-act="slot-form" data-id="${esc(pick || planned[0] || vlIds[0])}">J'ai un créneau</button>
-      <a class="btn small" href="${esc(VQ.url)}" target="_blank" rel="noopener">Comment réserver</a></div>`;
+    if (P.phase === 'before') body = `<p>${t('vl.before', {list: planned.length ? ` (${planned.slice(0, 3).map(id => esc(shortName(ents.get(id)))).join(', ')}…)` : ''})}</p>`;
+    else if (pick) body = `<p>${t('vl.bookNow', {name: esc(shortName(ents.get(pick)))})}${waitOf(pick) != null ? t('vl.currentQueue', {w: waitOf(pick)}) : ''}${vlOf(pick).returnStart ? t('vl.nextSlot', {time: hhmm(isoMod(vlOf(pick).returnStart).mod)}) : ''}</p>`;
+    else body = `<p class="muted">${t('vl.none', {vl: esc(VQ.name)})}</p>`;
+    const app = vqAppLink(), rs = pick && P.phase === 'open' && vlOf(pick).returnStart ? isoMod(vlOf(pick).returnStart).mod : null;
+    body += `<div class="row-inline">${rs != null ? `<button class="btn small primary" type="button" data-act="slot-quick" data-id="${esc(pick)}" data-start="${rs}">${icCheck}${t('vl.quick', {time: hhmm(rs)})}</button>` : ''}
+      <button class="btn small${rs != null ? '' : ' primary'}" type="button" data-act="slot-form" data-id="${esc(pick || planned[0] || vlIds[0])}">${t('vl.haveSlot')}</button>
+      ${app ? `<a class="btn small" href="${esc(app)}" target="_blank" rel="noopener">${t('vl.openApp')}</a>` : ''}
+      <a class="btn small" href="${esc(VQ.url)}" target="_blank" rel="noopener">${t('vl.howTo')}</a></div>`;
   }
   const chips = vlIds.sort((a, b) => shortName(ents.get(a)).localeCompare(shortName(ents.get(b)))).map(id => {
     const st = vlOf(id).state; const c = st === 'AVAILABLE' ? 'ok' : st === 'TEMP_FULL' ? 'full' : 'end';
-    return `<span class="chip ${c}">${esc(shortName(ents.get(id)))} · ${VL_FR[st] || 'inconnu'}</span>`;
+    return `<span class="chip ${c}">${esc(shortName(ents.get(id)))} · ${t('vl')[st] || t('vlUnknown')}</span>`;
   }).join('');
-  block.innerHTML = `<div class="block-head"><h2>${esc(VQ.name)}</h2><span class="muted">coupe-file gratuit</span></div>
+  block.innerHTML = `<div class="block-head"><h2>${esc(VQ.name)}</h2><span class="muted">${t('vl.free')}</span></div>
     <div class="card">${body}<div class="chips">${chips}</div></div>`;
 }
 
@@ -1549,29 +1631,34 @@ function renderBanner(P, plan) {
   let msg = null, warn = false, extra = '';
   const first = plan?.steps?.[0];
   if (P.phase === 'open' && (first?.kind === 'vl' || first?.kind === 'show') && first.leaveAt <= P.mod + 1) {
-    msg = `<b>Pars maintenant</b> vers ${esc(shortName(ents.get(first.id)))} : ${first.kind === 'vl' ? 'créneau ' + esc(VQ.name) : 'spectacle'} à ${hhmm(first.slot)}.`;
+    msg = t('banner.goNow', {name: esc(shortName(ents.get(first.id))), what: first.kind === 'vl' ? t('banner.vlSlot', {vl: esc(VQ.name)}) : t('tag.show'), time: hhmm(first.slot)});
   } else if (gpsPrompt) {
     const n = esc(shortName(ents.get(gpsPrompt.id)));
     if (gpsPrompt.kind === 'enter') {
-      msg = `Tu es à <b>${n}</b>. Tu fais la queue ?`;
-      extra = `<button type="button" class="yes" data-act="queue" data-id="${esc(gpsPrompt.id)}">Oui</button>`;
+      msg = t('banner.atRide', {name: n});
+      extra = `<button type="button" class="yes" data-act="queue" data-id="${esc(gpsPrompt.id)}">${t('yes')}</button>`;
     } else {
-      msg = `Tu as fini <b>${n}</b> ?`;
-      extra = `<button type="button" class="yes" data-act="done" data-id="${esc(gpsPrompt.id)}">Fait</button>`;
+      msg = t('banner.finished', {name: n});
+      extra = `<button type="button" class="yes" data-act="done" data-id="${esc(gpsPrompt.id)}">${t('act.done')}</button>`;
     }
-    extra += '<button type="button" data-act="prompt-no" aria-label="Non">✕</button>';
-  } else if (pendingAlert) { msg = pendingAlert; extra = '<button type="button" data-act="banner-close" aria-label="Fermer">✕</button>'; }
+    extra += `<button type="button" data-act="prompt-no" aria-label="${t('no')}">✕</button>`;
+  } else if (pendingAlert) { msg = pendingAlert; extra = `<button type="button" data-act="banner-close" aria-label="${t('close')}">✕</button>`; }
+  else if (pendingRate && ents.has(pendingRate)) {
+    msg = `${t('rate.ask', {name: esc(shortName(ents.get(pendingRate)))})} ${starsHTML(pendingRate, prefs.ratings[pendingRate])}`;
+    extra = `<button type="button" data-act="rate-skip" aria-label="${t('close')}">✕</button>`;
+  }
   else if (P.phase === 'open' && P.h.close - P.mod <= 45 && P.h.close - P.mod > 5 && !asked.has('last:' + P.day)) {
     const picks = lastCall(P);
-    msg = `<b>Dernier appel</b> : fermeture à ${hhmm(P.h.close)}, les files ferment à cette heure-là.${picks.length ? ` Encore possible : ${picks.map(p => `${esc(shortName(ents.get(p.id)))} (${p.w} min, ${p.walk} min à pied)`).join(', ')}.` : ''}`;
-    extra = `<button type="button" data-act="dismiss" data-key="last:${P.day}" aria-label="Fermer">✕</button>`;
+    msg = t('banner.lastCall', {time: hhmm(P.h.close)}) + (picks.length ? t('banner.stillPossible', {list: picks.map(p => `${esc(shortName(ents.get(p.id)))} (${p.w} min, ${t('walk', {n: p.walk})})`).join(', ')}) : '');
+    extra = `<button type="button" data-act="dismiss" data-key="last:${P.day}" aria-label="${t('close')}">✕</button>`;
   }
   else if (rainSoon(P) && !asked.has('rain:' + rainSoon(P))) {
-    msg = `<b>Pluie annoncée vers ${rainSoon(P)} h</b> : l'itinéraire passe aux attractions couvertes.`;
-    extra = `<button type="button" data-act="dismiss" data-key="rain:${rainSoon(P)}" aria-label="Fermer">✕</button>`;
+    msg = t('banner.rain', {h: rainSoon(P)});
+    extra = `<button type="button" data-act="dismiss" data-key="rain:${rainSoon(P)}" aria-label="${t('close')}">✕</button>`;
   }
-  else if (meta.offline) { msg = 'Pas de réseau : affichage des dernières données reçues. L\'actualisation reprend automatiquement.'; warn = true; }
-  else if (meta.stale) { msg = 'La source des temps d\'attente ne répond pas : données du dernier relevé.'; warn = true; }
+  else if (meta.offline) { msg = t('banner.offline'); warn = true; }
+  else if (meta.stale) { msg = t('banner.stale'); warn = true; }
+  else if (versionNote) { msg = versionNote; extra = `<button type="button" data-act="version-close" aria-label="${t('close')}">✕</button>`; }
   b.hidden = !msg;
   if (msg) { b.className = 'banner' + (warn ? ' warn' : ''); b.innerHTML = `<p>${msg}</p>${extra}`; }
 }
@@ -1589,7 +1676,7 @@ function renderList(P) {
     return false;
   }).filter(e => !q || e.key.includes(q));
   const info = new Map(arr.map(e => [e.id, {walk: walkMin(pos, e), wait: waitOf(e.id), next: todayShowtimes(e.id).find(s => s.mod >= P.mod - 2)}]));
-  const byName = (a, b) => a.name.localeCompare(b.name, 'fr');
+  const byName = (a, b) => a.name.localeCompare(b.name, LANG);
   arr.sort((a, b) => {
     const A = info.get(a.id), B = info.get(b.id);
     if (device.sort === 'name') return byName(a, b);
@@ -1598,33 +1685,34 @@ function renderList(P) {
     const wa = A.wait ?? (a.type === 'RESTAURANT' && statusOf(a.id) === 'OPERATING' ? -1 : 999), wb = B.wait ?? (b.type === 'RESTAURANT' && statusOf(b.id) === 'OPERATING' ? -1 : 999);
     return wa - wb || A.walk - B.walk || byName(a, b);
   });
-  const hint = {plan: 'Étoile pleine : incontournable · demi-étoile : bonus. Touche l\'étoile pour changer.', rides: 'Ajoute des attractions à ton programme avec l\'étoile.', shows: 'Étoile : le spectacle entre dans ton itinéraire, à la meilleure représentation.', food: 'Restaurants et stands du parc.'}[f];
-  $('#listHint').textContent = hint;
-  if (!arr.length) { $('#list').innerHTML = `<li class="empty">${f === 'plan' ? 'Ton programme est vide : passe sur « Attractions » et touche les étoiles.' : 'Rien à afficher.'}</li>`; return; }
+  $('#listHint').textContent = t('list.hint.' + f);
+  if (!arr.length) { $('#list').innerHTML = `<li class="empty">${f === 'plan' ? t('list.emptyPlan') : t('list.empty')}</li>`; return; }
   $('#list').innerHTML = arr.map(e => {
     const I = info.get(e.id), st = statusOf(e.id), isRide = e.type === 'ATTRACTION' && hasQueue(e.id);
-    const meta = [`${I.walk} min à pied`];
+    const meta = [t('walk', {n: I.walk})];
     let right = '', star = '<span class="star" aria-hidden="true"></span>';
     if (isRide) {
       if (I.wait != null) right = `<span class="pill w-${wclass(I.wait)}">${I.wait}<small>min</small></span>`;
-      else right = `<span class="pill word w-off">${STATUS_FR[st] || '—'}</span>`;
+      else right = `<span class="pill word w-off">${t('status')[st] || '—'}</span>`;
       const tr = trendOf(e.id);
       if (tr != null && Math.abs(tr) >= 10) meta.push(tr > 0 ? `<span class="up">↗ +${tr} min</span>` : `<span class="down">↘ ${tr} min</span>`);
-      const vl = vlOf(e.id); if (vl) meta.push(`${esc(VQ.name)} ${VL_FR[vl.state] || ''}`);
-      if (reopenedRecently(e.id)) meta.push('<span class="down">vient de rouvrir</span>');
-      if (tooSmall(e.id)) meta.push(`<span class="up">dès ${minCm(e)} cm</span>`);
-      if (prefs.alerts[e.id]) meta.push(`alerte ≤ ${prefs.alerts[e.id]} min`);
-      if (prefs.again[e.id]) meta.push(`à refaire ≤ ${prefs.again[e.id]} min`);
-      if (prefs.done[e.id]) meta.push(`fait${prefs.done[e.id] > 1 ? ' ×' + prefs.done[e.id] : ''}`);
+      const vl = vlOf(e.id); if (vl) meta.push(`${esc(VQ.name)} ${t('vl')[vl.state] || ''}`);
+      if (reopenedRecently(e.id)) meta.push(`<span class="down">${t('list.reopened')}</span>`);
+      if (tooSmall(e.id)) meta.push(`<span class="up">${t('note.fromCm', {cm: minCm(e)})}</span>`);
+      if (prefs.alerts[e.id]) meta.push(t('list.alert', {w: prefs.alerts[e.id]}));
+      if (prefs.again[e.id]) meta.push(t('list.again', {w: prefs.again[e.id]}));
+      if (prefs.done[e.id]) meta.push(`${t('list.done')}${prefs.done[e.id] > 1 ? ' ×' + prefs.done[e.id] : ''}`);
+      const gr = pooled?.ratings?.[e.id];
+      if (gr) meta.push(`★ ${gr.avg.toLocaleString(t('locale'))}${gr.n > 1 ? ` (${gr.n})` : ''}`);
       const p = prefs.plan[e.id];
-      star = `<button class="star ${p || ''}" type="button" data-act="star" data-id="${esc(e.id)}" aria-label="${p === 'must' ? 'Incontournable — passer en bonus' : p === 'bonus' ? 'Bonus — retirer du programme' : 'Ajouter au programme'}">${p === 'must' ? icStar : p === 'bonus' ? icStarHalf : icStarOff}</button>`;
+      star = `<button class="star ${p || ''}" type="button" data-act="star" data-id="${esc(e.id)}" aria-label="${p === 'must' ? t('star.must') : p === 'bonus' ? t('star.bonus') : t('star.add')}">${p === 'must' ? icStar : p === 'bonus' ? icStarHalf : icStarOff}</button>`;
     } else if (e.type === 'SHOW') {
-      right = I.next ? `<span class="est">${hhmm(I.next.mod)}</span>` : '<span class="est">terminé</span>';
+      right = I.next ? `<span class="est">${hhmm(I.next.mod)}</span>` : `<span class="est">${t('list.over')}</span>`;
       const p = prefs.shows[e.id];
-      star = `<button class="star ${p ? 'must' : ''}" type="button" data-act="show-star" data-id="${esc(e.id)}" aria-label="${p ? 'Retirer de l\'itinéraire' : 'Ajouter à l\'itinéraire'}">${p ? icStar : icStarOff}</button>`;
-      if (prefs.done[e.id]) meta.push('vu');
+      star = `<button class="star ${p ? 'must' : ''}" type="button" data-act="show-star" data-id="${esc(e.id)}" aria-label="${p ? t('show.remove') : t('show.add')}">${p ? icStar : icStarOff}</button>`;
+      if (prefs.done[e.id]) meta.push(t('list.seen'));
     } else if (e.type === 'RESTAURANT') {
-      right = `<span class="pill word ${st === 'OPERATING' ? 'w-low' : 'w-off'}">${st === 'OPERATING' ? 'Ouvert' : 'Fermé'}</span>`;
+      right = `<span class="pill word ${st === 'OPERATING' ? 'w-low' : 'w-off'}">${st === 'OPERATING' ? t('food.open') : t('food.closed')}</span>`;
     }
     return `<li class="${prefs.done[e.id] ? 'done' : ''}">${star}
       <button class="row-main" type="button" data-act="open" data-id="${esc(e.id)}"><span class="row-name">${esc(e.name)}</span><span class="row-meta">${meta.join(' · ')}</span></button>${right}</li>`;
@@ -1658,10 +1746,23 @@ function renderMap(P, plan) {
     const box = L.latLngBounds([BOUNDS.south, BOUNDS.west], [BOUNDS.north, BOUNDS.east]);
     lmap = L.map('lmap', {maxBounds: box.pad(.5), minZoom: 14, zoomSnap: .5});
     lmap.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
-    L.tileLayer(MAP_TILES, {maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(lmap);
+    L.tileLayer(MAP_TILES, {maxZoom: 19, crossOrigin: true, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(lmap);
     lLayer = L.layerGroup().addTo(lmap);
     lmap.on('click', ev => { const el = ev.originalEvent?.target?.closest?.('[data-id]'); if (el) openSheet(el.dataset.id); });
+    // Déplacer la carte à la main arrête le suivi de la position
+    lmap.on('dragstart', () => { if (follow) { follow = false; renderMapCtl(); } });
+    const ctl = L.control({position: 'topright'});
+    ctl.onAdd = () => {
+      const d = L.DomUtil.create('div', 'map-ctl');
+      d.id = 'mapCtl';
+      L.DomEvent.disableClickPropagation(d);
+      L.DomEvent.on(d, 'click', ev => { const b = ev.target.closest('button'); if (b) mapAction(b.dataset.map); });
+      return d;
+    };
+    ctl.addTo(lmap);
+    renderMapCtl();
   }
+  if (follow && gpsPos) lmap.panTo([gpsPos.lat, gpsPos.lon], {animate: true});
   // Taille réelle connue seulement une fois l'onglet affiché : on recadre sur le parc la première fois
   setTimeout(() => {
     lmap.invalidateSize();
@@ -1691,24 +1792,161 @@ function renderMap(P, plan) {
     L.marker([o.lat, o.lon], {icon: icon(`<span class="mk friend">${esc(o.nick.slice(0, 1).toUpperCase())}</span>`, 24), opacity: Date.now() - o.ts > 10 * 60000 ? .5 : 1, zIndexOffset: 1500})
       .bindTooltip(esc(o.nick), {permanent: true, direction: 'right', offset: [12, 0], className: 'lbl'}).addTo(lLayer);
   }
+  // Points pratiques choisis (toilettes, eau…) et voiture
+  for (const p of (POI?.poi || []).filter(p => (device.poi || []).includes(p.t))) {
+    L.marker([p.lat, p.lon], {icon: icon(`<span class="mk poi">${POI_ICON[p.t] || '•'}</span>`, 22), zIndexOffset: 200})
+      .bindTooltip(esc(p.name || poiLabel(p.t)), {direction: 'top', offset: [0, -10], className: 'lbl'}).addTo(lLayer);
+  }
+  if (prefs.car) L.marker([prefs.car.lat, prefs.car.lon], {icon: icon('<span class="mk car">🚗</span>', 28), zIndexOffset: 1200}).on('click', () => openCar())
+    .bindTooltip(esc(t('car.title')), {permanent: true, direction: 'right', offset: [14, 0], className: 'lbl'}).addTo(lLayer);
   if (pos.lat != null) {
     if (pos.src === 'gps' && gpsPos?.acc) L.circle([pos.lat, pos.lon], {radius: gpsPos.acc, stroke: false, fillOpacity: .12, fillColor: getComputedStyle(document.body).getPropertyValue('--accent')}).addTo(lLayer);
     L.marker([pos.lat, pos.lon], {icon: icon('<span class="mk me"></span>', 18), zIndexOffset: 2000, interactive: false}).addTo(lLayer);
   }
-  const group = others.length ? ` Groupe : ${others.map(o => `${o.nick} (${walkMin(pos, o)} min, il y a ${Math.round((Date.now() - o.ts) / 60000)} min)`).join(', ')}.${meet ? ` Point de rencontre conseillé (losange) : ${shortName(meet)}.` : ''}` : device.share ? ' Personne d\'autre ne partage sa position pour l\'instant.' : '';
-  $('#mapNote').textContent = `Point violet : ${pos.src === 'gps' ? 'ta position GPS' : pos.src === 'last' ? `dernière attraction faite (${pos.name})` : 'entrée principale (active la position dans Réglages)'}. Grosses pastilles : ton programme, avec l'attente.${group}`;
+  const group = others.length ? t('map.group', {list: others.map(o => t('map.member', {nick: o.nick, walk: walkMin(pos, o), age: Math.round((Date.now() - o.ts) / 60000)})).join(', ')}) + (meet ? t('map.meet', {name: shortName(meet)}) : '') : device.share ? t('map.alone') : '';
+  $('#mapNote').textContent = t('map.note', {where: pos.src === 'gps' ? t('map.gps') : pos.src === 'last' ? t('map.last', {name: pos.name}) : t('map.entrance'), group});
+}
+/* Boutons de la carte : plein écran, me recentrer (et me suivre), tout le parc, toilettes les plus proches, voiture */
+let follow = false;
+const icFull = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+const icExit = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+const icLocate = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></svg>';
+const icPark = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 3 6.2v13.6L9 17.6l6 2.2 6-2.2V4.2L15 6.4 9 4Z"/><path d="M9 4v13.6M15 6.4V20"/></svg>';
+function renderMapCtl() {
+  const d = $('#mapCtl');
+  if (!d) return;
+  const full = $('#mapWrap').classList.contains('full');
+  d.innerHTML = `<button type="button" data-map="full" aria-label="${esc(full ? t('map.exit') : t('map.full'))}" title="${esc(full ? t('map.exit') : t('map.full'))}">${full ? icExit : icFull}</button>
+    <button type="button" data-map="locate" aria-pressed="${follow}" aria-label="${esc(t('map.locate'))}" title="${esc(t('map.locate'))}">${icLocate}</button>
+    <button type="button" data-map="park" aria-label="${esc(t('map.park'))}" title="${esc(t('map.park'))}">${icPark}</button>
+    ${POI?.poi?.some(p => p.t === 'toilets') ? `<button type="button" data-map="toilets" aria-label="${esc(t('poi.nearestBtn'))}" title="${esc(t('poi.nearestBtn'))}">🚻</button>` : ''}
+    <button type="button" data-map="car" aria-label="${esc(t('car.title'))}" title="${esc(t('car.title'))}">🚗</button>`;
+}
+function setMapFull(on) {
+  $('#mapWrap').classList.toggle('full', on);
+  document.body.style.overflow = on ? 'hidden' : '';
+  renderMapCtl();
+  setTimeout(() => lmap?.invalidateSize(), 50);
+}
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && $('#mapWrap').classList.contains('full')) setMapFull(false); });
+function mapAction(a) {
+  if (a === 'full') setMapFull(!$('#mapWrap').classList.contains('full'));
+  else if (a === 'park') { follow = false; lmap.fitBounds([[BOUNDS.south, BOUNDS.west], [BOUNDS.north, BOUNDS.east]]); renderMapCtl(); }
+  else if (a === 'locate') {
+    follow = !follow || !gpsPos;
+    if (gpsPos) lmap.setView([gpsPos.lat, gpsPos.lon], Math.max(lmap.getZoom(), 18));
+    else if (!device.gps) { device.gps = true; saveDevice(); startGps(); toast(t('map.waitGps')); }
+    else toast(gpsState === 'out' ? t('map.outPark') : t('map.waitGps'));
+    renderMapCtl();
+  } else if (a === 'toilets') nearestPoi('toilets');
+  else if (a === 'car') openCar();
+}
+
+/* ---------- Points pratiques (OpenStreetMap) : parks/<parc>.poi.json, généré par tools/park-poi.php ---------- */
+let POI = null;
+const POI_ICON = {toilets: '🚻', water: '💧', lockers: '🔒', atm: '🏧', parking: '🅿️', firstaid: '✚'};
+const POI_TYPES = ['toilets', 'water', 'lockers', 'atm', 'parking'];
+const poiLabel = ty => ({toilets: t('poi.toilets'), water: t('poi.water'), lockers: t('poi.lockers'), atm: t('poi.atm'), parking: t('poi.parking'), firstaid: t('poi.firstaid')})[ty] || ty;
+async function loadPoi() {
+  if (POI || !PARK.slug) return;
+  try { POI = await getJSON(`parks/${PARK.slug}.poi.json`, 10000); } catch (e) { POI = {poi: []}; }
+}
+function nearestPoi(type) {
+  const pos = currentPos(), list = (POI?.poi || []).filter(p => p.t === type);
+  if (!list.length) { toast(t('poi.none', {type: poiLabel(type)})); return; }
+  const best = list.map(p => ({p, m: walkMeters(pos, p)})).sort((a, b) => a.m - b.m)[0];
+  if (!(device.poi || []).includes(type)) { device.poi = (device.poi || []).concat(type); saveDevice(); }
+  follow = false;
+  lmap?.setView([best.p.lat, best.p.lon], 18);
+  toast(t('poi.nearest', {type: poiLabel(type), min: Math.max(1, Math.round(best.m / PACES[prefs.pace]))}));
+  render();
+}
+function renderPoiChips() {
+  const types = POI_TYPES.filter(ty => (POI?.poi || []).some(p => p.t === ty));
+  $('#poiChips').innerHTML = types.map(ty => `<button class="chip toggle" type="button" data-act="poi" data-id="${ty}" aria-pressed="${(device.poi || []).includes(ty)}">${POI_ICON[ty]} ${esc(poiLabel(ty))}</button>`).join('');
+}
+
+/* ---------- Voiture : place enregistrée (synchronisée avec le profil, donc tout le groupe la voit) ---------- */
+const carWalk = () => prefs.car ? Math.max(1, Math.round(walkMeters(currentPos(), prefs.car) / PACES[prefs.pace])) : null;
+const carRoute = () => `https://www.google.com/maps/dir/?api=1&destination=${prefs.car.lat},${prefs.car.lon}&travelmode=walking`;
+function openCar() {
+  let body;
+  if (prefs.car) {
+    body = `<p>${esc(prefs.car.name || t('car.myPos'))} · ${t('car.walk', {min: carWalk()})}</p>
+      <div class="row-inline"><a class="btn primary" href="${esc(carRoute())}" target="_blank" rel="noopener">${t('car.route')}</a>
+      <button class="btn" type="button" data-act="car-show">${t('car.onMap')}</button>
+      <button class="btn" type="button" data-act="car-clear">${t('car.clear')}</button></div>`;
+  } else {
+    const fresh = gpsPos && Date.now() - gpsPos.ts < 5 * 60000;
+    const lots = (POI?.poi || []).filter(p => p.t === 'parking' && p.name).map(p => ({...p, d: dist(ENTRANCE, p) + (/hotel|hôtel/i.test(p.name) ? 5000 : 0)})).sort((a, b) => a.d - b.d).slice(0, 8);   // parkings d'hôtel en dernier
+    body = `<p class="muted">${t('car.hint')}</p>
+      <div class="row-inline">${fresh || lastGps ? `<button class="btn primary" type="button" data-act="car-here">${t('car.here')}</button>` : `<p class="muted">${t('car.noGps')}</p>`}</div>
+      ${lots.length ? `<span class="eyebrow">${t('car.pick')}</span><div class="user-list">${lots.map((p, i) => `<button class="btn small" type="button" data-act="car-lot" data-id="${i}">${esc(p.name)}</button>`).join('')}</div>` : ''}`;
+    carLots = lots;
+  }
+  $('#sheet').innerHTML = `<div class="sheet-in"><div class="sheet-head"><div><div class="eyebrow">🚗</div><h2 class="sheet-title" id="sheetTitle">${t('car.title')}</h2></div>
+    <button class="icon-btn" type="button" data-act="sheet-close" aria-label="${t('close')}">✕</button></div>${body}</div>`;
+  const dlg = $('#sheet');
+  if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
+}
+let carLots = [], lastGps = null;   // lastGps : dernière position GPS, même hors du parc (le parking est dehors)
+function saveCar(car) {
+  withUndo(t('car.saved', {name: car.name || t('car.myPos')}), () => { prefs.car = car; });
+  if ($('#sheet').open) $('#sheet').close();
+}
+
+/* ---------- Carte hors ligne : toutes les tuiles du parc, zooms 15 à 18 ---------- */
+function mapTiles() {
+  const out = [], x = (lon, z) => Math.floor((lon + 180) / 360 * 2 ** z),
+    y = (lat, z) => { const r = lat * Math.PI / 180; return Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * 2 ** z); };
+  for (let z = 15; z <= 18; z++)
+    for (let i = x(BOUNDS.west, z); i <= x(BOUNDS.east, z); i++)
+      for (let j = y(BOUNDS.north, z); j <= y(BOUNDS.south, z); j++) out.push(MAP_TILES.replace('{z}', z).replace('{x}', i).replace('{y}', j));
+  return out;
+}
+let dlBusy = false;
+async function downloadMap() {
+  if (dlBusy || !('caches' in window)) return;
+  dlBusy = true;
+  const list = mapTiles(), cache = await caches.open('ep-tiles');
+  let done = 0, failed = 0;
+  // Deux requêtes à la fois : on reste raisonnable avec les serveurs d'OpenStreetMap
+  const worker = async () => {
+    while (list.length) {
+      const url = list.pop();
+      try {
+        if (!await cache.match(url, {ignoreVary: true})) { const r = await fetch(url, {mode: 'cors'}); if (r.ok) await cache.put(url, r); else failed++; }
+      } catch (e) { failed++; }
+      done++;
+      if (done % 5 === 0) renderMapTools(Math.round(done / (done + list.length) * 100));
+    }
+  };
+  await Promise.all([worker(), worker()]);
+  dlBusy = false;
+  if (failed > done / 10) toast(t('map.dlFail'));
+  else { device.mapAt = Date.now(); device.mapFor = PARK.slug; saveDevice(); toast(t('map.dlDone', {n: done})); }
+  renderMapTools();
+}
+function renderMapTools(pct) {
+  const n = mapTiles().length, mb = Math.max(1, Math.round(n * 22 / 1024));
+  const at = device.mapAt && device.mapFor === PARK.slug ? new Date(device.mapAt).toLocaleDateString(t('locale')) : null;
+  const car = prefs.car ? `<p><b>🚗 ${t('car.title')}</b> · ${esc(prefs.car.name || t('car.myPos'))} · ${t('car.walk', {min: carWalk()})} <a href="${esc(carRoute())}" target="_blank" rel="noopener">${t('car.route')}</a></p>`
+    : `<p class="muted">🚗 ${t('car.none')} <button class="btn small" type="button" data-act="car">${t('car.save')}</button></p>`;
+  $('#mapTools').innerHTML = `${car}
+    <p class="muted">${pct != null ? t('map.dlProgress', {pct}) : at ? t('map.dlDoneAt', {date: at}) : t('map.dlHint')}</p>
+    <div class="row-inline"><button class="btn small" type="button" data-act="map-dl" ${dlBusy ? 'disabled' : ''}>${t('map.dl', {mb})}</button></div>`;
 }
 function renderMapSVG(P, plan) {
   const pts = [...ents.values()].filter(e => e.type === 'ATTRACTION' && e.lat != null && hasQueue(e.id));
-  if (!pts.length) { $('#mapWrap').innerHTML = '<p class="empty">Carte disponible dès le chargement des attractions.</p>'; return; }
-  const lat0 = 48.2645, cosL = Math.cos(lat0 * Math.PI / 180);
+  if (!pts.length) { $('#mapWrap').innerHTML = `<p class="empty">${t('map.wait')}</p>`; return; }
+  const cosL = Math.cos(ENTRANCE.lat * Math.PI / 180);
   const lons = pts.map(p => p.lon), lats = pts.map(p => p.lat);
   const minLon = Math.min(...lons), maxLat = Math.max(...lats);
   const X = lon => (lon - minLon) * cosL * 111320 + 40, Y = lat => (maxLat - lat) * 110540 + 40;
   const W = Math.ceil(X(Math.max(...lons)) + 40), H = Math.ceil(Y(Math.min(...lats)) + 40);
   const pos = currentPos(), first = plan?.steps?.[0];
   const next = first ? ents.get(first.kind === 'meal' ? first.place : first.id) : null;
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Plan schématique des attractions avec leur temps d'attente">`;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('map.aria')}">`;
   for (let y = 40; y < H; y += 100) svg += `<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;
   for (let x = 40; x < W; x += 100) svg += `<line y1="0" y2="${H}" x1="${x}" x2="${x}" stroke="var(--line)" stroke-width="1"/>`;
   svg += `<g transform="translate(16 ${H - 18})"><line x1="0" x2="100" y1="0" y2="0" stroke="var(--muted)" stroke-width="3"/><text x="0" y="-8" font-size="15" fill="var(--muted)" font-family="var(--font-body)">100 m</text></g>`;
@@ -1758,12 +1996,37 @@ function renderMapSVG(P, plan) {
   }
   svg += '</svg>';
   $('#mapWrap').innerHTML = svg;
-  const group = others.length ? ` Groupe : ${others.map(o => `${o.nick} (${walkMin(pos, o)} min, il y a ${Math.round((Date.now() - o.ts) / 60000)} min)`).join(', ')}.${meet ? ` Point de rencontre conseillé (losange) : ${shortName(meet)}.` : ''}` : device.share ? ' Personne d\'autre ne partage sa position pour l\'instant.' : '';
-  $('#mapNote').textContent = `Point violet : ${pos.src === 'gps' ? 'ta position GPS' : pos.src === 'last' ? `dernière attraction faite (${pos.name})` : 'entrée principale (active la position dans Réglages)'}. Gros points : ton programme.${group} Plan schématique, nord en haut.`;
+  const group = others.length ? t('map.group', {list: others.map(o => t('map.member', {nick: o.nick, walk: walkMin(pos, o), age: Math.round((Date.now() - o.ts) / 60000)})).join(', ')}) + (meet ? t('map.meet', {name: shortName(meet)}) : '') : device.share ? t('map.alone') : '';
+  $('#mapNote').textContent = t('map.noteSvg', {where: pos.src === 'gps' ? t('map.gps') : pos.src === 'last' ? t('map.last', {name: pos.name}) : t('map.entrance'), group});
 }
 
 /* ---------- Réglages ---------- */
 let calData = null, calLoading = false;
+let fcData = null, fcLoading = false;
+function loadForecast() {
+  if (fcData || fcLoading || meta.source !== 'serveur') return;
+  fcLoading = true;
+  getJSON(`${SERVER}?r=forecast`, 20000).then(j => { fcData = j; }).catch(() => { fcData = {days: []}; })
+    .finally(() => { fcLoading = false; if (!$('#sheet').open) render(); });
+}
+/* « school:DE-BW », « school:FR » → « DE (BW, RP), FR, CH (6) » : régions groupées par pays */
+const fcWhy = d => {
+  const list = type => {
+    const by = {};
+    for (const w of d.why.filter(w => w.startsWith(type + ':'))) { const [c, sub] = w.slice(type.length + 1).split('-'); (by[c] = by[c] || []).push(sub); }
+    return Object.entries(by).map(([c, subs]) => { subs = subs.filter(Boolean); return subs.length > 3 ? `${c} (${subs.length})` : subs.length ? `${c} (${subs.join(', ')})` : c; }).join(', ');
+  };
+  const school = list('school'), pub = list('public');
+  return [school ? t('fc.school', {list: school}) : '', pub ? t('fc.public', {list: pub}) : ''].filter(Boolean).join(' · ');
+};
+function renderForecast() {
+  loadForecast();
+  const days = (fcData?.days || []).slice(0, 45);
+  $('#fcHint').textContent = fcData ? (days.length ? t('fc.hint', {src: fcData.history ? t('fc.srcHistory') : t('fc.srcGeneric')}) : t('fc.none')) : t('loading');
+  $('#forecast').innerHTML = days.map(d => `<div class="cal-row fc"><span>${shortDayFmt.format(new Date(d.day + 'T12:00:00Z'))}</span>
+    <i style="--c:var(--w-${['low', 'mid', 'high', 'peak'][d.level - 1]});width:${d.level * 25}%" title="${esc(fcWhy(d))}"></i><b>${esc(t('fc.levels')[d.level - 1])}</b></div>
+    ${d.why.length ? `<span style="grid-column:1/-1;margin:-2px 0 4px">${esc(fcWhy(d))}</span>` : ''}`).join('');
+}
 function loadCalendar() {
   if (calData || calLoading || meta.source !== 'serveur') return;
   calLoading = true;
@@ -1771,7 +2034,6 @@ function loadCalendar() {
     .finally(() => { calLoading = false; if (!$('#sheet').open) render(); });
 }
 /* Affluence habituelle d'un jour de la semaine, d'après les jours relevés */
-const weekdayFmt = new Intl.DateTimeFormat('fr-FR', {weekday: 'long', timeZone: 'UTC'});
 function crowdForecast(day) {
   if (!calData || calData.length < 5) return null;
   const wd = new Date(day + 'T12:00:00Z').getUTCDay();
@@ -1785,15 +2047,16 @@ const MEAL_FROM = [660, 690, 720, 750], MEAL_TO = [780, 810, 840, 870, 900];
 function renderSettings() {
   const vals = Object.values(prefs.plan);
   const doneN = Object.keys(prefs.done).length, showN = Object.keys(prefs.shows).length;
-  $('#userSummary').textContent = !user ? 'Aucun profil choisi.' : user.local ? 'Profil local : ton programme reste sur ce téléphone (serveur injoignable au moment du choix).' : `Connecté en tant que ${user.name}. Tout est enregistré sur le serveur à chaque changement.`;
+  document.querySelectorAll('#langSeg button').forEach(bt => bt.setAttribute('aria-pressed', bt.dataset.lang === LANG));
+  $('#userSummary').textContent = !user ? t('set.noUser') : user.local ? t('set.localUser') : t('set.user', {name: user.name});
   $('#copyRow').hidden = !remote();
   if (remote()) fetchUsers().then(list => {
     const sel = $('#copyFrom'), others = list.filter(u => u.id !== user.id);
     const v = sel.value;
-    sel.innerHTML = others.length ? others.map(u => `<option value="${esc(u.id)}">${esc(u.name)}</option>`).join('') : '<option value="">Aucun autre profil</option>';
+    sel.innerHTML = others.length ? others.map(u => `<option value="${esc(u.id)}">${esc(u.name)}</option>`).join('') : `<option value="">${t('set.noOther')}</option>`;
     if (others.some(u => u.id === v)) sel.value = v;
   }).catch(() => { $('#copyRow').hidden = true; });
-  $('#planSummary').textContent = `${vals.filter(v => v === 'must').length} incontournables · ${vals.filter(v => v === 'bonus').length} bonus${showN ? ` · ${showN} spectacle${showN > 1 ? 's' : ''}` : ''} · ${doneN} fait${doneN > 1 ? 's' : ''} aujourd'hui`;
+  $('#planSummary').textContent = t('set.planSummary', {must: vals.filter(v => v === 'must').length, bonus: vals.filter(v => v === 'bonus').length, shows: showN, done: doneN});
   $('#mealChk').checked = !!prefs.meal.on;
   document.querySelectorAll('#mealDurSeg button').forEach(bt => bt.setAttribute('aria-pressed', +bt.dataset.mealDur === prefs.meal.dur));
   $('#mealFrom').innerHTML = MEAL_FROM.map(m => `<option value="${m}" ${m === prefs.meal.from ? 'selected' : ''}>${hhmm(m)}</option>`).join('');
@@ -1805,29 +2068,30 @@ function renderSettings() {
   $('#singleChk').checked = !!prefs.single;
   $('#shareChk').checked = !!device.share;
   if (document.activeElement !== $('#nickIn')) { $('#nickIn').value = device.nick; $('#nickIn').placeholder = shareNick(); }
-  $('#gpsStatus').textContent = {off: 'Désactivée : les distances partent de la dernière attraction marquée « faite », ou de l\'entrée.', wait: 'Recherche de ta position…', on: 'Active : les distances partent de l\'endroit où tu es. La page te demande aussi si tu fais la queue en arrivant à une attraction.', out: 'Active, mais tu n\'es pas dans le parc : les distances partent de l\'entrée.', denied: 'Refusée par le navigateur. Autorise la localisation pour ce site dans les réglages du téléphone.', unavailable: 'Indisponible (la page doit être servie en HTTPS).'}[gpsState] || '';
-  $('#gpsBtn').textContent = device.gps ? 'Désactiver la position' : 'Utiliser ma position';
+  $('#gpsStatus').textContent = {off: t('gps.off'), wait: t('gps.wait'), on: t('gps.on'), out: t('gps.out'), denied: t('gps.denied'), unavailable: t('gps.unavailable')}[gpsState] || '';
+  $('#gpsBtn').textContent = device.gps ? t('gps.disable') : t('gps.enable');
   renderPushStatus();
   renderCrowd();
-  $('#versionLine').textContent = `Version ${APP_VERSION} · les mises à jour arrivent toutes seules à l'ouverture de l'appli.`;
-  const src = meta.source === 'serveur' ? 'via ton serveur (cache + historique)' : meta.source === 'direct' ? 'en direct depuis themeparks.wiki (api.php injoignable, pas d\'historique)' : 'aucune pour l\'instant';
+  renderForecast();
+  $('#versionLine').textContent = t('set.version', {v: APP_VERSION});
+  const src = meta.source === 'serveur' ? t('data.server') : meta.source === 'direct' ? t('data.direct') : t('data.none');
   const n = (prefs.samples || []).length, RF = realFactor();
-  $('#dataStatus').innerHTML = `Source : ${src}.<br>Historique : ${hasHistory() ? `${stats.days} jour${stats.days > 1 ? 's' : ''} (base ${esc(stats.basis)})` : 'aucun pour l\'instant. Lance le cron de collecte (voir README) : dès la veille, les prévisions se basent sur les vraies files.'}<br>
-    Temps réels : ${n >= 2 ? `tu attends ~${Math.round(RF * 100)} % des temps affichés (${n} mesures).` : pooled?.n >= 2 ? `~${Math.round(RF * 100)} % des temps affichés, d'après ${pooled.n} mesures de tous les profils. Après deux mesures à toi, ce sont les tiennes qui comptent.` : 'touche « Dans la file » en entrant dans une file, puis « Fait » à la sortie : après deux mesures, l\'itinéraire utilise les vrais temps.'}`;
+  $('#dataStatus').innerHTML = `${t('data.source', {src})}<br>${t('data.history', {h: hasHistory() ? t('data.days', {n: stats.days, basis: esc(basisName())}) : t('data.noHistory')})}<br>
+    ${t('data.real', {r: n >= 2 ? t('data.realMine', {pct: Math.round(RF * 100), n}) : pooled?.n >= 2 ? t('data.realPooled', {pct: Math.round(RF * 100), n: pooled.n}) : t('data.realHow')})}`;
 }
 function renderCrowd() {
   const P = lastP || phaseInfo(), k = P.phase === 'open' ? parkRatio(P.mod) : null;
-  $('#crowdStatus').textContent = k ? `Aujourd'hui : ${Math.abs(Math.round((k - 1) * 100))} % ${k >= 1 ? 'au-dessus' : 'en dessous'} d'un jour habituel.` : 'Attente moyenne des attractions entre 11 h et 16 h, jour par jour (historique de ton serveur).';
+  $('#crowdStatus').textContent = k ? t('crowd.today', {pct: Math.abs(Math.round((k - 1) * 100)), dir: k >= 1 ? t('above') : t('below')}) : t('crowd.about');
   loadCalendar();
   const days = (calData || []).slice(-21);
-  if (!days.length) { $('#calendar').innerHTML = calData ? '<span>Pas encore assez d\'historique.</span>' : ''; return; }
+  if (!days.length) { $('#calendar').innerHTML = calData ? `<span>${t('crowd.notEnough')}</span>` : ''; return; }
   const max = Math.max(...days.map(d => d.avg), 1);
   const byWd = {};
   for (const d of calData) { const wd = new Date(d.day + 'T12:00:00Z').getUTCDay(); (byWd[wd] = byWd[wd] || []).push(d.avg); }
-  const wdNames = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
+  const wdNames = t('weekdaysShort');
   const ranking = Object.entries(byWd).map(([wd, a]) => [wd, a.reduce((s, x) => s + x, 0) / a.length]).sort((a, b) => a[1] - b[1]);
   $('#calendar').innerHTML = days.map(d => `<div class="cal-row"><span>${shortDayFmt.format(new Date(d.day + 'T12:00:00Z'))}</span><i style="--c:var(--w-${wclass(d.avg)});width:${Math.max(4, d.avg / max * 100)}%"></i><b>${Math.round(d.avg)}′</b></div>`).join('')
-    + (ranking.length >= 3 ? `<span>Jours les plus calmes : ${ranking.slice(0, 3).map(([wd, v]) => `${wdNames[wd]} (${Math.round(v)}′)`).join(', ')}.</span>` : '');
+    + (ranking.length >= 3 ? `<span>${t('crowd.calmest', {list: ranking.slice(0, 3).map(([wd, v]) => `${wdNames[wd]} (${Math.round(v)}′)`).join(', ')})}</span>` : '');
 }
 
 /* ---------- Fiche détaillée ---------- */
@@ -1838,7 +2102,7 @@ function chartSVG(id, P) {
   const prof = stats?.typical?.[id] || {};
   const typ = Object.entries(prof).map(([k, v]) => [+k + (stats.bucket || 30) / 2, v]).filter(p => p[0] >= x0 && p[0] <= x1).sort((a, b) => a[0] - b[0]);
   const vals = s.filter(p => p[1] != null).map(p => p[1]).concat(typ.map(p => p[1]));
-  if (!vals.length) return '<p class="muted">Pas encore de relevé pour cette attraction aujourd\'hui. La courbe se remplit au fil des actualisations.</p>';
+  if (!vals.length) return `<p class="muted">${t('chart.empty')}</p>`;
   const ymax = Math.max(30, Math.ceil(Math.max(...vals) / 15) * 15);
   const W = 340, H = 140, L = 30, R = 10, T = 10, B = 22;
   const X = m => L + (clamp(m, x0, x1) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
@@ -1856,8 +2120,8 @@ function chartSVG(id, P) {
   const lastPt = [...s].reverse().find(p => p[1] != null);
   if (lastPt) g += `<circle cx="${X(lastPt[0])}" cy="${Y(lastPt[1])}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>`;
   if (P.phase === 'open') g += `<line x1="${X(P.mod)}" x2="${X(P.mod)}" y1="${T}" y2="${H - B}" stroke="var(--ink)" stroke-width="1" opacity=".35"/>`;
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Attente au fil de la journée">${g}</svg>
-    <div class="legend"><span><i style="--c:var(--accent)"></i>aujourd'hui</span>${typ.length > 1 ? '<span><i style="--c:var(--muted)"></i>habituel (pointillés)</span>' : ''}</div>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('chart.aria')}">${g}</svg>
+    <div class="legend"><span><i style="--c:var(--accent)"></i>${t('chart.today')}</span>${typ.length > 1 ? `<span><i style="--c:var(--muted)"></i>${t('chart.usual')}</span>` : ''}</div>`;
 }
 
 /* Heures creuses et de pointe habituelles d'une attraction, d'après l'historique */
@@ -1870,7 +2134,8 @@ function bestSlots(id, P) {
   const lo = pts.reduce((a, x) => x[1] < a[1] ? x : a), hi = pts.reduce((a, x) => x[1] > a[1] ? x : a);
   // Autres creux à moins de 5 min du minimum : on les cite aussi
   const calm = pts.filter(x => x[1] <= lo[1] + 5 && x[0] !== lo[0]).slice(0, 2).map(x => hhmm(x[0] + b / 2));
-  return `<b>Au plus bas vers ${hhmm(lo[0] + b / 2)}</b> (~${r5(lo[1])} min${calm.length ? `, aussi ${calm.join(', ')}` : ''}) · pic vers ${hhmm(hi[0] + b / 2)} (~${r5(hi[1])} min). <span class="muted">D'après ${stats.days} jour${stats.days > 1 ? 's' : ''} (${esc(stats.basis)}).</span>`;
+  return t('best.low', {time: hhmm(lo[0] + b / 2), w: r5(lo[1]), also: calm.length ? t('best.also', {list: calm.join(', ')}) : ''})
+    + t('best.peak', {time: hhmm(hi[0] + b / 2), w: r5(hi[1])}) + ` <span class="muted">${t('best.basis', {n: stats.days, basis: esc(basisName())})}</span>`;
 }
 const thresholdSelect = (selId, id, cur, values, none) => `<select id="${selId}" data-id="${esc(id)}">${[''].concat(values).map(v => `<option value="${v}" ${String(cur || '') === String(v) ? 'selected' : ''}>${v === '' ? none : v + ' min'}</option>`).join('')}</select>`;
 function openSheet(id) {
@@ -1882,69 +2147,72 @@ function openSheet(id) {
   if (isRide) {
     const T = P.phase === 'open' ? typicalAt(id, P.mod) : null, vl = vlOf(id), p = prefs.plan[id], cm = minCm(e);
     body += `<div class="stats">
-      <div class="stat"><span>Attente</span><b class="${w != null ? '' : 'muted'}">${w != null ? w + '′' : (STATUS_FR[st] || '—')}</b></div>
-      <div class="stat"><span>D'habitude</span><b>${T != null ? r5(T) + '′' : '—'}</b></div>
-      <div class="stat"><span>À pied</span><b>${wk}′</b></div></div>`;
-    const tags = [cm ? `Taille mini accompagné : ${cm} cm (indicatif)${tooSmall(id) ? ' · <b>trop petit pour ton groupe</b>' : ''}` : '', keyIn(e, INDOOR) ? 'Couverte' : '', keyIn(e, WET) ? 'On en ressort mouillé' : ''].filter(Boolean);
+      <div class="stat"><span>${t('sheet.wait')}</span><b class="${w != null ? '' : 'muted'}">${w != null ? w + '′' : (t('status')[st] || '—')}</b></div>
+      <div class="stat"><span>${t('sheet.usual')}</span><b>${T != null ? r5(T) + '′' : '—'}</b></div>
+      <div class="stat"><span>${t('sheet.walk')}</span><b>${wk}′</b></div></div>`;
+    const tags = [cm ? t('sheet.minCm', {cm}) + (tooSmall(id) ? t('sheet.tooSmall') : '') : '', keyIn(e, INDOOR) ? t('sheet.indoor') : '', keyIn(e, WET) ? t('sheet.wet') : ''].filter(Boolean);
     if (tags.length) body += `<p class="muted">${tags.join(' · ')}</p>`;
-    if (vl) body += `<p>${esc(VQ.name)} : <b>${VL_FR[vl.state] || 'état inconnu'}</b>${vl.state === 'AVAILABLE' && vl.returnStart ? ` · créneau proposé vers ${hhmm(isoMod(vl.returnStart).mod)}` : ''}</p>`;
+    if (vl) body += `<p>${t('sheet.vl', {vl: esc(VQ.name), state: t('vl')[vl.state] || t('vlStateUnknown')})}${vl.state === 'AVAILABLE' && vl.returnStart ? t('sheet.vlOffer', {time: hhmm(isoMod(vl.returnStart).mod)}) : ''}</p>`;
     body += chartSVG(id, P);
+    const gr = pooled?.ratings?.[id];
+    body += `<div class="row-inline"><span class="muted">${t('rate.mine')}</span>${starsHTML(id, prefs.ratings[id])}${gr ? `<span class="muted">${t('rate.group', {avg: gr.avg.toLocaleString(t('locale')), n: gr.n})}</span>` : ''}</div>`;
     const bs = bestSlots(id, P);
     if (bs) body += `<p>${bs}</p>`;
-    body += `<div class="set"><span class="eyebrow">Dans mon programme</span>
-      <div class="seg" role="group" aria-label="Programme">
-        <button type="button" data-act="plan" data-val="must" data-id="${esc(id)}" aria-pressed="${p === 'must'}">Incontournable</button>
-        <button type="button" data-act="plan" data-val="bonus" data-id="${esc(id)}" aria-pressed="${p === 'bonus'}">Bonus</button>
-        <button type="button" data-act="plan" data-val="" data-id="${esc(id)}" aria-pressed="${!p}">Non</button></div></div>`;
+    body += `<div class="set"><span class="eyebrow">${t('sheet.inPlan')}</span>
+      <div class="seg" role="group" aria-label="${t('sheet.plan')}">
+        <button type="button" data-act="plan" data-val="must" data-id="${esc(id)}" aria-pressed="${p === 'must'}">${t('plan.must')}</button>
+        <button type="button" data-act="plan" data-val="bonus" data-id="${esc(id)}" aria-pressed="${p === 'bonus'}">${t('plan.bonus')}</button>
+        <button type="button" data-act="plan" data-val="" data-id="${esc(id)}" aria-pressed="${!p}">${t('no')}</button></div></div>`;
     const inQueue = prefs.queue?.id === id;
     body += `<div class="row-inline">
-      <button class="btn primary" type="button" data-act="done" data-id="${esc(id)}">${icCheck}${prefs.done[id] ? `Refait (${prefs.done[id]}×)` : 'Marquer fait'}</button>
-      ${P.phase === 'open' && !inQueue ? `<button class="btn" type="button" data-act="queue" data-id="${esc(id)}">Je suis dans la file</button>` : ''}
-      ${inQueue ? `<button class="btn" type="button" data-act="queue-cancel" data-id="${esc(id)}">Quitter la file</button>` : ''}
-      ${prefs.done[id] ? `<button class="btn" type="button" data-act="undone" data-id="${esc(id)}">Annuler « fait »</button>` : ''}</div>`;
-    body += `<label class="field">M'alerter quand l'attente passe sous…${thresholdSelect('alertSel', id, prefs.alerts[id], [5, 10, 15, 20, 30, 45], 'Pas d\'alerte')}</label>`;
+      <button class="btn primary" type="button" data-act="done" data-id="${esc(id)}">${icCheck}${prefs.done[id] ? t('sheet.redone', {n: prefs.done[id]}) : t('sheet.markDone')}</button>
+      ${P.phase === 'open' && !inQueue ? `<button class="btn" type="button" data-act="queue" data-id="${esc(id)}">${t('sheet.inQueue')}</button>` : ''}
+      ${inQueue ? `<button class="btn" type="button" data-act="queue-cancel" data-id="${esc(id)}">${t('act.leaveQueue')}</button>` : ''}
+      ${prefs.done[id] ? `<button class="btn" type="button" data-act="undone" data-id="${esc(id)}">${t('sheet.undone')}</button>` : ''}</div>`;
+    body += `<label class="field">${t('sheet.alert')}${thresholdSelect('alertSel', id, prefs.alerts[id], [5, 10, 15, 20, 30, 45], t('sheet.noAlert'))}</label>`;
     if (prefs.single && keyIn(e, SINGLE_RIDER)) {
       const seen = prefs.srSeen[id], fresh = seen && now() - seen.at < 45 * 60000;
-      body += `<label class="field">File single rider relevée à l'entrée (min)<input id="srIn" data-id="${esc(id)}" type="number" inputmode="numeric" min="0" max="180" value="${fresh ? seen.w : ''}" placeholder="Estimation : ~${w != null ? r5(w * SR_FACTOR) : '?'} min"></label>`;
+      body += `<label class="field">${t('sheet.srIn')}<input id="srIn" data-id="${esc(id)}" type="number" inputmode="numeric" min="0" max="180" value="${fresh ? seen.w : ''}" placeholder="${t('sheet.srPh', {w: w != null ? r5(w * SR_FACTOR) : '?'})}"></label>`;
     }
-    body += `<label class="field">À refaire si l'attente passe sous…${thresholdSelect('againSel', id, prefs.again[id], [5, 10, 15, 20, 30], 'Une fois suffit')}</label>`;
+    body += `<label class="field">${t('sheet.again')}${thresholdSelect('againSel', id, prefs.again[id], [5, 10, 15, 20, 30], t('sheet.once'))}</label>`;
     if (vl) body += slotForm(id, P);
   } else if (e.type === 'SHOW') {
     const times = todayShowtimes(id), planned = lastPlan?.steps.find(s => s.kind === 'show' && s.id === id);
-    body += `<p>${wk} min à pied${planned ? ` · prévu dans ton itinéraire à <b>${hhmm(planned.slot)}</b>` : ''}</p>${times.length ? `<div class="showtimes">${times.map(s => `<span class="chip ${s.mod >= P.mod ? 'ok' : 'end'}">${hhmm(s.mod)}</span>`).join('')}</div>` : '<p class="muted">Pas de représentation annoncée aujourd\'hui.</p>'}
-      <div class="row-inline"><button class="btn${prefs.shows[id] ? '' : ' primary'}" type="button" data-act="show-star" data-id="${esc(id)}">${prefs.shows[id] ? 'Retirer de mon itinéraire' : 'Ajouter à mon itinéraire'}</button>
-      ${prefs.shows[id] && !prefs.done[id] ? `<button class="btn" type="button" data-act="done" data-id="${esc(id)}">${icCheck}Vu</button>` : ''}</div>`;
+    body += `<p>${t('walk', {n: wk})}${planned ? t('sheet.showPlanned', {time: hhmm(planned.slot)}) : ''}</p>${times.length ? `<div class="showtimes">${times.map(s => `<span class="chip ${s.mod >= P.mod ? 'ok' : 'end'}">${hhmm(s.mod)}</span>`).join('')}</div>` : `<p class="muted">${t('sheet.noShow')}</p>`}
+      <div class="row-inline"><button class="btn${prefs.shows[id] ? '' : ' primary'}" type="button" data-act="show-star" data-id="${esc(id)}">${prefs.shows[id] ? t('sheet.showRemove') : t('sheet.showAdd')}</button>
+      ${prefs.shows[id] && !prefs.done[id] ? `<button class="btn" type="button" data-act="done" data-id="${esc(id)}">${icCheck}${t('act.seen')}</button>` : ''}</div>`;
   } else {
-    body += `<p>${st === 'OPERATING' ? 'Ouvert' : 'Fermé pour l\'instant'} · ${wk} min à pied</p>`;
+    body += `<p>${st === 'OPERATING' ? t('food.open') : t('food.closedNow')} · ${t('walk', {n: wk})}</p>`;
   }
   $('#sheet').innerHTML = `<div class="sheet-in">
-    <div class="sheet-head"><div><div class="eyebrow">${{ATTRACTION: 'Attraction', SHOW: 'Spectacle', RESTAURANT: 'Restauration'}[e.type] || ''}${isRide && st !== 'OPERATING' ? ' · ' + STATUS_FR[st] : ''}</div>
+    <div class="sheet-head"><div><div class="eyebrow">${t('types')[e.type] || ''}${isRide && st !== 'OPERATING' ? ' · ' + t('status')[st] : ''}</div>
       <h2 class="sheet-title" id="sheetTitle">${esc(e.name)}</h2></div>
-      <button class="icon-btn" type="button" data-act="sheet-close" aria-label="Fermer">✕</button></div>${body}</div>`;
+      <button class="icon-btn" type="button" data-act="sheet-close" aria-label="${t('close')}">✕</button></div>${body}</div>`;
   const dlg = $('#sheet');
   if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
   dlg.dataset.id = id;
 }
 function slotForm(id, P) {
   const vlIds = [...live.keys()].filter(x => vlOf(x) && hasQueue(x));
-  const suggested = hhmm(Math.ceil((P.phase === 'open' ? P.mod + 60 : (P.h?.open ?? 600) + 60) / 5) * 5);
-  return `<div class="set"><span class="eyebrow">J'ai réservé un créneau ${esc(VQ.name)}</span>
+  const rs = vlOf(id)?.returnStart;
+  const suggested = rs ? hhmm(isoMod(rs).mod) : hhmm(Math.ceil((P.phase === 'open' ? P.mod + 60 : (P.h?.open ?? 600) + 60) / 5) * 5);
+  return `<div class="set"><span class="eyebrow">${t('slot.title', {vl: esc(VQ.name)})}</span>
     <div class="row-inline">
-      <label class="field" style="flex:1">Attraction<select id="slotRide">${vlIds.map(x => `<option value="${esc(x)}" ${x === id ? 'selected' : ''}>${esc(shortName(ents.get(x)))}</option>`).join('')}</select></label>
-      <label class="field">Début du créneau<input id="slotTime" type="time" value="${suggested}" step="300"></label>
+      <label class="field" style="flex:1">${t('slot.ride')}<select id="slotRide">${vlIds.map(x => `<option value="${esc(x)}" ${x === id ? 'selected' : ''}>${esc(shortName(ents.get(x)))}</option>`).join('')}</select></label>
+      <label class="field">${t('slot.start')}<input id="slotTime" type="time" value="${suggested}" step="300"></label>
     </div>
-    <button class="btn" type="button" data-act="slot-save">Enregistrer le créneau</button></div>`;
+    <button class="btn" type="button" data-act="slot-save">${t('slot.save')}</button></div>`;
 }
 
 /* ---------- Toast ---------- */
 let toastTimer = null, toastUndo = null;
 function toast(text, undo) {
-  const t = $('#toast');
+  const box = $('#toast');
   toastUndo = undo || null;
-  t.innerHTML = `<span>${esc(text)}</span>${undo ? '<button type="button" data-act="undo">Annuler</button>' : ''}`;
-  t.hidden = false;
+  box.innerHTML = `<span>${esc(text)}</span>${undo ? `<button type="button" data-act="undo">${t('undo')}</button>` : ''}`;
+  box.hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.hidden = true; toastUndo = null; }, 6000);
+  toastTimer = setTimeout(() => { box.hidden = true; toastUndo = null; }, 6000);
 }
 /* Change l'état, l'enregistre et propose « Annuler » qui remet la version d'avant */
 function withUndo(text, change) {
@@ -1966,12 +2234,12 @@ function applyPreset(name) {
     if (ps.must.some(k => e.key.includes(k))) plan[e.id] = 'must';
     else if (ps.bonus.some(k => e.key.includes(k))) plan[e.id] = 'bonus';
   }
-  withUndo(`${Object.keys(plan).length} attractions ajoutées au programme`, () => { prefs.plan = plan; prefs.onboarded = true; });
+  withUndo(t('toast.preset', {n: Object.keys(plan).length}), () => { prefs.plan = plan; prefs.onboarded = true; });
 }
 function markDone(id) {
   const P = lastP || phaseInfo(), day = berlin(now()).day;
   const hadSlot = prefs.slots.some(s => s.id === id && s.day === day);
-  withUndo(`${shortName(ents.get(id))} : ${ents.get(id)?.type === 'SHOW' ? 'vu' : 'fait'}`, () => {
+  withUndo(t('toast.done', {name: shortName(ents.get(id)), what: ents.get(id)?.type === 'SHOW' ? t('list.seen') : t('list.done')}), () => {
     const q = prefs.queue;
     let real = null;
     if (q && q.id === id) {
@@ -1988,25 +2256,36 @@ function markDone(id) {
     delete prefs.skip[id];
   });
   gpsPrompt = null;
+  if (ents.get(id)?.type === 'ATTRACTION') { pendingRate = id; renderBanner(lastP || phaseInfo(), lastPlan); }
   // Un seul créneau VirtualLine à la fois : le suivant se réserve dès que celui-ci est utilisé
   if (hadSlot && P.phase === 'open') {
     const pick = vlPick(P, id);
-    pendingAlert = `<b>Re-réserve un créneau ${esc(VQ.name)}</b> dans ${esc(VQ.app || 'l\'appli officielle du parc')}${pick ? ` : <b>${esc(shortName(ents.get(pick)))}</b> est le plus intéressant${waitOf(pick) != null ? ` (file ${waitOf(pick)} min)` : ''}` : ''}. Puis note-le avec « J'ai un créneau ».`;
+    // parks.json décrit l'appli du parc en français : ailleurs, libellé générique
+    pendingAlert = t('rebook', {vl: esc(VQ.name), app: esc((LANG === 'fr' && VQ.app) || t('rebook.app')),
+      pick: pick ? t('rebook.pick', {name: esc(shortName(ents.get(pick))), w: waitOf(pick) != null ? t('rebook.queue', {w: waitOf(pick)}) : ''}) : ''});
     renderBanner(P, lastPlan);
   }
 }
 function startQueue(id) {
   const step = lastPlan?.steps.find(s => s.id === id);
   asked.add('enter:' + id); gpsPrompt = null;
-  withUndo(`Dans la file : ${shortName(ents.get(id))}`, () => {
+  withUndo(t('toast.inQueue', {name: shortName(ents.get(id))}), () => {
     prefs.queue = {id, since: now(), posted: waitOf(id) ?? r5(step?.wait ?? 0)};
   });
   if ($('#sheet').open) $('#sheet').close();
 }
 
-let pendingAlert = null;
+let pendingAlert = null, pendingRate = null, versionNote = null;   // versionNote : « Nouvelle version », le moins prioritaire
+/* Note de 1 à 5 : une bonne note ajoute l'attraction à « À refaire » si rien n'est réglé */
+function rate(id, n) {
+  const auto = n >= 4 && !prefs.again[id] && ents.get(id)?.type === 'ATTRACTION' ? (n === 5 ? 20 : 15) : 0;
+  pendingRate = null;
+  withUndo(auto ? t('rate.again', {n, thr: auto}) : t('rate.saved', {n}), () => { prefs.ratings[id] = n; if (auto) prefs.again[id] = auto; });
+}
+const starsHTML = (id, cur) => `<span class="stars" role="group" aria-label="${esc(t('rate.mine'))}">${[1, 2, 3, 4, 5].map(n =>
+  `<button type="button" data-act="rate" data-id="${esc(id)}" data-n="${n}" aria-pressed="${!!cur && n <= cur}" aria-label="${n}/5">★</button>`).join('')}</span>`;
 document.addEventListener('click', ev => {
-  const el = ev.target.closest('[data-act], [data-tab], [data-filter], [data-sort], [data-pace], [data-route], [data-meal-dur]');
+  const el = ev.target.closest('[data-act], [data-tab], [data-filter], [data-sort], [data-pace], [data-route], [data-meal-dur], [data-lang]');
   if (!el) return;
   if (el.dataset.tab && !el.dataset.act) { switchTab(el.dataset.tab); return; }
   if (el.dataset.filter) { device.filter = el.dataset.filter; saveDevice(); renderList(lastP || phaseInfo()); return; }
@@ -2014,12 +2293,13 @@ document.addEventListener('click', ev => {
   if (el.dataset.pace) { prefs.pace = el.dataset.pace; savePrefs(); render(); return; }
   if (el.dataset.route) { prefs.route = el.dataset.route; savePrefs(); render(); return; }
   if (el.dataset.mealDur) { prefs.meal.dur = +el.dataset.mealDur; savePrefs(); render(); return; }
+  if (el.dataset.lang) { setLang(el.dataset.lang); return; }
   const id = el.dataset.id, act = el.dataset.act;
   switch (act) {
     case 'open': if (id) openSheet(id); break;
     case 'goto': prefs.onboarded = true; device.filter = 'rides'; saveDevice(); savePrefs(); switchTab(el.dataset.tab); break;
     case 'preset': applyPreset(el.dataset.preset); break;
-    case 'clear-plan': withUndo('Programme vidé', () => { prefs.plan = {}; prefs.shows = {}; }); break;
+    case 'clear-plan': withUndo(t('toast.cleared'), () => { prefs.plan = {}; prefs.shows = {}; }); break;
     case 'star': {
       const cur = prefs.plan[id];
       if (!cur) prefs.plan[id] = 'must'; else if (cur === 'must') prefs.plan[id] = 'bonus'; else delete prefs.plan[id];
@@ -2029,9 +2309,9 @@ document.addEventListener('click', ev => {
       if (prefs.shows[id]) delete prefs.shows[id]; else { prefs.shows[id] = true; delete prefs.skip[id]; }
       prefs.onboarded = true; savePrefs(); render();
       if ($('#sheet').open) openSheet(id);
-      toast(prefs.shows[id] ? 'Spectacle ajouté : l\'itinéraire choisit la meilleure représentation' : 'Spectacle retiré de l\'itinéraire');
+      toast(prefs.shows[id] ? t('toast.showAdded') : t('toast.showRemoved'));
       break;
-    case 'show-skip': withUndo(`${shortName(ents.get(id))} : pas aujourd'hui`, () => { prefs.skip[id] = 9999; }); break;
+    case 'show-skip': withUndo(t('toast.notToday', {name: shortName(ents.get(id))}), () => { prefs.skip[id] = 9999; }); break;
     case 'plan':
       if (el.dataset.val) prefs.plan[id] = el.dataset.val; else delete prefs.plan[id];
       prefs.onboarded = true; savePrefs(); render(); openSheet(id); break;
@@ -2040,15 +2320,15 @@ document.addEventListener('click', ev => {
       delete prefs.done[id]; if (prefs.lastDone === id) prefs.lastDone = null; savePrefs(); render(); openSheet(id); break;
     case 'skip': {
       const P = lastP || phaseInfo();
-      withUndo(`${shortName(ents.get(id))} : on y revient dans 30 min minimum`, () => { prefs.skip[id] = P.mod + 30; });
+      withUndo(t('toast.skip', {name: shortName(ents.get(id))}), () => { prefs.skip[id] = P.mod + 30; });
       break;
     }
     case 'queue': startQueue(id); break;
-    case 'queue-cancel': withUndo('Sorti de la file', () => { prefs.queue = null; }); if ($('#sheet').open) $('#sheet').close(); break;
-    case 'meal-done': withUndo('Pause repas : faite', () => { prefs.mealDone = true; }); break;
+    case 'queue-cancel': withUndo(t('toast.leftQueue'), () => { prefs.queue = null; }); if ($('#sheet').open) $('#sheet').close(); break;
+    case 'meal-done': withUndo(t('toast.mealDone'), () => { prefs.mealDone = true; }); break;
     case 'meal-later': {
       const P = lastP || phaseInfo();
-      withUndo('Repas décalé d\'au moins 30 min', () => { prefs.mealSkip = P.mod + 30; });
+      withUndo(t('toast.mealLater'), () => { prefs.mealSkip = P.mod + 30; });
       break;
     }
     case 'dismiss': asked.add(el.dataset.key); render(); break;
@@ -2056,26 +2336,45 @@ document.addEventListener('click', ev => {
     case 'slot-form': openSheet(id); setTimeout(() => $('#slotTime')?.focus(), 50); break;
     case 'slot-save': {
       const rid = $('#slotRide').value, tv = $('#slotTime').value;
-      if (!rid || !/^\d{2}:\d{2}$/.test(tv)) { toast('Indique l\'heure de début du créneau'); break; }
+      if (!rid || !/^\d{2}:\d{2}$/.test(tv)) { toast(t('toast.slotTime')); break; }
       const [hh, mm] = tv.split(':').map(Number);
       const P = lastP || phaseInfo(), day = P.phase === 'closed' ? P.day : berlin(now()).day;
       prefs.slots = prefs.slots.filter(s => s.day !== day).concat([{id: rid, start: hh * 60 + mm, day}]);
       prefs.onboarded = true; pendingAlert = null; savePrefs();
-      $('#sheet').close(); toast(`Créneau ${VQ.name} enregistré : ${shortName(ents.get(rid))} à ${tv}`); render(); break;
+      $('#sheet').close(); toast(t('toast.slotSaved', {vl: VQ.name, name: shortName(ents.get(rid)), time: tv})); render(); break;
     }
-    case 'slot-del': withUndo('Créneau supprimé', () => { prefs.slots = prefs.slots.filter(s => s.id !== id); }); break;
+    case 'poi': {
+      const cur = device.poi || [];
+      device.poi = cur.includes(id) ? cur.filter(x => x !== id) : cur.concat(id); saveDevice(); render(); break;
+    }
+    case 'car': openCar(); break;
+    case 'car-here': { const g = gpsPos || lastGps; saveCar({lat: g.lat, lon: g.lon, name: null, ts: Date.now()}); break; }
+    case 'car-lot': { const l = carLots[+id]; if (l) saveCar({lat: l.lat, lon: l.lon, name: l.name, ts: Date.now()}); break; }
+    case 'car-clear': withUndo(t('car.cleared'), () => { prefs.car = null; }); $('#sheet').close(); break;
+    case 'car-show': $('#sheet').close(); switchTab('map'); setTimeout(() => { follow = false; lmap?.setView([prefs.car.lat, prefs.car.lon], 17); }, 100); break;
+    case 'map-dl': downloadMap(); break;
+    case 'version-close': versionNote = null; render(); break;
+    case 'rate-skip': pendingRate = null; render(); break;
+    case 'rate': rate(id, +el.dataset.n); if ($('#sheet').open) openSheet(id); break;
+    case 'slot-quick': {
+      const start = +el.dataset.start, day = berlin(now()).day;
+      prefs.slots = prefs.slots.filter(s => s.day !== day).concat([{id, start, day}]);
+      prefs.onboarded = true; pendingAlert = null; savePrefs();
+      toast(t('toast.slotSaved', {vl: VQ.name, name: shortName(ents.get(id)), time: hhmm(start)})); render(); break;
+    }
+    case 'slot-del': withUndo(t('toast.slotDeleted'), () => { prefs.slots = prefs.slots.filter(s => s.id !== id); }); break;
     case 'sheet-close': $('#sheet').close(); break;
     case 'banner-close': pendingAlert = null; render(); break;
     case 'itin-more': itinExpanded = !itinExpanded; render(); break;
     case 'undo': if (toastUndo) { const u = toastUndo; toastUndo = null; $('#toast').hidden = true; u(); } break;
     case 'gps': if (device.gps) stopGps(true); else { device.gps = true; saveDevice(); startGps(); } renderSettings(); break;
     case 'push-on': enablePush(); break;
-    case 'help': openHelp(el.dataset.section); break;
+    case 'help': if (el.dataset.section === 'news') versionNote = null; openHelp(el.dataset.section); break;
     case 'recap': openRecap(); break;
     case 'recap-share': shareRecap(); break;
     case 'help-close': $('#help').close(); break;
     case 'check-update':
-      toast('Recherche d\'une mise à jour…');
+      toast(t('toast.checking'));
       Promise.resolve(navigator.serviceWorker?.getRegistration()).then(reg => reg?.update()).catch(() => {}).finally(() => location.reload());
       break;
     case 'install':
@@ -2083,8 +2382,8 @@ document.addEventListener('click', ev => {
       break;
     case 'install-hide': device.installHidden = true; saveDevice(); renderInstall(); break;
     case 'push-test':
-      fetch(`${SERVER}?r=push-test&u=${encodeURIComponent(user.id)}`, {method: 'POST'}).then(r => r.json())
-        .then(j => toast(j.sent ? 'Notification envoyée' : 'Aucun téléphone abonné pour ce profil')).catch(() => toast('Serveur injoignable'));
+      fetch(`${SERVER}?r=push-test&u=${encodeURIComponent(user.id)}&lang=${LANG}`, {method: 'POST'}).then(r => r.json())
+        .then(j => toast(j.sent ? t('toast.pushSent') : t('toast.pushNone'))).catch(() => toast(t('toast.offline')));
       break;
     case 'switch-user': openLogin(false); break;
     case 'login': selectUser({id, name: el.dataset.name}); break;
@@ -2095,55 +2394,55 @@ document.addEventListener('click', ev => {
       if (!from) break;
       getJSON(`${SERVER}?r=state&u=${encodeURIComponent(from)}`).then(j => {
         const s = j.state || {};
-        withUndo(`Programme de ${name} copié`, () => {
+        withUndo(t('toast.copied', {name}), () => {
           prefs.plan = Object.assign({}, s.plan); prefs.shows = Object.assign({}, s.shows); prefs.again = Object.assign({}, s.again);
           if (s.meal) prefs.meal = Object.assign({}, DEFAULTS.meal, s.meal);
           prefs.onboarded = true;
         });
-      }).catch(() => toast('Impossible de lire ce profil'));
+      }).catch(() => toast(t('toast.copyFail')));
       break;
     }
     case 'reset': {
-      if (el.dataset.armed !== '1') { el.dataset.armed = '1'; el.textContent = 'Confirmer la remise à zéro'; el.classList.add('primary'); setTimeout(() => { el.dataset.armed = ''; el.textContent = 'Remettre à zéro'; el.classList.remove('primary'); }, 4000); break; }
+      if (el.dataset.armed !== '1') { el.dataset.armed = '1'; el.textContent = t('reset.confirm'); el.classList.add('primary'); setTimeout(() => { el.dataset.armed = ''; el.textContent = t('reset'); el.classList.remove('primary'); }, 4000); break; }
       Object.assign(prefs, {done: {}, skip: {}, slots: [], alerted: {}, lastDone: null, mealDone: false, mealSkip: 0, queue: null, planned: null, srSeen: {}, log: []});
       savePrefs();
-      el.dataset.armed = ''; el.textContent = 'Remettre à zéro'; el.classList.remove('primary');
-      toast('Journée remise à zéro'); render(); break;
+      el.dataset.armed = ''; el.textContent = t('reset'); el.classList.remove('primary');
+      toast(t('toast.reset')); render(); break;
     }
   }
 });
 document.addEventListener('change', ev => {
-  const t = ev.target;
-  if (t.id === 'alertSel' || t.id === 'againSel') {
-    const id = t.dataset.id, v = t.value, map = t.id === 'alertSel' ? prefs.alerts : prefs.again;
+  const tg = ev.target;
+  if (tg.id === 'alertSel' || tg.id === 'againSel') {
+    const id = tg.dataset.id, v = tg.value, map = tg.id === 'alertSel' ? prefs.alerts : prefs.again;
     if (v) { map[id] = +v; delete prefs.alerted[id]; delete prefs.alerted['r:' + id]; } else delete map[id];
     savePrefs();
-    toast(t.id === 'alertSel' ? (v ? `Alerte : ${shortName(ents.get(id))} sous ${v} min` : 'Alerte supprimée') : (v ? `À refaire dès que la file passe sous ${v} min` : 'Une fois suffit'));
+    toast(tg.id === 'alertSel' ? (v ? t('toast.alert', {name: shortName(ents.get(id)), w: v}) : t('toast.alertOff')) : (v ? t('toast.again', {w: v}) : t('sheet.once')));
     if (v && !pushOn && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission();
     checkAlerts(); render();
   }
-  if (t.id === 'hotelChk') { prefs.hotel = t.checked; savePrefs(); render(); }
-  if (t.id === 'mealChk') { prefs.meal.on = t.checked; savePrefs(); render(); }
-  if (t.id === 'mealFrom' || t.id === 'mealTo') {
-    prefs.meal[t.id === 'mealFrom' ? 'from' : 'to'] = +t.value;
-    if (prefs.meal.to - prefs.meal.from < prefs.meal.dur) toast('Fenêtre plus courte que le repas : il sera placé au plus tôt');
+  if (tg.id === 'hotelChk') { prefs.hotel = tg.checked; savePrefs(); render(); }
+  if (tg.id === 'mealChk') { prefs.meal.on = tg.checked; savePrefs(); render(); }
+  if (tg.id === 'mealFrom' || tg.id === 'mealTo') {
+    prefs.meal[tg.id === 'mealFrom' ? 'from' : 'to'] = +tg.value;
+    if (prefs.meal.to - prefs.meal.from < prefs.meal.dur) toast(t('toast.mealWindow'));
     savePrefs(); render();
   }
-  if (t.id === 'singleChk') { prefs.single = t.checked; savePrefs(); render(); }
-  if (t.id === 'srIn') {
-    const id = t.dataset.id, v = t.value === '' ? null : clamp(Math.round(+t.value), 0, 180);
+  if (tg.id === 'singleChk') { prefs.single = tg.checked; savePrefs(); render(); }
+  if (tg.id === 'srIn') {
+    const id = tg.dataset.id, v = tg.value === '' ? null : clamp(Math.round(+tg.value), 0, 180);
     if (v == null) delete prefs.srSeen[id]; else prefs.srSeen[id] = {w: v, at: now()};
-    savePrefs(); render(); toast(v == null ? 'Estimation single rider rétablie' : `Single rider : ${v} min, pris en compte 45 min`);
+    savePrefs(); render(); toast(v == null ? t('toast.srReset') : t('toast.sr', {w: v}));
   }
-  if (t.id === 'shareChk') {
-    device.share = t.checked; saveDevice();
+  if (tg.id === 'shareChk') {
+    device.share = tg.checked; saveDevice();
     if (device.share && !device.gps) { device.gps = true; saveDevice(); startGps(); }
     if (device.share && gpsPos) postWhere(gpsPos);
     if (!device.share) postWhere(null);
     renderSettings();
   }
-  if (t.id === 'nickIn') { device.nick = t.value.trim().slice(0, 24); saveDevice(); if (device.share && gpsPos) postWhere(gpsPos); }
-  if (t.id === 'heightIn') { prefs.height = clamp(Math.round(+t.value || 0), 0, 220); savePrefs(); render(); }
+  if (tg.id === 'nickIn') { device.nick = tg.value.trim().slice(0, 24); saveDevice(); if (device.share && gpsPos) postWhere(gpsPos); }
+  if (tg.id === 'heightIn') { prefs.height = clamp(Math.round(+tg.value || 0), 0, 220); savePrefs(); render(); }
 });
 document.addEventListener('submit', ev => {
   if (ev.target.id === 'newUser') { ev.preventDefault(); createUser($('#newName').value); }
@@ -2184,11 +2483,11 @@ function checkAlerts() {
     hits.push(`${label}${shortName(ents.get(id))} : ${w} min`);
   };
   for (const [id, thr] of Object.entries(prefs.alerts)) check(id, id, thr, '');
-  for (const [id, thr] of Object.entries(prefs.again)) if (prefs.done[id] > 0) check('r:' + id, id, thr, 'À refaire · ');
+  for (const [id, thr] of Object.entries(prefs.again)) if (prefs.done[id] > 0) check('r:' + id, id, thr, t('alert.againPrefix'));
   if (!hits.length) return;
   savePrefs(false);
-  pendingAlert = `<b>File courte</b> · ${hits.map(esc).join(' · ')}`;
-  notify('File courte', hits.join('\n'));
+  pendingAlert = `<b>${t('alert.short')}</b> · ${hits.map(esc).join(' · ')}`;
+  notify(t('alert.short'), hits.join('\n'));
 }
 
 /* ---------- Notifications push ---------- */
@@ -2212,25 +2511,25 @@ async function subscribePush(silent) {
   pushOn = true;
 }
 async function enablePush() {
-  if (!remote()) { toast('Choisis un profil enregistré sur le serveur pour recevoir les notifications'); return; }
-  if (isIOS && !standalone()) { toast('Sur iPhone : ajoute d\'abord la page à l\'écran d\'accueil, puis ouvre-la depuis l\'icône'); return; }
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) { toast('Notifications push non prises en charge par ce navigateur'); return; }
+  if (!remote()) { toast(t('push.needProfile')); return; }
+  if (isIOS && !standalone()) { toast(t('push.ios')); return; }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) { toast(t('push.unsupported')); return; }
   try {
-    if (await Notification.requestPermission() !== 'granted') { toast('Notifications refusées : autorise-les dans les réglages du téléphone'); renderSettings(); return; }
+    if (await Notification.requestPermission() !== 'granted') { toast(t('push.refused')); renderSettings(); return; }
     await subscribePush(false);
-    toast('Notifications activées sur ce téléphone');
-  } catch (e) { toast('Activation impossible : ' + e.message); }
+    toast(t('push.enabled'));
+  } catch (e) { toast(t('push.fail', {msg: e.message})); }
   renderSettings();
 }
 function renderPushStatus() {
   const np = 'Notification' in window ? Notification.permission : 'unsupported';
   let txt;
-  if (pushOn) txt = 'Actives sur ce téléphone, même page fermée : files sous tes seuils, attractions à refaire, réouvertures, départ pour un créneau VirtualLine, un spectacle ou le repas.';
-  else if (np === 'denied') txt = 'Bloquées dans le navigateur : autorise-les dans les réglages du téléphone.';
-  else if (isIOS && !standalone()) txt = 'Sur iPhone (iOS 16.4 ou plus), ajoute la page à l\'écran d\'accueil puis ouvre-la depuis l\'icône pour les activer.';
-  else if (!('PushManager' in window)) txt = 'Push non pris en charge ici : alertes par vibration, page ouverte seulement.';
-  else txt = 'Reçois les alertes téléphone en poche : files courtes, réouvertures, départ pour un créneau ou un spectacle.';
-  $('#pushStatus').textContent = txt + (serverPushSubs > 1 ? ` ${serverPushSubs} téléphones abonnés pour ce profil.` : '');
+  if (pushOn) txt = t('push.on');
+  else if (np === 'denied') txt = t('push.blocked');
+  else if (isIOS && !standalone()) txt = t('push.iosHint');
+  else if (!('PushManager' in window)) txt = t('push.noPush');
+  else txt = t('push.pitch');
+  $('#pushStatus').textContent = txt + (serverPushSubs > 1 ? t('push.subs', {n: serverPushSubs}) : '');
   $('#pushBtn').hidden = pushOn || np === 'denied';
   $('#pushTest').hidden = !pushOn;
 }
@@ -2260,40 +2559,42 @@ function recapData() {
   for (const l of rides) counts[l.id] = (counts[l.id] || 0) + 1;
   const fav = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
   return {rides: rides.length, distinct: Object.keys(counts).length, shows: log.length - rides.length, km: m / 1000, queue, gained,
-    best: best && best.g >= 10 ? best : null, fav: fav && fav[1] > 1 ? fav : null, from: log[0].t, to: log[log.length - 1].t};
+    best: best && best.g >= 10 ? best : null, fav: fav && fav[1] > 1 ? fav : null, from: log[0].t, to: log[log.length - 1].t,
+    top: Object.keys(counts).filter(id => prefs.ratings[id]).map(id => [id, prefs.ratings[id]]).sort((a, b) => b[1] - a[1]).slice(0, 3)};
 }
-const km = x => x.toFixed(1).replace('.', ',');
+const km = x => kmFmt.format(x);
 function recapHTML(r) {
   const lines = [];
-  if (r.gained >= 10) lines.push(`Tu as attendu environ <b>${dur(r.gained)} de moins</b> que l'attente moyenne de la journée sur ces attractions.`);
-  if (r.best) lines.push(`Meilleur coup : <b>${esc(shortName(ents.get(r.best.id)))}</b> à ${r.best.w} min (${Math.round(r.best.avg)} en moyenne).`);
-  if (r.fav) lines.push(`Préférée : <b>${esc(shortName(ents.get(r.fav[0])))}</b> ×${r.fav[1]}.`);
-  if (r.shows) lines.push(`${r.shows} spectacle${r.shows > 1 ? 's' : ''} vu${r.shows > 1 ? 's' : ''}.`);
-  return `<article class="card"><div class="eyebrow">Ta journée · ${hhmm(r.from)} – ${hhmm(r.to)}</div>
-    <div class="stats"><div class="stat"><span>Tours</span><b>${r.rides}</b></div><div class="stat"><span>Dans les files</span><b>${dur(r.queue)}</b></div><div class="stat"><span>À pied</span><b>≈ ${km(r.km)} km</b></div></div>
+  if (r.gained >= 10) lines.push(t('recap.gained', {d: dur(r.gained)}));
+  if (r.best) lines.push(t('recap.best', {name: esc(shortName(ents.get(r.best.id))), w: r.best.w, avg: Math.round(r.best.avg)}));
+  if (r.fav) lines.push(t('recap.fav', {name: esc(shortName(ents.get(r.fav[0]))), n: r.fav[1]}));
+  if (r.top.length) lines.push(t('recap.top', {list: r.top.map(([id, n]) => `${esc(shortName(ents.get(id)))} ${'★'.repeat(n)}`).join(', ')}));
+  if (r.shows) lines.push(t('recap.shows', {n: r.shows}));
+  return `<article class="card"><div class="eyebrow">${t('recap.eyebrow', {from: hhmm(r.from), to: hhmm(r.to)})}</div>
+    <div class="stats"><div class="stat"><span>${t('recap.rides')}</span><b>${r.rides}</b></div><div class="stat"><span>${t('recap.queues')}</span><b>${dur(r.queue)}</b></div><div class="stat"><span>${t('sheet.walk')}</span><b>≈ ${km(r.km)} km</b></div></div>
     ${lines.length ? `<p>${lines.join(' ')}</p>` : ''}
-    <div class="row-inline"><button class="btn small primary" type="button" data-act="recap-share">Partager</button></div></article>`;
+    <div class="row-inline"><button class="btn small primary" type="button" data-act="recap-share">${t('recap.share')}</button></div></article>`;
 }
 function openRecap() {
   const r = recapData();
-  $('#sheet').innerHTML = `<div class="sheet-in"><div class="sheet-head"><div><div class="eyebrow">${esc(fmtDay(berlin(now()).day))}</div><h2 class="sheet-title" id="sheetTitle">Récap de ma journée</h2></div>
-    <button class="icon-btn" type="button" data-act="sheet-close" aria-label="Fermer">✕</button></div>
-    ${r ? recapHTML(r) : '<p class="muted">Rien d\'enregistré aujourd\'hui : touche « Fait » à la sortie de chaque attraction, le récap se remplit tout seul.</p>'}</div>`;
+  $('#sheet').innerHTML = `<div class="sheet-in"><div class="sheet-head"><div><div class="eyebrow">${esc(fmtDay(berlin(now()).day))}</div><h2 class="sheet-title" id="sheetTitle">${t('recap.title')}</h2></div>
+    <button class="icon-btn" type="button" data-act="sheet-close" aria-label="${t('close')}">✕</button></div>
+    ${r ? recapHTML(r) : `<p class="muted">${t('recap.empty')}</p>`}</div>`;
   const dlg = $('#sheet');
   if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
 }
 function shareRecap() {
   const r = recapData();
   if (!r) return;
-  const text = `${PARK.name}, ${fmtDay(berlin(now()).day)} : ${r.rides} tours (${r.distinct} attractions), ${dur(r.queue)} dans les files, ≈ ${km(r.km)} km à pied`
-    + (r.gained >= 10 ? `, ${dur(r.gained)} d'attente gagnée` : '') + (r.fav ? `. Préférée : ${shortName(ents.get(r.fav[0]))} ×${r.fav[1]}` : '') + '.';
-  if (navigator.share) navigator.share({title: `Ma journée à ${PARK.name}`, text}).catch(() => {});
-  else navigator.clipboard?.writeText(text).then(() => toast('Récap copié')).catch(() => toast(text));
+  const text = t('share.text', {park: PARK.name, day: fmtDay(berlin(now()).day), rides: r.rides, distinct: r.distinct, queue: dur(r.queue), km: km(r.km)})
+    + (r.gained >= 10 ? t('share.gained', {d: dur(r.gained)}) : '') + (r.fav ? t('share.fav', {name: shortName(ents.get(r.fav[0])), n: r.fav[1]}) : '') + '.';
+  if (navigator.share) navigator.share({title: t('share.title', {park: PARK.name}), text}).catch(() => {});
+  else navigator.clipboard?.writeText(text).then(() => toast(t('toast.recapCopied'))).catch(() => toast(text));
 }
 
 /* ---------- Groupe : positions partagées ---------- */
 let where = [], lastShare = 0;
-const shareNick = () => (device.nick || (remote() ? user.name : '') || 'Moi').slice(0, 24);
+const shareNick = () => (device.nick || (remote() ? user.name : '') || t('me')).slice(0, 24);
 const groupMembers = () => where.filter(x => x.device !== device.id && x.lat != null && Date.now() - x.ts < 20 * 60000);
 function postWhere(pos) {
   lastShare = Date.now();
@@ -2317,7 +2618,7 @@ function meetingPoint(people) {
 /* ---------- Aide ---------- */
 function openHelp(section) {
   const dlg = $('#help');
-  $('#helpVersion').textContent = `Version ${APP_VERSION}`;
+  $('#helpVersion').textContent = t('help.version', {v: APP_VERSION});
   if (section) { const d = $('#help-' + section); if (d) d.open = true; }
   if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
   if (section) $('#help-' + section)?.scrollIntoView({block: 'start'});
@@ -2329,19 +2630,19 @@ $('#help').addEventListener('click', ev => { if (ev.target === $('#help')) $('#h
    iPhone : pas d'invite possible, on explique Partager → Sur l'écran d'accueil. */
 let installEvt = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderInstall(); });
-window.addEventListener('appinstalled', () => { installEvt = null; toast('EP Live est installée : ouvre-la depuis ton écran d\'accueil'); renderInstall(); });
+window.addEventListener('appinstalled', () => { installEvt = null; toast(t('install.done')); renderInstall(); });
 function installHTML() {
-  if (installEvt) return `<p>Ajoute EP Live à ton écran d'accueil : elle s'ouvre en plein écran, reste utilisable quand le réseau du parc sature, et peut t'envoyer des notifications.</p>
-    <div class="row-inline"><button class="btn primary" type="button" data-act="install">Installer l'appli</button>`;
-  if (isIOS) return `<p>Dans Safari, touche <b>Partager</b> (le carré avec une flèche vers le haut), puis <b>Sur l'écran d'accueil</b>. Ouvre ensuite EP Live depuis l'icône : c'est indispensable pour recevoir les notifications (iOS 16.4 ou plus).</p>
+  if (installEvt) return `<p>${t('install.prompt')}</p>
+    <div class="row-inline"><button class="btn primary" type="button" data-act="install">${t('install.btn')}</button>`;
+  if (isIOS) return `<p>${t('install.ios')}</p>
     <div class="row-inline">`;
-  return `<p>Dans le menu du navigateur (⋮), choisis <b>Installer l'application</b> ou <b>Ajouter à l'écran d'accueil</b>.</p><div class="row-inline">`;
+  return `<p>${t('install.menu')}</p><div class="row-inline">`;
 }
 function renderInstall() {
   const card = $('#installCard'), set = $('#installSet'), installed = standalone();
   card.hidden = installed || device.installHidden || !(installEvt || isIOS);
-  if (!card.hidden) card.innerHTML = `<div class="eyebrow">Installer l'appli</div>${installHTML()}<button class="btn" type="button" data-act="install-hide">Plus tard</button></div>`;
-  set.innerHTML = `<h2>Application</h2>${installed ? '<p class="muted">Installée sur ce téléphone.</p>' : installHTML() + '</div>'}`;
+  if (!card.hidden) card.innerHTML = `<div class="eyebrow">${t('install.btn')}</div>${installHTML()}<button class="btn" type="button" data-act="install-hide">${t('act.later')}</button></div>`;
+  set.innerHTML = `<h2>${t('install.h')}</h2>${installed ? `<p class="muted">${t('install.installed')}</p>` : installHTML() + '</div>'}`;
 }
 
 /* ---------- Position ---------- */
@@ -2377,6 +2678,7 @@ function startGps() {
   if (watchId != null) navigator.geolocation.clearWatch(watchId);
   watchId = navigator.geolocation.watchPosition(p => {
     const q = {lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy, ts: Date.now()};
+    if (q.acc < 150) lastGps = q;
     if (q.acc < 150 && inPark(q)) {
       gpsPos = q; gpsState = 'on';
       // Position transmise au serveur (au plus toutes les 2 min) pour calculer l'heure de départ des notifications
@@ -2449,6 +2751,7 @@ async function refresh() {
     }
     cacheSet('live', {meta, live: {liveData: [...live.values()]}, stats});
     if (!ents.size || [...ents.values()].every(e => e.lat == null)) { await loadStatic(); ingestLive({liveData: [...live.values()]}); await loadWalk(); }
+    if (!POI) loadPoi();
     updateTrail();
     checkAlerts();
   } catch (e) {
@@ -2471,23 +2774,25 @@ function restoreFromCache() {
    Démarrage
    ===================================================================== */
 (async function init() {
+  applyI18n(); applyFormats();
   await bootPark();
-  if (!PARK) { $('#nextBox').innerHTML = '<div class="card"><p>Impossible de charger la configuration du parc (parks.json). Vérifie la connexion puis recharge la page.</p></div>'; return; }
+  if (!PARK) { $('#nextBox').innerHTML = `<div class="card"><p>${t('boot.fail')}</p></div>`; return; }
   restoreFromCache();
-  if (user) rolloverDay();
+  if (user) { rolloverDay(); syncLang(); }
   const initialTab = (location.hash || '').slice(1) || device.tab || 'now';
   device.tab = ['now', 'list', 'map', 'settings'].includes(initialTab) ? initialTab : 'now';
   document.querySelectorAll('[data-tab-panel]').forEach(p => { p.hidden = p.dataset.tabPanel !== device.tab; });
   document.querySelectorAll('.tabbar [data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === device.tab));
   // Nouvelle version depuis la dernière ouverture sur ce téléphone : on le signale une fois
   if (device.seenVersion !== APP_VERSION) {
-    if (device.seenVersion || user || loadJSON('ep-planner-v1')) pendingAlert = `<b>Nouvelle version de l'appli.</b> <button type="button" class="yes" data-act="help" data-section="news">Voir les nouveautés</button>`;
+    if (device.seenVersion || user || loadJSON('ep-planner-v1')) versionNote = `<b>${t('boot.newVersion')}</b> <button type="button" class="yes" data-act="help" data-section="news">${t('boot.seeNews')}</button>`;
     device.seenVersion = APP_VERSION; saveDevice();
   }
   render();
   if (!user) openLogin(true);
   await loadStatic();
   await loadWalk();
+  loadPoi();
   render();
   await refresh();
   setInterval(() => { if (!document.hidden) refresh(); }, REFRESH_MS);

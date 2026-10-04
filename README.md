@@ -13,15 +13,18 @@ Dans ce document, `europapark.example.com` désigne l'adresse de ton installatio
 ```
 www/                              ← racine web (/var/www/europapark/www)
   index.html                      l'appli complète (style + logique)
+  i18n.js                         textes de l'interface en français, anglais et allemand
   api.php                         relais du serveur : temps d'attente, historique, météo, profils, notifications push
   sw.js, manifest.webmanifest     installation sur l'écran d'accueil, ouverture hors réseau, réception des notifications
   parks.json                      description des parcs (identifiant, entrée, listes d'attractions…)
   parks/<parc>.walk.json          distances à pied par les allées (OpenStreetMap), générées par tools/walk-matrix.php
+  parks/<parc>.poi.json           toilettes, eau, casiers, distributeurs, parkings (OpenStreetMap), générés par tools/park-poi.php
   data/                           créé par api.php, jamais servi, ignoré par git (voir « Données »)
 deploy/
   nginx/europapark.conf           vhost nginx (à adapter)
   cron/europapark                 collecte + notifications, chaque minute de 8 h à 21 h
 tools/walk-matrix.php             génère les distances à pied d'un parc
+tools/park-poi.php                génère les points pratiques d'un parc
 Dockerfile, docker-compose.yml, docker/   installation avec Docker
 ```
 
@@ -66,6 +69,8 @@ Tout ce que tu fais est enregistré sur le serveur à chaque changement : progra
    - **Single rider accepté** : file séparée, souvent bien plus courte, sur certaines attractions (Blue Fire, Voltron, CanCan et Arthur d'après les sources consultées ; à vérifier sur place). L'appli compte la moitié de l'attente normale, ou la vraie attente si tu la notes dans la fiche (valable 45 min).
    - **Position** : « Utiliser ma position ».
    - **Notifications** : « Activer les notifications », puis « Tester ».
+4. **Carte hors ligne** : dans l'onglet **Carte**, « Télécharger la carte » enregistre tout le parc sur le téléphone (environ 300 tuiles, quelques Mo). À faire en wifi : la carte reste utilisable quand la 4G sature.
+5. **Quel jour venir ?** (Réglages) : affluence prévue des prochains jours d'ouverture, de *calme* à *très chargé*. Elle combine ton historique (ou, à défaut, le jour de la semaine) avec les vacances scolaires et jours fériés des régions d'où viennent les visiteurs : pour Europa-Park, Bade-Wurtemberg, Rhénanie-Palatinat, Hesse, Sarre, Grand Est et le reste de la France, et les cantons suisses voisins.
 
 Le soir et la veille, l'onglet **Maintenant** affiche un **aperçu de la journée suivante** : itinéraire estimé depuis l'ouverture, météo, conseils, et **affluence prévue**. Celle-ci correspond à l'attente moyenne habituelle de ce jour de la semaine, comparée à la moyenne des derniers jours enregistrés par le serveur.
 
@@ -84,6 +89,7 @@ Toucher le nom ouvre la **fiche** de l'attraction :
 - l'attente, l'attente habituelle à cette heure et la courbe de la journée comparée à l'habituel ;
 - les **heures creuses et de pointe** habituelles (« Au plus bas vers 17:30, ~15 min · pic vers 12:15, ~55 min ») ;
 - la taille minimale et l'état du VirtualLine ;
+- **ta note** (1 à 5 étoiles) et celle du groupe ;
 - les choix « M'alerter sous… » et « À refaire si l'attente passe sous… ».
 
 **Avec le GPS**, l'appli remarque toute seule où tu es :
@@ -94,10 +100,24 @@ Toucher le nom ouvre la **fiche** de l'attraction :
 **VirtualLine** (coupe-file gratuit) :
 1. La carte VirtualLine indique quelle attraction réserver maintenant (celle où ça fait gagner le plus).
 2. Réserve dans l'**appli officielle Europa-Park** (un seul créneau à la fois par billet).
-3. Note ton créneau avec **J'ai un créneau** : l'itinéraire s'organise autour et te dit quand partir.
+3. Note ton créneau avec **J'ai un créneau**, ou en un geste avec **J'ai réservé 15:20** quand l'heure proposée est connue. L'itinéraire s'organise autour et te dit quand partir.
 4. Après **Fait** sur le créneau, l'appli te dit quoi re-réserver tout de suite.
 
-**La carte** affiche le parc sur un fond OpenStreetMap (allées, bâtiments, lacs), zoomable. Les grosses pastilles correspondent à ton programme et indiquent l'attente en direct ; un pointillé mène à la prochaine étape, et le groupe apparaît s'il partage sa position. Les zones déjà vues restent en mémoire pour les moments où le réseau sature.
+Le bouton **Ouvrir l'appli** lance l'appli officielle : directement sur Android, et par sa fiche App Store sur iPhone. Avec les notifications, tu es prévenu quand une file virtuelle s'ouvre sur une attraction de ton programme, si tu n'as pas déjà un créneau. La réservation elle-même se fait toujours dans l'appli officielle : il n'en existe pas d'accès public, et imiter l'appli avec tes identifiants serait contraire aux conditions du parc.
+
+**La carte** affiche le parc sur un fond OpenStreetMap (allées, bâtiments, lacs), zoomable. Elle prend toute la hauteur de l'écran. Les grosses pastilles correspondent à ton programme et indiquent l'attente en direct ; un pointillé mène à la prochaine étape, et le groupe apparaît s'il partage sa position. Les zones déjà vues restent en mémoire pour les moments où le réseau sature.
+
+| Bouton de la carte | Effet |
+|---|---|
+| ⤢ | plein écran (✕ ou Échap pour sortir) |
+| ◎ | te recentre et te suit pendant que tu marches ; déplacer la carte arrête le suivi |
+| 🗺 | revient à la vue de tout le parc |
+| 🚻 | montre les toilettes les plus proches |
+| 🚗 | ta voiture |
+
+Au-dessus de la carte, des boutons affichent ou masquent les **toilettes, l'eau potable, les casiers, les distributeurs et les parkings** issus d'OpenStreetMap. À Europa-Park, la carte compte 28 toilettes ; seuls 3 robinets d'eau potable sont signalés, et seuls les casiers de l'entrée sont cartographiés.
+
+**Ta voiture** : en arrivant, enregistre ta place, soit avec ta position GPS, soit en choisissant le parking dans la liste. Elle est enregistrée dans le profil, donc tout le groupe la voit. Le soir, l'onglet Maintenant affiche « Retour à la voiture » avec le temps de marche et un lien d'itinéraire (Google Maps, à pied).
 
 **Repas et spectacles** apparaissent dans l'itinéraire comme des étapes à heure fixe. Pour le repas, l'appli indique le resto ouvert le plus proche. *Plus tard* le décale d'au moins 30 min, *Fait* le retire.
 
@@ -128,11 +148,21 @@ Chaque « Fait » est noté. Une fois le parc fermé, l'onglet **Maintenant** af
 - le nombre de tours et le temps passé dans les files (mesuré si tu as utilisé « Dans la file », sinon le temps affiché) ;
 - la distance à pied, estimée entre les attractions ;
 - l'attente gagnée par rapport à l'attente moyenne relevée ce jour-là sur les mêmes attractions ;
-- le meilleur coup et l'attraction préférée.
+- le meilleur coup, l'attraction préférée et **vos mieux notées**.
+
+**Notes** : après chaque « Fait », un bandeau te demande une note de 1 à 5 étoiles ; tu peux aussi noter depuis la fiche. 4 étoiles ajoutent l'attraction à « À refaire » sous 15 min, 5 étoiles sous 20 min, si rien n'est déjà réglé. La liste des attractions affiche la note moyenne de tous les profils du serveur.
 
 Le bouton **Partager** l'envoie à qui tu veux. Le récap est aussi disponible à tout moment dans **Réglages → Récap de ma journée**.
 
 **Réglages → Nouvelle journée** remet à zéro les attractions faites, les créneaux, le repas et les alertes, en gardant le programme. Ça se fait aussi tout seul au changement de jour.
+
+## 8. Langues
+
+L'appli existe en **français**, **anglais** et **allemand**. Par défaut, elle prend la langue du téléphone (une autre langue que ces trois-là donne l'anglais). **Réglages → Langue / Language / Sprache** la change pour ce téléphone, sans recharger la page ; les dates, les nombres et l'aide suivent.
+
+La langue choisie est aussi enregistrée avec le profil : les notifications push arrivent dans la langue du dernier téléphone qui l'a réglée (avec un profil commun à plusieurs téléphones, c'est donc une seule langue pour tous).
+
+Pour ajouter une langue : dans `www/i18n.js`, copier le bloc `I18N.en` sous un nouveau code (`I18N.nl = {…}`), traduire chaque valeur (les `{nom}` sont remplacés par l'appli, les fonctions gèrent les pluriels), ajouter un bouton `data-lang="nl"` dans `#langSeg` de `index.html`, puis les textes des notifications dans `MSG` en haut de `api.php`. Une clé absente d'une langue s'affiche en français.
 
 ---
 
@@ -154,7 +184,7 @@ Pour estimer la file d'une attraction à l'heure où tu y arriveras, l'appli :
 1. part de l'attente **affichée maintenant** ;
 2. rejoint progressivement le **profil habituel** de l'attraction (après environ 1 h 30, c'est surtout l'habituel qui compte) ;
 3. corrige ce profil de l'**affluence du jour** : rapport médian « attente actuelle / attente habituelle » sur tout le parc (affiché « Affluence : +20 % au-dessus d'un jour habituel ») ;
-4. multiplie par le **facteur temps réel** : avec « Dans la file » puis « Fait », elle compare le temps affiché à l'entrée au temps réellement attendu. Elle utilise la médiane de cet écart (souvent 70 à 90 % de l'affiché). Les mesures de tous les profils du serveur (30 derniers jours) servent à tout le monde ; dès que tu as deux mesures à toi, ce sont les tiennes qui comptent.
+4. multiplie par le **facteur temps réel** : avec « Dans la file » puis « Fait », elle compare le temps affiché à l'entrée au temps réellement attendu. Elle utilise la médiane de cet écart (souvent 70 à 90 % de l'affiché). Les mesures de tous les profils du serveur (30 derniers jours) servent à tout le monde ; dès que tu as deux mesures à toi, ce sont les tiennes qui comptent. L'écart est calculé **par attraction** dès qu'il y a assez de mesures (2 à toi, ou 3 de tous les profils), car certaines attractions gonflent davantage leur affichage que d'autres ; sinon, c'est l'écart moyen qui s'applique.
 
 ## Le choix de la prochaine étape
 
@@ -182,7 +212,7 @@ score = gain − coût de marche − 0,15 × file prévue − 12 (si bonus) + m�
 
 Chaque profil est un fichier sur le serveur. L'appli y envoie son état 1 s après chaque changement, et récupère la version du serveur à chaque actualisation si elle est plus récente. En cas de conflit, la modification la plus récente gagne.
 
-Les réglages d'affichage restent propres à chaque téléphone : onglet ouvert, filtre, GPS activé ou non.
+Les réglages d'affichage restent propres à chaque téléphone : onglet ouvert, filtre, GPS activé ou non, langue.
 
 ## Les notifications push
 
@@ -191,7 +221,7 @@ Le cron appelle `api.php collect` chaque minute. Ce script :
 2. pour chaque profil abonné qui a ouvert l'appli aujourd'hui, vérifie les conditions du tableau de la partie 5 (au plus 3 notifications par minute) ;
 3. envoie les notifications au service de push du téléphone (Apple, Google ou Mozilla), qui les livre.
 
-Pour savoir quand dire « pars maintenant », le serveur utilise ta dernière position GPS (moins de 10 min), sinon ta dernière attraction faite, sinon l'entrée.
+Le texte des notifications est dans la langue du profil (`state.lang`, voir « Langues »). Pour savoir quand dire « pars maintenant », le serveur utilise ta dernière position GPS (moins de 10 min), sinon ta dernière attraction faite, sinon l'entrée.
 
 ## Les positions du groupe
 
@@ -332,6 +362,14 @@ php tools/walk-matrix.php --park-id=<id> --bbox=sud,ouest,nord,est --entrance=la
 
 Le script récupère les allées du parc sur OpenStreetMap (Overpass) et en garde le plus grand réseau connecté, en ignorant les files d'attente et les accès privés. Il raccroche chaque attraction, spectacle et restaurant à l'allée la plus proche, puis calcule tous les plus courts chemins. Il affiche un résumé : points raccrochés, distance de raccrochement maximale, rapport chemin / ligne droite. Overpass limite les requêtes : `--osm-cache` permet de relancer le calcul sans tout retélécharger.
 
+Les points pratiques (toilettes, eau, casiers, distributeurs, parkings) se génèrent de la même façon :
+
+```bash
+php tools/park-poi.php --bbox=sud,ouest,nord,est --out=www/parks/<parc>.poi.json [--osm-cache=osm.json]
+```
+
+Seuls les points situés dans le contour du parc sur OpenStreetMap sont gardés ; pour les parkings, la zone est élargie d'environ 1,2 km. Pour la prévision d'affluence, ajoute dans `parks.json` la liste `holidays` des régions d'où viennent les visiteurs, avec leur poids : `{"c": "DE", "s": "DE-BW", "w": 4}`, ou `"s": null` pour tout le pays. Les codes sont ceux d'[OpenHolidays](https://openholidaysapi.org).
+
 ## Historique
 
 Le cron tourne chaque minute de 8 h à 21 h : il enregistre un point d'historique toutes les 4 min au plus et envoie les notifications. L'historique est conservé 45 jours ; plus il y a de jours enregistrés, meilleures sont les prévisions.
@@ -342,20 +380,21 @@ Toutes les réponses sont en JSON. Une erreur renvoie `{"error": "…"}` avec le
 
 | Route | Rôle |
 |---|---|
-| `GET ?r=bundle[&u=ID&since=ms]` | temps en direct + statistiques + `weather` + `where` (positions du groupe) + `real` (écart temps réel/affiché de tous les profils) (appelé par la page). Avec `u` : `user` = `null` si le profil n'existe pas, sinon `{id, name, updatedAt, push, state}` ; `push` = nombre de téléphones abonnés, `state` seulement s'il est plus récent que `since` |
+| `GET ?r=bundle[&u=ID&since=ms]` | temps en direct + statistiques + `weather` + `where` (positions du groupe) + `real` (mesures partagées entre profils : écart temps réel/affiché global et par attraction, notes moyennes) (appelé par la page). Avec `u` : `user` = `null` si le profil n'existe pas, sinon `{id, name, updatedAt, push, state}` ; `push` = nombre de téléphones abonnés, `state` seulement s'il est plus récent que `since` |
 | `GET ?r=live` · `children` · `schedule` | données brutes themeparks.wiki, avec cache |
 | `GET ?r=weather` | prévisions Open-Meteo brutes (cache 30 min ; après un échec, pas de nouvel essai avant 5 min) |
 | `GET ?r=calendar` | `{days: [{day, avg, peak}]}` : attente moyenne (11 h – 16 h) de chaque jour passé de l'historique |
 | `GET ?r=users` | `[{id, name, updatedAt}]`, triés par nom |
-| `POST ?r=user` `{name}` | crée un profil → 201 `{id, name}` ; 409 si le pseudo existe (avec son `id`) |
+| `POST ?r=user` `{name}` | crée un profil → 201 `{id, name}` ; 409 si le pseudo existe (avec son `id`). `&lang=fr\|en\|de` : langue du message d'erreur |
 | `GET ?r=state&u=ID` | `{id, name, updatedAt, state}` |
 | `POST ?r=state&u=ID` `{updatedAt, state}` | enregistre l'état (256 Ko max). Le plus récent gagne : 409 `{updatedAt, state}` si le serveur a une version plus récente |
 | `GET ?r=push-key` | `{key}` : clé publique VAPID (`applicationServerKey`) |
 | `POST ?r=push-sub&u=ID` | enregistre la `PushSubscription` du téléphone (retirée des autres profils) → `{ok, subs}` |
 | `POST ?r=push-unsub&u=ID` `{endpoint}` | supprime un abonnement |
 | `GET ?r=where` · `POST ?r=where` `{device, nick, lat, lon}` | positions partagées de moins de 20 min (`lat: null` arrête le partage) ; aussi renvoyées par `bundle` (`where`) |
-| `POST ?r=push-test&u=ID` | notification de test vers tous les téléphones du profil → `{sent, codes}` |
+| `POST ?r=push-test&u=ID[&lang=fr\|en\|de]` | notification de test vers tous les téléphones du profil → `{sent, codes}` |
 | `?r=collect` | collecte + notifications (aussi `php api.php collect`, utilisé par le cron) |
+| `GET ?r=forecast` | affluence prévue des prochains jours d'ouverture : `{days: [{day, open, close, idx, level 1–4, why}], history}` (cache d'un jour) |
 | `GET ?r=config` | description du parc de l'instance (`parks.json[EP_PARK]` + `slug`) |
 | `GET ?r=health` | état du cache, de l'historique, nombre de profils, clés VAPID |
 

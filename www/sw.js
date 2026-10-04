@@ -1,9 +1,9 @@
 /* Service worker : garde la page et les polices en cache pour qu'elle s'ouvre
    instantanément, même quand le réseau du parc est saturé.
    Les temps d'attente (api.php / themeparks.wiki) passent toujours par le réseau. */
-const CACHE = 'ep-live-v3';
+const CACHE = 'ep-live-v5';
 const TILES = 'ep-tiles';   // fond de carte et Leaflet : gardés d'une version à l'autre
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'parks.json', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
+const SHELL = ['./', 'index.html', 'i18n.js', 'manifest.webmanifest', 'parks.json', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -27,7 +27,7 @@ self.addEventListener('fetch', e => {
   // Tuiles OpenStreetMap et Leaflet : cache d'abord, le réseau seulement pour ce qui manque
   if (url.hostname === 'tile.openstreetmap.org' || (url.hostname === 'cdnjs.cloudflare.com' && url.pathname.includes('/leaflet/'))) {
     e.respondWith(caches.open(TILES).then(async cache => {
-      const hit = await cache.match(e.request);
+      const hit = await cache.match(e.request, {ignoreVary: true});   // tuiles aussi téléchargées par la page (carte hors ligne)
       if (hit) return hit;
       const r = await fetch(e.request);
       if (r.ok || r.type === 'opaque') cache.put(e.request, r.clone());

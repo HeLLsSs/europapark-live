@@ -181,11 +181,81 @@
     "virtualQueue": {
       "name": "VirtualLine",
       "url": "https://www.europapark.de/fr/parc-de-loisirs/infos/planifiez-votre-sejour/virtualline-europa-park",
-      "app": "l'appli officielle Europa-Park"
+      "app": "l'appli officielle Europa-Park",
+      "appIos": "https://apps.apple.com/app/id378319816",
+      "appAndroid": "com.EuropaParkMackKG.EPGuide"
     },
+    "holidays": [
+      {
+        "c": "DE",
+        "s": "DE-BW",
+        "w": 4
+      },
+      {
+        "c": "DE",
+        "s": "DE-RP",
+        "w": 1
+      },
+      {
+        "c": "DE",
+        "s": "DE-HE",
+        "w": 1
+      },
+      {
+        "c": "DE",
+        "s": "DE-SL",
+        "w": 0.5
+      },
+      {
+        "c": "FR",
+        "s": "FR-GE",
+        "w": 3
+      },
+      {
+        "c": "FR",
+        "s": null,
+        "w": 1
+      },
+      {
+        "c": "CH",
+        "s": "CH-BS",
+        "w": 0.7
+      },
+      {
+        "c": "CH",
+        "s": "CH-BL",
+        "w": 0.7
+      },
+      {
+        "c": "CH",
+        "s": "CH-AG",
+        "w": 0.7
+      },
+      {
+        "c": "CH",
+        "s": "CH-ZH",
+        "w": 0.7
+      },
+      {
+        "c": "CH",
+        "s": "CH-BE",
+        "w": 0.4
+      },
+      {
+        "c": "CH",
+        "s": "CH-SO",
+        "w": 0.3
+      },
+      {
+        "c": "CH",
+        "s": "CH-LU",
+        "w": 0.3
+      }
+    ],
     "sources": [
       "https://api.themeparks.wiki/v1/entity/639738d3-9574-4f60-ab5b-4c392901320b/children",
-      "https://www.europapark.de/fr/parc-de-loisirs/infos/planifiez-votre-sejour/virtualline-europa-park"
+      "https://www.europapark.de/fr/parc-de-loisirs/infos/planifiez-votre-sejour/virtualline-europa-park",
+      "https://openholidaysapi.org"
     ]
   },
   "phantasialand": {
@@ -321,13 +391,41 @@
     },
     "transport": null,
     "virtualQueue": null,
+    "holidays": [
+      {
+        "c": "DE",
+        "s": "DE-NW",
+        "w": 5
+      },
+      {
+        "c": "DE",
+        "s": "DE-RP",
+        "w": 1
+      },
+      {
+        "c": "DE",
+        "s": "DE-HE",
+        "w": 0.5
+      },
+      {
+        "c": "NL",
+        "s": null,
+        "w": 1
+      },
+      {
+        "c": "BE",
+        "s": null,
+        "w": 0.7
+      }
+    ],
     "sources": [
       "https://api.themeparks.wiki/v1/entity/abb67808-61e3-49ef-996c-1b97ed64fac6/children",
       "https://www.phantasialand.de/en/theme-park/one-of-a-kind-attractions/attractions-overview-summer/",
       "https://www.phantasialand.de/en/theme-park/rookburgh/f-l-y/",
       "https://www.phantasialand.de/en/theme-park/one-of-a-kind-attractions/taron/",
       "https://www.openstreetmap.org/#map=18/50.7990/6.8793",
-      "https://forums.coasterforce.com/threads/3-days-at-phantasialand-day-somehow-forgetfulness.46696/post-1166971"
+      "https://forums.coasterforce.com/threads/3-days-at-phantasialand-day-somehow-forgetfulness.46696/post-1166971",
+      "https://openholidaysapi.org"
     ]
   },
   "efteling": {
@@ -476,13 +574,31 @@
       "url": "https://www.efteling.com/nl/park/informatie/wachtrijen",
       "app": "l'appli officielle Efteling"
     },
+    "holidays": [
+      {
+        "c": "NL",
+        "s": null,
+        "w": 6
+      },
+      {
+        "c": "BE",
+        "s": null,
+        "w": 2
+      },
+      {
+        "c": "DE",
+        "s": "DE-NW",
+        "w": 0.5
+      }
+    ],
     "sources": [
       "https://api.themeparks.wiki/v1/entity/30713cf6-69a9-47c9-a505-52bb965f01be/children",
       "https://www.efteling.com/en/park/attractions",
       "https://www.efteling.com/en/park/attractions/baron-1898",
       "https://www.efteling.com/nl/park/informatie/wachtrijen",
       "https://www.looopings.nl/weblog/26051/Zo-werkt-de-nieuwe-virtuele-wachtrij-bij-Droomvlucht-in-de-Efteling.html",
-      "https://www.openstreetmap.org/#map=18/51.6494/5.0438"
+      "https://www.openstreetmap.org/#map=18/51.6494/5.0438",
+      "https://openholidaysapi.org"
     ]
   },
   "disneylandpark": {
@@ -615,12 +731,40 @@
     },
     "transport": "railroad|streetcars|main street vehicles",
     "virtualQueue": null,
+    "holidays": [
+      {
+        "c": "FR",
+        "s": "FR-IF",
+        "w": 4
+      },
+      {
+        "c": "FR",
+        "s": null,
+        "w": 3
+      },
+      {
+        "c": "BE",
+        "s": null,
+        "w": 0.7
+      },
+      {
+        "c": "NL",
+        "s": null,
+        "w": 0.5
+      },
+      {
+        "c": "DE",
+        "s": null,
+        "w": 0.3
+      }
+    ],
     "sources": [
       "https://api.themeparks.wiki/v1/destinations",
       "https://api.themeparks.wiki/v1/entity/dae968d5-630d-4719-8b06-3d107e944401/children",
       "https://api.themeparks.wiki/v1/entity/dae968d5-630d-4719-8b06-3d107e944401/live",
       "https://dlptips.com/advice/ride-restrictions/",
-      "https://www.openstreetmap.org/#map=18/48.8704/2.7795"
+      "https://www.openstreetmap.org/#map=18/48.8704/2.7795",
+      "https://openholidaysapi.org"
     ]
   },
   "waltdisneystudios": {
@@ -735,12 +879,40 @@
     },
     "transport": null,
     "virtualQueue": null,
+    "holidays": [
+      {
+        "c": "FR",
+        "s": "FR-IF",
+        "w": 4
+      },
+      {
+        "c": "FR",
+        "s": null,
+        "w": 3
+      },
+      {
+        "c": "BE",
+        "s": null,
+        "w": 0.7
+      },
+      {
+        "c": "NL",
+        "s": null,
+        "w": 0.5
+      },
+      {
+        "c": "DE",
+        "s": null,
+        "w": 0.3
+      }
+    ],
     "sources": [
       "https://api.themeparks.wiki/v1/destinations",
       "https://api.themeparks.wiki/v1/entity/ca888437-ebb4-4d50-aed2-d227f7096968/children",
       "https://api.themeparks.wiki/v1/entity/ca888437-ebb4-4d50-aed2-d227f7096968/live",
       "https://dlptips.com/advice/ride-restrictions/",
-      "https://www.openstreetmap.org/#map=18/48.8682/2.7807"
+      "https://www.openstreetmap.org/#map=18/48.8682/2.7807",
+      "https://openholidaysapi.org"
     ]
   },
   "parcasterix": {
@@ -897,13 +1069,36 @@
     },
     "transport": null,
     "virtualQueue": null,
+    "holidays": [
+      {
+        "c": "FR",
+        "s": "FR-IF",
+        "w": 5
+      },
+      {
+        "c": "FR",
+        "s": "FR-HF",
+        "w": 1.5
+      },
+      {
+        "c": "FR",
+        "s": null,
+        "w": 2
+      },
+      {
+        "c": "BE",
+        "s": null,
+        "w": 0.5
+      }
+    ],
     "sources": [
       "https://api.themeparks.wiki/v1/entity/9e938687-fd99-46f3-986a-1878210378f8/children",
       "https://www.parcasterix.fr/en/attractions",
       "https://www.parcasterix.fr/en/attractions/thrill/by-toutatis",
       "https://www.parcasterix.fr/en/attractions/thrill/osiris-convolvulis",
       "https://www.parcasterix.fr/en/attractions/family/fulliautomatix",
-      "https://www.openstreetmap.org/#map=18/49.1361/2.5727"
+      "https://www.openstreetmap.org/#map=18/49.1361/2.5727",
+      "https://openholidaysapi.org"
     ]
   }
 }

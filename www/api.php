@@ -14,12 +14,12 @@
  *   weather     prévisions Open-Meteo (JSON amont)
  *   calendar    affluence moyenne des jours passés (11 h – 16 h)
  *   users       liste des profils
- *   user        POST {name} : crée un profil
+ *   user        POST {name} : crée un profil (&lang=fr|en|de : langue du message d'erreur)
  *   state       GET / POST &u=ID : état synchronisé du profil (le plus récent gagne)
  *   push-key    clé publique VAPID pour s'abonner aux notifications
  *   push-sub    POST &u=ID : enregistre l'abonnement push du téléphone
  *   push-unsub  POST &u=ID : supprime un abonnement push
- *   push-test   POST &u=ID : envoie une notification de test
+ *   push-test   POST &u=ID : envoie une notification de test (&lang=fr|en|de)
  *   collect     force une collecte + alertes push (pour le cron) — aussi en CLI : php api.php collect
  *   health      état du cache et de l'historique
  *
@@ -42,8 +42,59 @@ const MAX_STATE     = 262144;  // octets — taille max d'un état synchronisé
 const MAX_PUSH_RUN  = 3;       // notifications max par profil et par collecte
 const WHERE_KEEP    = 7200000; // ms — positions du groupe effacées après 2 h
 const WHERE_FRESH   = 1200000; // ms — positions du groupe affichées si moins de 20 min
+const HOLIDAYS_API  = 'https://openholidaysapi.org/'; // vacances scolaires et jours fériés (prévision d'affluence)
 const PACES         = ['enfants' => 55, 'normal' => 75, 'rapide' => 90]; // mètres par minute, comme PACES dans index.html
 const JSON_OUT      = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+
+// Textes envoyés à l'utilisateur (notifications push, erreurs affichées par la page), comme i18n.js.
+// Push : [titre, texte] ; la langue est state.lang du profil (fr par défaut).
+const MSG = [
+    'fr' => [
+        'go'           => ['Pars maintenant', '{ride} : créneau VirtualLine à {time} · {walk} min à pied'],
+        'show'         => ['Spectacle', '{ride} à {time} · pars maintenant ({walk} min à pied)'],
+        'meal'         => ['Pause repas', "C'est le bon moment : les files sont au plus haut."],
+        'last'         => ['Dernier appel', 'Fermeture à {time} : {list}.'],
+        'rain'         => ['Pluie', "Pluie annoncée vers {h} h : l'itinéraire passe aux attractions couvertes."],
+        'alert'        => ['File courte', '{ride} : {wait} min (seuil {thr})'],
+        'again'        => ['À refaire', '{ride} : {wait} min'],
+        'reopen'       => ['Réouverture', '{ride} vient de rouvrir · file {wait} min'],
+        'vlopen'       => ['{vq} ouvert', "{ride} : créneau proposé vers {time}. Réserve dans l'appli officielle."],
+        'vlopen_now'   => ['{vq} ouvert', "{ride} : des créneaux sont disponibles. Réserve dans l'appli officielle."],
+        'test'         => ['Europa-Park Live', 'Les notifications fonctionnent sur ce téléphone.'],
+        'nick_invalid' => "Pseudo invalide : 2 à 24 lettres, chiffres, espaces ou . _ ' -",
+        'nick_taken'   => 'Ce pseudo existe déjà : choisis-le dans la liste.',
+    ],
+    'en' => [
+        'go'           => ['Leave now', '{ride}: VirtualLine slot at {time} · {walk} min walk'],
+        'show'         => ['Show', '{ride} at {time} · leave now ({walk} min walk)'],
+        'meal'         => ['Meal break', "Now's the time: queues are at their longest."],
+        'last'         => ['Last call', 'Closing at {time}: {list}.'],
+        'rain'         => ['Rain', 'Rain expected around {h}:00: the route switches to indoor rides.'],
+        'alert'        => ['Short queue', '{ride}: {wait} min (threshold {thr})'],
+        'again'        => ['Ride again', '{ride}: {wait} min'],
+        'reopen'       => ['Reopened', '{ride} just reopened · queue {wait} min'],
+        'vlopen'       => ['{vq} open', '{ride}: next slot around {time}. Book it in the official app.'],
+        'vlopen_now'   => ['{vq} open', '{ride}: slots are available. Book one in the official app.'],
+        'test'         => ['Europa-Park Live', 'Notifications work on this phone.'],
+        'nick_invalid' => "Invalid nickname: 2 to 24 letters, digits, spaces or . _ ' -",
+        'nick_taken'   => 'This nickname already exists: pick it from the list.',
+    ],
+    'de' => [
+        'go'           => ['Jetzt losgehen', '{ride}: VirtualLine-Zeitfenster um {time} · {walk} min zu Fuß'],
+        'show'         => ['Show', '{ride} um {time} · jetzt losgehen ({walk} min zu Fuß)'],
+        'meal'         => ['Essenspause', 'Jetzt ist der richtige Moment: Die Schlangen sind am längsten.'],
+        'last'         => ['Letzter Aufruf', 'Parkschluss um {time}: {list}.'],
+        'rain'         => ['Regen', 'Regen gegen {h} Uhr erwartet: Die Route wechselt zu überdachten Attraktionen.'],
+        'alert'        => ['Kurze Schlange', '{ride}: {wait} min (Schwelle {thr})'],
+        'again'        => ['Nochmal', '{ride}: {wait} min'],
+        'reopen'       => ['Wieder offen', '{ride} hat wieder geöffnet · Schlange {wait} min'],
+        'vlopen'       => ['{vq} offen', '{ride}: Zeitfenster ab etwa {time}. Buche es in der offiziellen App.'],
+        'vlopen_now'   => ['{vq} offen', '{ride}: Zeitfenster verfügbar. Buche eines in der offiziellen App.'],
+        'test'         => ['Europa-Park Live', 'Benachrichtigungen funktionieren auf diesem Handy.'],
+        'nick_invalid' => "Ungültiger Nickname: 2 bis 24 Buchstaben, Ziffern, Leerzeichen oder . _ ' -",
+        'nick_taken'   => 'Diesen Nickname gibt es schon: Wähl ihn in der Liste aus.',
+    ],
+];
 
 // Parc de l'instance : parks.json, choisi par EP_PARK (par défaut le premier du fichier)
 $PARKS = json_decode((string) @file_get_contents(__DIR__ . '/parks.json'), true);
@@ -126,6 +177,10 @@ if (!defined('EP_LIB')) {
                 echo $weather;
                 break;
 
+            case 'forecast':
+                send(200, forecast($DATA, $UPSTREAM));
+                break;
+
             case 'calendar':
                 send(200, calendar($DATA, date('Y-m-d')));
                 break;
@@ -145,14 +200,14 @@ if (!defined('EP_LIB')) {
                 $name = read_body(4096)['name'] ?? '';
                 $name = is_string($name) ? trim($name) : '';
                 if (preg_match("/^[\\p{L}\\p{N} _.'-]{2,24}$/u", $name) !== 1) {
-                    throw new HttpError('Pseudo invalide : 2 à 24 lettres, chiffres, espaces ou . _ \' -', 400);
+                    throw new HttpError(msg(req_lang(), 'nick_invalid'), 400);
                 }
                 $id = substr(hash('sha256', lower($name)), 0, 16);
                 $file = "$DATA/users/$id.json";
                 with_lock($file, function () use ($file, $id, $name) {
                     if (is_file($file)) {
                         $u = json_decode((string) file_get_contents($file), true);
-                        send(409, ['error' => 'Ce pseudo existe déjà : choisis-le dans la liste.', 'id' => $id, 'name' => $u['name'] ?? $name]);
+                        send(409, ['error' => msg(req_lang(), 'nick_taken'), 'id' => $id, 'name' => $u['name'] ?? $name]);
                         return;
                     }
                     write_json($file, ['id' => $id, 'name' => $name, 'created' => now_ms(), 'updatedAt' => null, 'state' => null]);
@@ -238,9 +293,10 @@ if (!defined('EP_LIB')) {
                 require_post();
                 $id = user_param();
                 read_user("$DATA/users/$id.json");
+                [$title, $body] = msg(req_lang(), 'test');
                 [$sent, $codes] = push_user($DATA, $id, [[
-                    'title' => 'Europa-Park Live',
-                    'body'  => 'Les notifications fonctionnent sur ce téléphone.',
+                    'title' => $title,
+                    'body'  => $body,
                     'tag'   => 'ep-test',
                     'url'   => './#now',
                 ]]);
@@ -675,21 +731,103 @@ function with_lock(string $file, callable $fn)
     }
 }
 
-/** Écart « attente réelle / attente affichée » mesuré par tous les profils (30 derniers jours), médiane. Cache 5 min. */
+/** Mesures partagées entre tous les profils, cache 5 min :
+ *  écart « attente réelle / attente affichée » (30 derniers jours, médiane), global et par attraction, et notes des attractions. */
 function pooled_real(string $data): ?array
 {
     $cache = "$data/cache/real.json";
     if (is_file($cache) && time() - filemtime($cache) < 300) return json_decode((string) file_get_contents($cache), true);
-    $r = [];
+    $r = []; $byRide = []; $notes = [];
     $since = now_ms() - 30 * 86400000;
     foreach (user_files($data) as $f) {
         $u = json_decode((string) file_get_contents($f), true);
         foreach ((array) ($u['state']['samples'] ?? []) as $x) {
-            if (($x['posted'] ?? 0) >= 10 && is_numeric($x['real'] ?? null) && ($x['t'] ?? 0) > $since) $r[] = $x['real'] / $x['posted'];
+            if (($x['posted'] ?? 0) >= 10 && is_numeric($x['real'] ?? null) && ($x['t'] ?? 0) > $since) {
+                $r[] = $x['real'] / $x['posted'];
+                if (is_string($x['id'] ?? null)) $byRide[$x['id']][] = $x['real'] / $x['posted'];
+            }
+        }
+        foreach ((array) ($u['state']['ratings'] ?? []) as $id => $n) {
+            if (is_numeric($n) && $n >= 1 && $n <= 5) $notes[(string) $id][] = (int) $n;
         }
     }
-    sort($r);
-    $out = $r ? ['f' => round($r[intdiv(count($r), 2)], 3), 'n' => count($r)] : null;
+    $med = function (array $a) { sort($a); return round($a[intdiv(count($a), 2)], 3); };
+    $out = $r ? ['f' => $med($r), 'n' => count($r)] : ['f' => 1, 'n' => 0];
+    $out['rides'] = (object) array_map(function ($a) use ($med) { return ['f' => $med($a), 'n' => count($a)]; }, $byRide);
+    $out['ratings'] = (object) array_map(function ($a) { return ['avg' => round(array_sum($a) / count($a), 1), 'n' => count($a)]; }, $notes);
+    write_json($cache, $out);
+    return $out;
+}
+
+/* ------------------------------------------------------------------ */
+/* Prévision d'affluence des prochains jours d'ouverture :
+   jour de la semaine (historique, sinon valeurs génériques) × vacances scolaires et jours fériés
+   des régions d'où viennent les visiteurs (parks.json « holidays », source openholidaysapi.org). */
+
+
+function forecast(string $data, string $upstream): array
+{
+    global $PARK;
+    $today = date('Y-m-d');
+    $cache = "$data/cache/forecast-$today.json";
+    if (is_file($cache)) return json_decode((string) file_get_contents($cache), true) ?: ['days' => []];
+
+    // Jours d'ouverture connus
+    $open = [];
+    [$sch] = cached($data, 'schedule', TTL_SCHEDULE, $upstream . PARK_ID . '/schedule');
+    foreach (json_decode($sch, true)['schedule'] ?? [] as $x) {
+        if (($x['type'] ?? '') === 'OPERATING' && ($x['date'] ?? '') >= $today) {
+            $open[$x['date']] = [minute_of_day((int) strtotime($x['openingTime'])), minute_of_day((int) strtotime($x['closingTime']))];
+        }
+    }
+    ksort($open);
+    if (!$open) return ['days' => []];
+    $to = array_key_last($open);
+
+    // Vacances et fériés par pays (une requête par pays et par type)
+    $regions = is_array($PARK['holidays'] ?? null) ? $PARK['holidays'] : [];
+    $hol = [];
+    foreach (array_unique(array_column($regions, 'c')) as $c) {
+        foreach (['SchoolHolidays' => 'school', 'PublicHolidays' => 'public'] as $route => $type) {
+            [$code, $body] = http_req('GET', HOLIDAYS_API . "$route?countryIsoCode=$c&validFrom=$today&validTo=$to&languageIsoCode=EN", ['Accept: application/json'], null, 8);
+            foreach ($code === 200 ? (json_decode($body, true) ?: []) : [] as $h) {
+                $hol[] = ['c' => $c, 'type' => $type, 'from' => $h['startDate'], 'to' => $h['endDate'],
+                    'subs' => array_column($h['subdivisions'] ?? [], 'code'), 'all' => !empty($h['nationwide'])];
+            }
+        }
+    }
+
+    // Poids de chaque jour de la semaine : historique (moyenne par jour / moyenne générale), sinon générique
+    $wd = [1 => .85, 2 => .85, 3 => .9, 4 => .9, 5 => 1, 6 => 1.3, 7 => 1.2];
+    $cal = calendar($data, $today)['days'] ?? [];
+    if (count($cal) >= 10) {
+        $all = array_sum(array_column($cal, 'avg')) / count($cal);
+        $by = [];
+        foreach ($cal as $d) $by[(int) date('N', strtotime($d['day']))][] = $d['avg'];
+        foreach ($by as $n => $a) if (count($a) >= 2 && $all > 0) $wd[$n] = array_sum($a) / count($a) / $all;
+    }
+
+    $total = array_sum(array_map(function ($r) { return (float) ($r['w'] ?? 1); }, $regions)) ?: 1;
+    $days = [];
+    foreach ($open as $day => [$o, $cl]) {
+        $school = 0; $public = 0; $why = [];
+        foreach ($regions as $r) {
+            foreach ($hol as $h) {
+                if ($h['c'] !== $r['c'] || $day < $h['from'] || $day > $h['to']) continue;
+                if (!$h['all'] && !empty($r['s']) && !in_array($r['s'], $h['subs'], true)) continue;
+                // « Tout le pays » : vacances nationales ou communes à au moins 3 régions (pas l'outre-mer seul)
+                if (!$h['all'] && empty($r['s']) && count($h['subs']) < 3) continue;
+                if ($h['type'] === 'school') $school += (float) ($r['w'] ?? 1); else $public += (float) ($r['w'] ?? 1);
+                $why[$h['type'] . ':' . ($r['s'] ?? $r['c'])] = true;
+                break;
+            }
+        }
+        $idx = $wd[(int) date('N', strtotime($day))] * (1 + .7 * $school / $total + .5 * $public / $total);
+        $days[] = ['day' => $day, 'open' => $o, 'close' => $cl, 'idx' => round($idx, 2),
+            'level' => $idx < .95 ? 1 : ($idx < 1.15 ? 2 : ($idx < 1.4 ? 3 : 4)), 'why' => array_keys($why)];
+    }
+    $out = ['days' => $days, 'history' => count($cal) >= 10];
+    foreach (glob("$data/cache/forecast-*.json") ?: [] as $old) @unlink($old);
     write_json($cache, $out);
     return $out;
 }
@@ -922,6 +1060,22 @@ function hhmm(int $m): string
     return sprintf('%02d:%02d', intdiv($m, 60) % 24, $m % 60);
 }
 
+/** Texte de MSG dans la langue demandée (sinon en français), {nom} remplacés par $vars. */
+function msg(string $lang, string $key, array $vars = [])
+{
+    $tr = [];
+    foreach ($vars as $k => $v) $tr['{' . $k . '}'] = (string) $v;
+    $m = MSG[$lang][$key] ?? MSG['fr'][$key];
+    return is_array($m) ? array_map(function ($s) use ($tr) { return strtr($s, $tr); }, $m) : strtr($m, $tr);
+}
+
+/** Langue d'une requête de la page : ?lang=, sinon Accept-Language, sinon français. */
+function req_lang(): string
+{
+    $l = strtolower(substr((string) ($_GET['lang'] ?? $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''), 0, 2));
+    return isset(MSG[$l]) ? $l : 'fr';
+}
+
 /**
  * Envoie les alertes du moment aux profils abonnés dont la journée (state.day) est aujourd'hui.
  * $live : JSON live décodé ([] si périmé), $prev : point d'historique précédent. Retourne le nombre de notifications.
@@ -953,13 +1107,15 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
     }
     global $PARK;
     $transport = !empty($PARK['transport']) ? '/' . str_replace('/', '\\/', (string) $PARK['transport']) . '/i' : null;
-    $wait = []; $status = [];
+    $wait = []; $status = []; $vlq = [];
+    $vqName = $PARK['virtualQueue']['name'] ?? null;
     foreach ($live['liveData'] ?? [] as $e) {
         $id = $e['id'] ?? null;
         if (!is_string($id)) continue;
         if (!isset($ents[$id])) $ents[$id] = ['name' => short_name((string) ($e['name'] ?? '?')), 'pos' => null];
         $status[$id] = $e['status'] ?? '';
         if ($transport && preg_match($transport, (string) ($e['name'] ?? ''))) continue; // trains et gares : pas des attractions
+        $vlq[$id] = $e['queue']['RETURN_TIME'] ?? null;
         $w = $e['queue']['STANDBY']['waitTime'] ?? null;
         if ($status[$id] === 'OPERATING' && is_numeric($w)) $wait[$id] = (int) $w;
     }
@@ -998,6 +1154,7 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
         $done = (array) ($st['done'] ?? []);
         $isDone = function ($id) use ($done) { return (int) ($done[$id] ?? 0) > 0; };
         $pace = is_string($st['pace'] ?? null) ? $st['pace'] : 'normal';
+        $lang = is_string($st['lang'] ?? null) ? $st['lang'] : 'fr';
 
         // Position : GPS de moins de 10 min, sinon dernière attraction faite, sinon l'entrée
         $pos = $st['pos'] ?? null;
@@ -1016,7 +1173,7 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
             $start = (int) $s['start'];
             $w = $walk($s['id']);
             if ($now >= $start - $w - 2 - 1 && $now <= $start + 5) {
-                $msgs[] = ["v:{$s['id']}:$start", 86400, 'Pars maintenant', $name($s['id']) . ' : créneau VirtualLine à ' . hhmm($start) . " · $w min à pied"];
+                $msgs[] = ["v:{$s['id']}:$start", 86400, ...msg($lang, 'go', ['ride' => $name($s['id']), 'time' => hhmm($start), 'walk' => $w])];
             }
         }
         $planned = is_array($st['planned'] ?? null) && ($st['planned']['day'] ?? null) === $today ? $st['planned'] : [];
@@ -1025,13 +1182,13 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
             $start = (int) $s['start'];
             $w = $walk($s['id']);
             if ($now >= $start - $w - 5 - 1 && $now <= $start + 5) {
-                $msgs[] = ["s:{$s['id']}:$start", 86400, 'Spectacle', $name($s['id']) . ' à ' . hhmm($start) . " · pars maintenant ($w min à pied)"];
+                $msgs[] = ["s:{$s['id']}:$start", 86400, ...msg($lang, 'show', ['ride' => $name($s['id']), 'time' => hhmm($start), 'walk' => $w])];
             }
         }
         if (is_numeric($planned['meal'] ?? null) && empty($st['mealDone'])) {
             $meal = (int) $planned['meal'];
             if ($now >= $meal - 2 && $now <= $meal + 20) {
-                $msgs[] = ["m:$meal", 86400, 'Pause repas', "C'est le bon moment : les files sont au plus haut."];
+                $msgs[] = ["m:$meal", 86400, ...msg($lang, 'meal')];
             }
         }
 
@@ -1046,13 +1203,13 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
             sort($picks);
             $picks = array_slice($picks, 0, 3);
             if ($picks) {
-                $msgs[] = ["l:$today", 86400, 'Dernier appel', 'Fermeture à ' . hhmm($close) . ' : '
-                    . implode(', ', array_map(function ($p) use ($name) { return $name($p[2]) . " ({$p[3]} min)"; }, $picks)) . '.'];
+                $msgs[] = ["l:$today", 86400, ...msg($lang, 'last', ['time' => hhmm($close),
+                    'list' => implode(', ', array_map(function ($p) use ($name) { return $name($p[2]) . " ({$p[3]} min)"; }, $picks))])];
             }
         }
 
         if ($rain !== null) {
-            $msgs[] = ["p:$today:$rain", 10800, 'Pluie', "Pluie annoncée vers {$rain} h : l'itinéraire passe aux attractions couvertes."];
+            $msgs[] = ["p:$today:$rain", 10800, ...msg($lang, 'rain', ['h' => $rain])];
         }
 
         // Alertes sur les files : pas pendant que l'utilisateur fait la queue
@@ -1060,19 +1217,35 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
             foreach ((array) ($st['alerts'] ?? []) as $id => $thr) {
                 $id = (string) $id;
                 if (is_numeric($thr) && isset($wait[$id]) && $wait[$id] <= $thr) {
-                    $msgs[] = ["a:$id", 1800, 'File courte', $name($id) . " : {$wait[$id]} min (seuil " . (int) $thr . ')'];
+                    $msgs[] = ["a:$id", 1800, ...msg($lang, 'alert', ['ride' => $name($id), 'wait' => $wait[$id], 'thr' => (int) $thr])];
                 }
             }
             foreach ((array) ($st['again'] ?? []) as $id => $thr) {
                 $id = (string) $id;
                 if (is_numeric($thr) && $isDone($id) && isset($wait[$id]) && $wait[$id] <= $thr) {
-                    $msgs[] = ["g:$id", 1800, 'À refaire', $name($id) . " : {$wait[$id]} min"];
+                    $msgs[] = ["g:$id", 1800, ...msg($lang, 'again', ['ride' => $name($id), 'wait' => $wait[$id]])];
                 }
             }
             foreach ((array) ($st['plan'] ?? []) as $id => $kind) {
                 $id = (string) $id;
                 if (!$isDone($id) && ($prevStatus[$id] ?? null) === 'D' && isset($wait[$id])) {
-                    $msgs[] = ["r:$id", 1800, 'Réouverture', $name($id) . " vient de rouvrir · file {$wait[$id]} min"];
+                    $msgs[] = ["r:$id", 1800, ...msg($lang, 'reopen', ['ride' => $name($id), 'wait' => $wait[$id]])];
+                }
+            }
+            // File virtuelle ouverte sur une attraction du programme, si aucun créneau n'est en cours (un seul à la fois)
+            $hasSlot = false;
+            foreach (is_array($st['slots'] ?? null) ? $st['slots'] : [] as $x) {
+                if (($x['day'] ?? null) === $today && is_numeric($x['start'] ?? null) && $x['start'] + 10 >= $now) $hasSlot = true;
+            }
+            if ($vqName && !$hasSlot) {
+                foreach ((array) ($st['plan'] ?? []) as $id => $kind) {
+                    $id = (string) $id;
+                    $q = $vlq[$id] ?? null;
+                    if ($isDone($id) || ($q['state'] ?? '') !== 'AVAILABLE') continue;
+                    // Heure du prochain créneau pas toujours fournie par themeparks.wiki
+                    $t = strtotime((string) ($q['returnStart'] ?? ''));
+                    $msgs[] = ["q:$id", 10800, ...($t ? msg($lang, 'vlopen', ['vq' => $vqName, 'ride' => $name($id), 'time' => hhmm(minute_of_day($t))])
+                        : msg($lang, 'vlopen_now', ['vq' => $vqName, 'ride' => $name($id)]))];
                 }
             }
         }
