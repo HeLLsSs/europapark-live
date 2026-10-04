@@ -51,6 +51,10 @@ Tout ce que tu fais est enregistré sur le serveur à chaque changement : progra
 - **Un profil commun** (ex. « Groupe ») choisi par tout le monde. Un « Fait » touché sur un téléphone arrive sur les autres en 2 minutes au plus, et tout le monde reçoit les notifications. C'est le plus simple si vous restez ensemble.
 - **Un profil chacun.** Dans **Réglages → Profil**, « Copier le programme de… » reprend le programme d'un autre.
 
+**Programme commun** : chacun met ses étoiles dans son propre profil, puis **Réglages → Fusionner des programmes** (en étant connecté au profil qui recevra le résultat, par exemple « Groupe »). Tu coches les profils à prendre en compte. Une attraction devient incontournable si au moins la moitié des profils la mettent en incontournable, bonus si au moins un profil la veut ; tous les spectacles choisis sont gardés. « Annuler » rétablit l'ancien programme.
+
+**Se séparer puis se retrouver** : chaque sous-groupe utilise son propre profil. Dans la fiche d'une attraction, « Se retrouver ici » fixe l'heure du rendez-vous. L'itinéraire de chacun s'arrange pour y être à l'heure, avec le bandeau et la notification « Pars maintenant ». **Partager** envoie le rendez-vous aux autres par un lien (`?meet=AAAA-MM-JJTHH:MM&at=<attraction>`), qui l'ajoute à leur profil dès l'ouverture.
+
 **Pour se retrouver** : dans **Réglages → Ma position**, coche « Partager ma position avec le groupe » et indique ton prénom. Sur la **Carte**, chaque membre apparaît en point plein avec son prénom et le temps de marche jusqu'à lui. Un losange marque le **point de rencontre** conseillé : l'attraction la plus proche du centre du groupe. Une position disparaît 20 min après le dernier point, ou dès qu'on décoche le partage.
 
 ## 3. Préparer la journée (la veille)
@@ -69,8 +73,9 @@ Tout ce que tu fais est enregistré sur le serveur à chaque changement : progra
    - **Single rider accepté** : file séparée, souvent bien plus courte, sur certaines attractions (Blue Fire, Voltron, CanCan et Arthur d'après les sources consultées ; à vérifier sur place). L'appli compte la moitié de l'attente normale, ou la vraie attente si tu la notes dans la fiche (valable 45 min).
    - **Position** : « Utiliser ma position ».
    - **Notifications** : « Activer les notifications », puis « Tester ».
-4. **Carte hors ligne** : dans l'onglet **Carte**, « Télécharger la carte » enregistre tout le parc sur le téléphone (environ 300 tuiles, quelques Mo). À faire en wifi : la carte reste utilisable quand la 4G sature.
-5. **Quel jour venir ?** (Réglages) : affluence prévue des prochains jours d'ouverture, de *calme* à *très chargé*. Elle combine ton historique (ou, à défaut, le jour de la semaine) avec les vacances scolaires et jours fériés des régions d'où viennent les visiteurs : pour Europa-Park, Bade-Wurtemberg, Rhénanie-Palatinat, Hesse, Sarre, Grand Est et le reste de la France, et les cantons suisses voisins.
+4. **Affichage** : **mode plein soleil** (contraste maximal, textes plus gros, pour lire l'écran dehors) et **économie de batterie** (GPS moins précis, actualisation toutes les 5 min au lieu de 2). Sur Android, l'appli propose l'économie d'elle-même sous 20 % de batterie.
+5. **Carte hors ligne** : dans l'onglet **Carte**, « Télécharger la carte » enregistre tout le parc sur le téléphone (environ 300 tuiles, quelques Mo). À faire en wifi : la carte reste utilisable quand la 4G sature.
+6. **Quel jour venir ?** (Réglages) : affluence prévue des prochains jours d'ouverture, de *calme* à *très chargé*. Elle combine ton historique (ou, à défaut, le jour de la semaine) avec les vacances scolaires et jours fériés des régions d'où viennent les visiteurs : pour Europa-Park, Bade-Wurtemberg, Rhénanie-Palatinat, Hesse, Sarre, Grand Est et le reste de la France, et les cantons suisses voisins.
 
 Le soir et la veille, l'onglet **Maintenant** affiche un **aperçu de la journée suivante** : itinéraire estimé depuis l'ouverture, météo, conseils, et **affluence prévue**. Celle-ci correspond à l'attente moyenne habituelle de ce jour de la semaine, comparée à la moyenne des derniers jours enregistrés par le serveur.
 
@@ -119,6 +124,8 @@ Au-dessus de la carte, des boutons affichent ou masquent les **toilettes, l'eau 
 
 **Ta voiture** : en arrivant, enregistre ta place, soit avec ta position GPS, soit en choisissant le parking dans la liste. Elle est enregistrée dans le profil, donc tout le groupe la voit. Le soir, l'onglet Maintenant affiche « Retour à la voiture » avec le temps de marche et un lien d'itinéraire (Google Maps, à pied).
 
+**Spectacles de saison** : en période d'Halloween ou de Noël, les spectacles correspondants sont marqués 🎃 et passent en tête de la liste (regex `seasonal` dans `parks.json`). Les attractions payantes en supplément, comme les maisons hantées, ne sont pas dans les données.
+
 **Repas et spectacles** apparaissent dans l'itinéraire comme des étapes à heure fixe. Pour le repas, l'appli indique le resto ouvert le plus proche. *Plus tard* le décale d'au moins 30 min, *Fait* le retire.
 
 ## 5. Les notifications
@@ -134,6 +141,7 @@ Une fois activées (**Réglages → Notifications**), elles arrivent même appli
 | **Spectacle** | c'est l'heure de partir pour un spectacle choisi (5 min d'avance) |
 | **Pause repas** | c'est le moment de manger prévu par l'itinéraire |
 | **Dernier appel** | 45 min avant la fermeture : les dernières attractions encore faisables, ton programme d'abord |
+| **Rendez-vous** | c'est l'heure de partir pour le rendez-vous du groupe |
 | **Pluie** | de la pluie est annoncée dans l'heure alors qu'il ne pleut pas : l'itinéraire passe aux attractions couvertes (aussi en bandeau dans l'appli) |
 
 Les alertes de file courte, d'attraction à refaire et de réouverture sont mises en pause pendant que tu es « dans la file ». Appli ouverte, les mêmes alertes s'affichent aussi en bandeau, avec vibration.
@@ -202,10 +210,20 @@ score = gain − coût de marche − 0,15 × file prévue − 12 (si bonus) + m�
 - les **bonus** ne passent que s'il reste assez de temps pour tous les incontournables ;
 - une attraction **en panne** est retentée 45 min plus tard ; une attraction **trop grande** pour le plus petit du groupe est écartée.
 
+## Rejouer une journée
+
+**Réglages → Rejouer une journée** rejoue un jour enregistré par le cron avec ton programme et les files réellement relevées ce jour-là, minute par minute : marche, attente réelle à l'arrivée, durée du tour, attraction fermée à l'arrivée retentée plus tard. Trois stratégies sont comparées :
+- l'**itinéraire de l'appli** ;
+- l'**ordre du programme** ;
+- la **file la plus courte** à chaque étape.
+
+Le tableau donne les incontournables faits, le nombre de tours, le temps de file et le temps de marche. Sur une journée de test, l'appli faisait les 13 incontournables, contre 10 et 9 pour les deux autres stratégies ; celles-ci faisaient plus de tours au total, en enchaînant des petites attractions bonus. Limite : le profil habituel peut inclure le jour rejoué, ce qui avantage un peu l'appli.
+
 ## Les étapes à heure fixe
 
 - **Créneau VirtualLine** : l'itinéraire s'arrange pour que tu arrives à l'heure, et aucune attraction ne passe avant si elle risque de te le faire rater.
 - **Spectacle choisi** : parmi les représentations du jour, l'appli prend celle où les files de tes incontournables sont au plus haut. Tu perds ainsi le moins de temps de file. Elle prévoit d'arriver 5 min avant et compte 30 min de spectacle.
+- **Rendez-vous du groupe** : heure et lieu fixes, l'itinéraire s'arrange pour que tu y sois à l'heure.
 - **Pause repas** : même principe dans ta fenêtre horaire, par pas de 15 min, au resto ouvert le plus proche (stands de boissons et glaciers exclus).
 
 ## Les profils et la synchronisation
@@ -394,6 +412,7 @@ Toutes les réponses sont en JSON. Une erreur renvoie `{"error": "…"}` avec le
 | `GET ?r=where` · `POST ?r=where` `{device, nick, lat, lon}` | positions partagées de moins de 20 min (`lat: null` arrête le partage) ; aussi renvoyées par `bundle` (`where`) |
 | `POST ?r=push-test&u=ID[&lang=fr\|en\|de]` | notification de test vers tous les téléphones du profil → `{sent, codes}` |
 | `?r=collect` | collecte + notifications (aussi `php api.php collect`, utilisé par le cron) |
+| `GET ?r=history&d=AAAA-MM-JJ` | relevés d'une journée passée (`data/hist`), pour « Rejouer une journée » |
 | `GET ?r=forecast` | affluence prévue des prochains jours d'ouverture : `{days: [{day, open, close, idx, level 1–4, why}], history}` (cache d'un jour) |
 | `GET ?r=config` | description du parc de l'instance (`parks.json[EP_PARK]` + `slug`) |
 | `GET ?r=health` | état du cache, de l'historique, nombre de profils, clés VAPID |

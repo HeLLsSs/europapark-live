@@ -197,6 +197,18 @@ dialog.sheet::backdrop{background:rgba(5,12,10,.45)}
 .chart text{font:600 10px var(--font-body);fill:var(--muted)}
 .showtimes{display:flex;flex-wrap:wrap;gap:6px}
 
+/* Mode plein soleil : clair, contraste maximal, textes plus gros (réglage de l'appareil) */
+:root[data-sun="1"]{--bg:#FFFFFF;--surface:#FFFFFF;--sunk:#EDEDED;--ink:#000000;--muted:#262626;--line:#8A8A8A;
+  --accent:#3A12B8;--accent-ink:#FFFFFF;--accent-soft:#E4DCFF;--board:#000000;--board-ink:#FFFFFF;--board-muted:#E0E0E0;--board-line:#555555;
+  --w-low:#006B3F;--w-mid:#7A5400;--w-high:#A33A00;--w-peak:#A1001F;--w-off:#4D4D4D;color-scheme:light}
+:root[data-sun="1"] body{font-size:18px;font-weight:600}
+:root[data-sun="1"] .board-name{font-size:2.3rem}
+:root[data-sun="1"] .board-wait .big{font-size:4.2rem}
+:root[data-sun="1"] .pill{font-size:1.55rem}
+:root[data-sun="1"] .leaflet-tile-pane{filter:none!important}
+.replay td,.replay th{padding:4px 8px 4px 0;text-align:left;font-variant-numeric:tabular-nums}
+.replay th{font-size:.78rem;color:var(--muted)}
+
 /* Carte Leaflet */
 #lmap{height:calc(100dvh - 260px - env(safe-area-inset-bottom,0px));min-height:340px;background:var(--sunk)}
 .map-wrap.full{position:fixed;inset:0;z-index:70;border:0;border-radius:0}
@@ -378,6 +390,17 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
             <button class="btn small" data-act="clear-plan" type="button" data-i18n="set.clear">Vider</button>
           </div>
         </div>
+        <div class="set" id="voteSet">
+          <h2 data-i18n="vote.title">Programme commun</h2>
+          <p class="muted" data-i18n="vote.hint">Chacun met ses étoiles dans son profil, puis l'appli fusionne : incontournable si la moitié du groupe le veut, bonus si au moins une personne le veut.</p>
+          <div class="row-inline"><button class="btn small" data-act="vote" type="button" data-i18n="vote.open">Fusionner des programmes</button></div>
+        </div>
+        <div class="set">
+          <label class="toggle"><span><b data-i18n="sun.title">Mode plein soleil</b><br><span class="muted" data-i18n="sun.hint">Contraste maximal et textes plus gros, pour lire l'écran dehors</span></span>
+            <input type="checkbox" id="sunChk"></label>
+          <label class="toggle"><span><b data-i18n="eco.title">Économie de batterie</b><br><span class="muted" data-i18n="eco.hint">GPS moins précis, actualisation toutes les 5 min au lieu de 2</span></span>
+            <input type="checkbox" id="ecoChk"></label>
+        </div>
         <div class="set">
           <label class="toggle"><span><b data-i18n="meal">Pause repas</b><br><span class="muted" data-i18n="set.mealHint">Placée quand les files sont au plus haut, près d'un resto ouvert</span></span>
             <input type="checkbox" id="mealChk"></label>
@@ -446,6 +469,15 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
           <h2 data-i18n="fc.title">Quel jour venir ?</h2>
           <p class="muted" id="fcHint"></p>
           <div class="cal" id="forecast"></div>
+        </div>
+        <div class="set">
+          <h2 data-i18n="replay.title">Rejouer une journée</h2>
+          <p class="muted" data-i18n="replay.hint">Simule une journée enregistrée par le serveur avec ton programme : l'itinéraire de l'appli face à deux stratégies simples, avec les vraies files de ce jour-là.</p>
+          <div class="row-inline">
+            <label class="field" style="flex:1"><span data-i18n="replay.day">Journée</span><select id="replayDay"></select></label>
+            <button class="btn small" data-act="replay" type="button" data-i18n="replay.run">Rejouer</button>
+          </div>
+          <div id="replayOut"></div>
         </div>
         <div class="set">
           <h2 data-i18n="set.data">Données</h2>
@@ -588,6 +620,8 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
       <li><b>Se retrouver</b> : Réglages → « Partager ma position avec le groupe », avec ton prénom. Sur la <b>Carte</b>, chacun apparaît en point plein avec son prénom et le temps de marche jusqu'à lui. Le losange marque le <b>point de rencontre</b> conseillé : l'attraction la plus proche du centre du groupe.</li>
     </ul>
     <p class="muted">Une position partagée est visible par tous ceux qui utilisent l'appli sur ce serveur, et disparaît 20 min après le dernier point. Décoche le partage pour l'effacer tout de suite.</p>
+    <p><b>Programme commun</b> : chacun met ses étoiles dans son profil, puis Réglages → « Fusionner des programmes ». Incontournable si au moins la moitié du groupe le veut, bonus si quelqu'un le veut ; tous les spectacles choisis sont gardés.</p>
+    <p><b>Se séparer puis se retrouver</b> : dans la fiche d'une attraction, « Se retrouver ici » à une heure donnée. L'itinéraire de chacun finit là à l'heure, avec une notification pour partir. Chaque sous-groupe utilise son propre profil ; « Partager » envoie le rendez-vous aux autres par lien.</p>
   </details>
 
   <details id="help-sr" data-i18n-html="help.sr"><summary>Single rider</summary>
@@ -603,6 +637,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
   <details id="help-crowd" data-i18n-html="help.crowd"><summary>Affluence</summary>
     <p>Pendant la journée, l'appli compare les files actuelles aux files habituelles à la même heure et en tient compte (« Affluence : +20 % »). La veille, l'aperçu indique l'affluence habituelle de ce jour de la semaine, d'après les jours enregistrés par le serveur. Réglages → Affluence montre les derniers jours et les jours les plus calmes.</p>
     <p><b>Quel jour venir ?</b> (Réglages) : affluence prévue des prochains jours d'ouverture, de calme à très chargé, d'après ton historique (ou le jour de la semaine) et les vacances scolaires et jours fériés des régions d'où viennent les visiteurs (Bade-Wurtemberg, Alsace, Suisse… pour Europa-Park).</p>
+    <p><b>Rejouer une journée</b> (Réglages) : l'appli rejoue un jour enregistré avec ton programme et les vraies files de ce jour-là, et compare son itinéraire à « l'ordre du programme » et à « la file la plus courte ».</p>
   </details>
 
   <details id="help-sync" data-i18n-html="help.sync"><summary>Profil, coupure, changement de téléphone</summary>
@@ -622,6 +657,8 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
       <li><b>Attractions aquatiques</b> : on peut en ressortir trempé. Par temps frais, l'appli les place plutôt aux heures chaudes.</li>
       <li><b>Fin de journée</b> : les files ferment à l'heure de fermeture du parc. L'itinéraire s'arrange pour que tu sois dans la dernière à temps.</li>
     </ul>
+    <p><b>Mode plein soleil</b> (Réglages) : contraste maximal et textes plus gros. <b>Économie de batterie</b> : GPS moins précis et actualisation toutes les 5 min ; sur Android, l'appli la propose d'elle-même sous 20 % de batterie.</p>
+    <p><b>Saison</b> : les spectacles de saison (Halloween, Noël…) sont marqués 🎃 et passent en tête de la liste des spectacles.</p>
   </details>
 
   <details id="help-faq" data-i18n-html="help.faq"><summary>Problèmes fréquents</summary>
@@ -657,6 +694,8 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
       <li><b>Toilettes, eau, casiers, distributeurs, parkings</b> sur la carte, et la place de ta <b>voiture</b>.</li>
       <li><b>VirtualLine</b> : créneau noté en un geste, bouton vers l'appli officielle, notification quand une file virtuelle s'ouvre.</li>
       <li><b>Notes</b> des attractions, écart affiché / réel <b>par attraction</b>, calendrier <b>« Quel jour venir ? »</b>.</li>
+      <li><b>Programme commun</b> par vote, <b>rendez-vous</b> pour se séparer puis se retrouver.</li>
+      <li><b>Mode plein soleil</b>, <b>économie de batterie</b>, spectacles de saison 🎃, <b>rejouer une journée</b>.</li>
     </ul>
     <p>Les mises à jour arrivent toutes seules à la prochaine ouverture de l'appli.</p>
   </details>
@@ -678,7 +717,7 @@ const PACES = {enfants: 55, normal: 75, rapide: 90}; // mètres par minute
 // Poids d'une minute de marche face à une minute de file gagnée.
 // Au-delà de 8 min de trajet, chaque minute compte double : on ne traverse le parc que si ça vaut vraiment le coup.
 const ROUTE = {attente: 1, equilibre: 1.6, marche: 2.4};
-const APP_VERSION = '2026.10.06.2';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
+const APP_VERSION = '2026.10.06.3';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
 const PEAK = {A: 45, B: 20, C: 8};
 // Courbe générique de remplissage d'un parc sur la journée (multiplicateur), minute du jour -> facteur
 const PRIOR = [[480,.4],[540,.45],[600,.75],[660,.95],[720,1],[900,.95],[960,.85],[1020,.65],[1050,.5],[1080,.3],[1140,.2]];
@@ -693,7 +732,10 @@ const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
 /* Parc de l'instance : parks.json, choisi côté serveur par EP_PARK (api.php?r=config).
    Les listes contiennent des morceaux de nom normalisé (voir norm()). */
 let PARK, PARK_ID, DIRECT, TZ, ENTRANCE, BOUNDS, WEATHER_URL, TIER_A, TIER_B, PRESETS, TRANSPORT, INDOOR, WET, SINGLE_RIDER, MIN_CM, RIDE_MINS, VQ;
-let partsFmt, dayFmt, shortDayFmt, weekdayFmt, kmFmt;
+let partsFmt, dayFmt, shortDayFmt, weekdayFmt, kmFmt, SEASONAL = null;
+// Spectacles de saison (Halloween, Noël…) mis en avant : regex « seasonal » de parks.json
+const seasonal = e => !!(SEASONAL && e && SEASONAL.test(e.name));
+const showName = e => (seasonal(e) ? '🎃 ' : '') + e.name;
 function applyPark(cfg) {
   PARK = cfg; PARK_ID = cfg.id; TZ = cfg.tz;
   DIRECT = 'https://api.themeparks.wiki/v1/entity/' + PARK_ID;
@@ -707,6 +749,7 @@ function applyPark(cfg) {
   INDOOR = cfg.indoor || []; WET = cfg.wet || []; SINGLE_RIDER = cfg.singleRider || [];
   MIN_CM = cfg.minCm || {}; RIDE_MINS = cfg.rideMin || {};
   VQ = cfg.virtualQueue || null;
+  SEASONAL = cfg.seasonal ? new RegExp(cfg.seasonal, 'i') : null;
   partsFmt = new Intl.DateTimeFormat('en-GB', {timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23'});
   applyFormats();
   document.querySelector('#parkName').textContent = cfg.name + (cfg.place ? ' · ' + cfg.place : '');
@@ -776,7 +819,7 @@ function saveJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } ca
 const cacheGet = k => loadJSON('ep-cache-' + k), cacheSet = (k, v) => saveJSON('ep-cache-' + k, v);
 
 const DEFAULTS = {plan:{}, shows:{}, again:{}, done:{}, skip:{}, slots:[], alerts:{}, alerted:{}, pace:'normal', hotel:false,
-  route:'equilibre', meal:{on:true, dur:45, from:690, to:840}, mealDone:false, mealSkip:0, height:0, queue:null, samples:[], planned:null, pos:null, single:false, srSeen:{}, log:[], ratings:{}, car:null,
+  route:'equilibre', meal:{on:true, dur:45, from:690, to:840}, mealDone:false, mealSkip:0, height:0, queue:null, samples:[], planned:null, pos:null, single:false, srSeen:{}, log:[], ratings:{}, car:null, meet:null,
   day:null, lastDone:null, onboarded:false, updatedAt:0};
 function withDefaults(st) {
   const p = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), st || {});
@@ -811,6 +854,7 @@ function rolloverDay() {
   if (prefs.day !== d) {
     Object.assign(prefs, {day: d, done: {}, skip: {}, alerted: {}, lastDone: null, mealDone: false, mealSkip: 0, queue: null, planned: null, srSeen: {}, log: []});
     prefs.slots = (prefs.slots || []).filter(s => s.day >= d);
+    if (prefs.meet && prefs.meet.day < d) prefs.meet = null;
     savePrefs(false);
   }
 }
@@ -1237,7 +1281,7 @@ function srFactor(id, e) {
   if (seen && now() - seen.at < 45 * 60000 && w) return clamp(seen.w / Math.max(5, w), .1, 1);
   return SR_FACTOR;
 }
-const stepName = s => s.kind === 'meal' ? t('meal') : shortName(ents.get(s.id));
+const stepName = s => s.kind === 'meal' ? t('meal') : s.kind === 'meet' ? t('meet.title') : shortName(ents.get(s.id));
 
 /* Étapes à heure fixe : créneaux VirtualLine notés, spectacles choisis, repas.
    Spectacles et repas tombent au moment où les files de ton programme sont au plus haut. */
@@ -1257,6 +1301,9 @@ function fixedSlots(P, cands, w0, from) {
     const m = pickTime(todayShowtimes(id).map(s => s.mod).filter(m => m >= from + 10 && m + 10 <= P.h.close), SHOW_MIN);
     if (m != null) out.push({kind: 'show', id, start: m, by: m - 5, slack: 0, end: m + SHOW_MIN});
   }
+  // Rendez-vous du groupe : heure et lieu fixes, l'itinéraire s'arrange pour y être à l'heure
+  const mt = prefs.meet;
+  if (mt && mt.day === P.day && ents.has(mt.id) && mt.start + 5 >= from) out.push({kind: 'meet', id: mt.id, start: mt.start, by: mt.start, slack: 0, end: mt.start + 5});
   const M = prefs.meal;
   if (M.on && !prefs.mealDone) {
     const a = Math.max(M.from, from, prefs.mealSkip || 0), b = Math.max(a, M.to - M.dur);
@@ -1302,9 +1349,10 @@ function computePlan(P) {
   const placeOf = (s, from) => s.kind === 'meal' ? nearestFood(from, open && s.start <= P.mod + 15) : ents.get(s.id);
   const takeSlot = s => {
     const place = placeOf(s, pos), ws = walkMin(pos, place), arrive = Math.max(t + ws, s.by);
-    const end = s.kind === 'meal' ? arrive + s.dur : s.kind === 'show' ? Math.max(arrive, s.start) + SHOW_MIN : arrive + 5 + rideMin(place);
+    const end = s.kind === 'meal' ? arrive + s.dur : s.kind === 'show' ? Math.max(arrive, s.start) + SHOW_MIN
+      : s.kind === 'meet' ? Math.max(arrive, s.start) + 2 : arrive + 5 + rideMin(place);
     steps.push({kind: s.kind, id: s.id, place: place?.id || null, start: t, walk: ws, arrive, slot: s.start, dur: s.dur, wait: s.kind === 'vl' ? 5 : 0, end, leaveAt: s.by - ws - 2});
-    t = end; pos = place || pos; if (s.kind !== 'meal') used.add(s.id); pending.shift();
+    t = end; pos = place || pos; if (s.kind !== 'meal' && s.kind !== 'meet') used.add(s.id); pending.shift();
   };
   const score = (id, tt, from, slot) => {
     if (used.has(id) || pending.some(s => s.id === id)) return null;
@@ -1353,7 +1401,8 @@ function computePlan(P) {
 function syncPlanned(P, plan) {
   if (!plan || (P.phase !== 'open' && P.phase !== 'before')) return;
   const pl = {day: P.day, meal: plan.steps.find(s => s.kind === 'meal')?.slot ?? null,
-    shows: plan.steps.filter(s => s.kind === 'show').map(s => ({id: s.id, start: s.slot}))};
+    shows: plan.steps.filter(s => s.kind === 'show').map(s => ({id: s.id, start: s.slot})),
+    meet: prefs.meet && prefs.meet.day === P.day ? {id: prefs.meet.id, start: prefs.meet.start} : null};
   if (JSON.stringify(pl) !== JSON.stringify(prefs.planned)) { prefs.planned = pl; savePrefs(false); }
 }
 
@@ -1444,6 +1493,12 @@ function boardHTML(P, plan, first) {
     facts.push(`<span>${leave <= P.mod + 1 ? t('goNow') : t('board.leaveAt', {time: hhmm(leave)})}</span>`);
     reason = t('board.showReason');
     actions = open ? [btn('done', t('act.seen'), true), btn('show-skip', t('act.notToday')), btn('open', t('act.details'))] : [];
+  } else if (first.kind === 'meet') {
+    const leave = Math.max(P.t0, first.leaveAt);
+    eyebrow = t('meet.board', {place: esc(shortName(e))}); big = hhmm(first.slot); small = t('meet.at');
+    facts.push(`<span>${t('walk', {n: first.walk})}</span>`, `<span>${leave <= P.mod + 1 ? t('goNow') : t('board.leaveAt', {time: hhmm(leave)})}</span>`);
+    reason = t('meet.reason');
+    actions = [btn('meet-done', t('meet.here'), true), btn('meet-share', t('meet.share')), btn('meet-cancel', t('meet.cancel'))];
   } else if (first.kind === 'meal') {
     const place = first.place && ents.get(first.place);
     eyebrow = t('board.meal', {time: hhmm(first.slot)}); big = first.dur; small = 'min';
@@ -1517,7 +1572,7 @@ function renderNow(P, plan) {
     const rest = plan.steps.slice(1), LIMIT = 6;
     const visible = itinExpanded ? rest : rest.slice(0, LIMIT);
     $('#itin').innerHTML = visible.map(s => {
-      const tag = {vl: VQ?.name, show: t('tag.show'), meal: t('tag.meal')}[s.kind] || (s.sr ? t('tag.sr') : s.again ? t('tag.again') : s.bonus ? t('tag.bonus') : '');
+      const tag = {vl: VQ?.name, show: t('tag.show'), meal: t('tag.meal'), meet: esc(shortName(ents.get(s.id)))}[s.kind] || (s.sr ? t('tag.sr') : s.again ? t('tag.again') : s.bonus ? t('tag.bonus') : '');
       const est = s.kind === 'vl' ? t('tag.slot') : s.kind === 'show' ? '' : s.kind === 'meal' ? dur(s.dur) : '~' + r5(s.wait) + ' min';
       const place = s.kind === 'meal' && s.place ? ents.get(s.place) : null, openId = s.kind === 'meal' ? s.place : s.id;
       const sub = place ? `${esc(shortName(place))} · ${t('walk', {n: s.walk})}` : t('walk', {n: s.walk});
@@ -1543,7 +1598,7 @@ function renderNow(P, plan) {
   if (up.length) {
     const pos = currentPos();
     $('#shows').innerHTML = up.slice(0, 6).map(s => `<li><time>${hhmm(s.mod)}</time>
-      <button class="it-name" type="button" data-act="open" data-id="${esc(s.id)}">${esc(s.name)}${prefs.shows[s.id] ? `<span class="vl">${t('tag.chosen')}</span>` : ''}<span class="it-sub">${t('walk', {n: walkMin(pos, ents.get(s.id))})}</span></button><span></span></li>`).join('');
+      <button class="it-name" type="button" data-act="open" data-id="${esc(s.id)}">${esc(showName(ents.get(s.id) || s))}${prefs.shows[s.id] ? `<span class="vl">${t('tag.chosen')}</span>` : ''}<span class="it-sub">${t('walk', {n: walkMin(pos, ents.get(s.id))})}</span></button><span></span></li>`).join('');
   }
 
   // Conseils avant ouverture / la veille
@@ -1630,8 +1685,8 @@ function renderBanner(P, plan) {
   const b = $('#banner');
   let msg = null, warn = false, extra = '';
   const first = plan?.steps?.[0];
-  if (P.phase === 'open' && (first?.kind === 'vl' || first?.kind === 'show') && first.leaveAt <= P.mod + 1) {
-    msg = t('banner.goNow', {name: esc(shortName(ents.get(first.id))), what: first.kind === 'vl' ? t('banner.vlSlot', {vl: esc(VQ.name)}) : t('tag.show'), time: hhmm(first.slot)});
+  if (P.phase === 'open' && ['vl', 'show', 'meet'].includes(first?.kind) && first.leaveAt <= P.mod + 1) {
+    msg = t('banner.goNow', {name: esc(shortName(ents.get(first.id))), what: first.kind === 'vl' ? t('banner.vlSlot', {vl: esc(VQ.name)}) : first.kind === 'meet' ? t('meet.title') : t('tag.show'), time: hhmm(first.slot)});
   } else if (gpsPrompt) {
     const n = esc(shortName(ents.get(gpsPrompt.id)));
     if (gpsPrompt.kind === 'enter') {
@@ -1658,6 +1713,10 @@ function renderBanner(P, plan) {
   }
   else if (meta.offline) { msg = t('banner.offline'); warn = true; }
   else if (meta.stale) { msg = t('banner.stale'); warn = true; }
+  else if (lowBattery && !device.eco && !asked.has('eco')) {
+    msg = t('eco.suggest');
+    extra = `<button type="button" class="yes" data-act="eco-on">${t('yes')}</button><button type="button" data-act="dismiss" data-key="eco" aria-label="${t('close')}">✕</button>`;
+  }
   else if (versionNote) { msg = versionNote; extra = `<button type="button" data-act="version-close" aria-label="${t('close')}">✕</button>`; }
   b.hidden = !msg;
   if (msg) { b.className = 'banner' + (warn ? ' warn' : ''); b.innerHTML = `<p>${msg}</p>${extra}`; }
@@ -1681,7 +1740,7 @@ function renderList(P) {
     const A = info.get(a.id), B = info.get(b.id);
     if (device.sort === 'name') return byName(a, b);
     if (device.sort === 'walk') return A.walk - B.walk || byName(a, b);
-    if (f === 'shows') return (A.next?.mod ?? 9999) - (B.next?.mod ?? 9999) || byName(a, b);
+    if (f === 'shows') return seasonal(b) - seasonal(a) || (A.next?.mod ?? 9999) - (B.next?.mod ?? 9999) || byName(a, b);
     const wa = A.wait ?? (a.type === 'RESTAURANT' && statusOf(a.id) === 'OPERATING' ? -1 : 999), wb = B.wait ?? (b.type === 'RESTAURANT' && statusOf(b.id) === 'OPERATING' ? -1 : 999);
     return wa - wb || A.walk - B.walk || byName(a, b);
   });
@@ -1715,7 +1774,7 @@ function renderList(P) {
       right = `<span class="pill word ${st === 'OPERATING' ? 'w-low' : 'w-off'}">${st === 'OPERATING' ? t('food.open') : t('food.closed')}</span>`;
     }
     return `<li class="${prefs.done[e.id] ? 'done' : ''}">${star}
-      <button class="row-main" type="button" data-act="open" data-id="${esc(e.id)}"><span class="row-name">${esc(e.name)}</span><span class="row-meta">${meta.join(' · ')}</span></button>${right}</li>`;
+      <button class="row-main" type="button" data-act="open" data-id="${esc(e.id)}"><span class="row-name">${esc(e.type === 'SHOW' ? showName(e) : e.name)}</span><span class="row-meta">${meta.join(' · ')}</span></button>${right}</li>`;
   }).join('');
 }
 
@@ -2065,6 +2124,11 @@ function renderSettings() {
   document.querySelectorAll('#routeSeg button').forEach(bt => bt.setAttribute('aria-pressed', bt.dataset.route === prefs.route));
   if (document.activeElement !== $('#heightIn')) $('#heightIn').value = prefs.height || '';
   $('#hotelChk').checked = !!prefs.hotel;
+  $('#sunChk').checked = !!device.sun;
+  $('#ecoChk').checked = !!device.eco;
+  $('#voteSet').hidden = !remote();
+  const rd = $('#replayDay'), days = (calData || []).map(d => d.day).reverse();
+  if (rd.options.length !== Math.max(1, days.length)) rd.innerHTML = days.length ? days.map(d => `<option value="${d}">${esc(fmtDay(d))}</option>`).join('') : `<option value="">${esc(t('replay.noDays'))}</option>`;
   $('#singleChk').checked = !!prefs.single;
   $('#shareChk').checked = !!device.share;
   if (document.activeElement !== $('#nickIn')) { $('#nickIn').value = device.nick; $('#nickIn').placeholder = shareNick(); }
@@ -2175,6 +2239,7 @@ function openSheet(id) {
       body += `<label class="field">${t('sheet.srIn')}<input id="srIn" data-id="${esc(id)}" type="number" inputmode="numeric" min="0" max="180" value="${fresh ? seen.w : ''}" placeholder="${t('sheet.srPh', {w: w != null ? r5(w * SR_FACTOR) : '?'})}"></label>`;
     }
     body += `<label class="field">${t('sheet.again')}${thresholdSelect('againSel', id, prefs.again[id], [5, 10, 15, 20, 30], t('sheet.once'))}</label>`;
+    if (P.phase === 'open' || P.phase === 'before') body += meetForm(id, P);
     if (vl) body += slotForm(id, P);
   } else if (e.type === 'SHOW') {
     const times = todayShowtimes(id), planned = lastPlan?.steps.find(s => s.kind === 'show' && s.id === id);
@@ -2191,6 +2256,16 @@ function openSheet(id) {
   const dlg = $('#sheet');
   if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
   dlg.dataset.id = id;
+}
+/* Rendez-vous ici : pour un groupe qui se sépare (chaque sous-groupe sur son profil) */
+function meetForm(id, P) {
+  const cur = prefs.meet && prefs.meet.day === P.day && prefs.meet.id === id ? prefs.meet.start : null;
+  const def = cur ?? Math.ceil((Math.max(P.mod, P.t0) + 90) / 15) * 15;
+  return `<div class="set"><span class="eyebrow">${t('meet.title')}</span>
+    <p class="muted">${t('meet.hint')}</p>
+    <div class="row-inline"><label class="field">${t('meet.time')}<input id="meetTime" type="time" step="300" value="${hhmm(def)}"></label>
+      <button class="btn small${cur != null ? '' : ' primary'}" type="button" data-act="meet-set" data-id="${esc(id)}">${cur != null ? t('meet.update') : t('meet.set')}</button>
+      ${cur != null ? `<button class="btn small" type="button" data-act="meet-share">${t('meet.share')}</button>` : ''}</div></div>`;
 }
 function slotForm(id, P) {
   const vlIds = [...live.keys()].filter(x => vlOf(x) && hasQueue(x));
@@ -2353,6 +2428,19 @@ document.addEventListener('click', ev => {
     case 'car-clear': withUndo(t('car.cleared'), () => { prefs.car = null; }); $('#sheet').close(); break;
     case 'car-show': $('#sheet').close(); switchTab('map'); setTimeout(() => { follow = false; lmap?.setView([prefs.car.lat, prefs.car.lon], 17); }, 100); break;
     case 'map-dl': downloadMap(); break;
+    case 'eco-on': device.eco = true; saveDevice(); if (device.gps) startGps(); toast(t('eco.on')); render(); break;
+    case 'meet-set': {
+      const tv = $('#meetTime').value, P = lastP || phaseInfo();
+      if (!/^\d{2}:\d{2}$/.test(tv)) break;
+      const [hh, mm] = tv.split(':').map(Number);
+      withUndo(t('meet.saved', {place: shortName(ents.get(id)), time: tv}), () => { prefs.meet = {id, start: hh * 60 + mm, day: P.day}; });
+      $('#sheet').close(); break;
+    }
+    case 'meet-done': case 'meet-cancel': withUndo(act === 'meet-done' ? t('meet.doneToast') : t('meet.cancelled'), () => { prefs.meet = null; }); break;
+    case 'meet-share': shareMeet(); break;
+    case 'vote': openVote(); break;
+    case 'vote-apply': applyVote(); break;
+    case 'replay': runReplay($('#replayDay').value); break;
     case 'version-close': versionNote = null; render(); break;
     case 'rate-skip': pendingRate = null; render(); break;
     case 'rate': rate(id, +el.dataset.n); if ($('#sheet').open) openSheet(id); break;
@@ -2442,6 +2530,8 @@ document.addEventListener('change', ev => {
     renderSettings();
   }
   if (tg.id === 'nickIn') { device.nick = tg.value.trim().slice(0, 24); saveDevice(); if (device.share && gpsPos) postWhere(gpsPos); }
+  if (tg.id === 'sunChk') { device.sun = tg.checked; saveDevice(); applySun(); }
+  if (tg.id === 'ecoChk') { device.eco = tg.checked; saveDevice(); if (device.gps) startGps(); render(); }
   if (tg.id === 'heightIn') { prefs.height = clamp(Math.round(+tg.value || 0), 0, 220); savePrefs(); render(); }
 });
 document.addEventListener('submit', ev => {
@@ -2615,6 +2705,141 @@ function meetingPoint(people) {
   return best;
 }
 
+/* ---------- Plein soleil, batterie ---------- */
+let lowBattery = false;
+function applySun() { if (device.sun) document.documentElement.dataset.sun = '1'; else delete document.documentElement.dataset.sun; }
+
+/* ---------- Rendez-vous partagé par lien : ?meet=AAAA-MM-JJTHH:MM&at=<id attraction> ---------- */
+function shareMeet() {
+  const m = prefs.meet;
+  if (!m) return;
+  const url = `${location.origin}${location.pathname}?meet=${m.day}T${hhmm(m.start)}&at=${encodeURIComponent(m.id)}`;
+  const text = t('meet.shareText', {place: shortName(ents.get(m.id)), time: hhmm(m.start)});
+  if (navigator.share) navigator.share({title: t('meet.title'), text, url}).catch(() => {});
+  else navigator.clipboard?.writeText(`${text} ${url}`).then(() => toast(t('meet.copied'))).catch(() => toast(url));
+}
+function importMeet() {
+  const q = new URLSearchParams(location.search), m = q.get('meet'), at = q.get('at');
+  if (!m || !at) return;
+  const [day, time] = m.split('T');
+  if (/^\d{4}-\d{2}-\d{2}$/.test(day) && /^\d{2}:\d{2}$/.test(time || '') && ents.has(at)) {
+    const [hh, mm] = time.split(':').map(Number);
+    prefs.meet = {id: at, start: hh * 60 + mm, day};
+    savePrefs();
+    toast(t('meet.saved', {place: shortName(ents.get(at)), time}));
+  }
+  q.delete('meet'); q.delete('at');
+  try { history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); } catch (e) {}
+}
+
+/* ---------- Programme commun : vote des profils choisis ----------
+   Incontournable si au moins la moitié des profils le mettent en incontournable,
+   bonus si au moins un profil le veut ; spectacles : réunion des choix. */
+let voteStates = null;
+async function openVote() {
+  $('#sheet').innerHTML = `<div class="sheet-in"><div class="sheet-head"><div><div class="eyebrow">${t('vote.title')}</div><h2 class="sheet-title" id="sheetTitle">${t('vote.open')}</h2></div>
+    <button class="icon-btn" type="button" data-act="sheet-close" aria-label="${t('close')}">✕</button></div>
+    <p class="muted">${t('vote.pick')}</p><div id="voteList"><p class="muted">${t('loading')}</p></div>
+    <p id="votePreview" class="muted"></p>
+    <div class="row-inline"><button class="btn primary" type="button" data-act="vote-apply">${t('vote.apply', {name: esc(user.name)})}</button></div></div>`;
+  const dlg = $('#sheet');
+  if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
+  try {
+    usersCache = null;
+    const list = await fetchUsers();
+    voteStates = {};
+    await Promise.all(list.map(u => getJSON(`${SERVER}?r=state&u=${encodeURIComponent(u.id)}`).then(j => { voteStates[u.id] = j.state || {}; }).catch(() => {})));
+    $('#voteList').innerHTML = list.map(u => {
+      const n = Object.keys(voteStates[u.id]?.plan || {}).length;
+      return `<label class="toggle"><span>${esc(u.name)} <span class="muted">· ${t('vote.count', {n})}</span></span><input type="checkbox" class="voteChk" value="${esc(u.id)}" ${n ? 'checked' : ''}></label>`;
+    }).join('');
+    votePreview();
+  } catch (e) { $('#voteList').innerHTML = `<p class="muted">${t('vote.fail')}</p>`; }
+}
+function voteMerge() {
+  const ids = [...document.querySelectorAll('.voteChk:checked')].map(c => c.value), n = ids.length, plan = {}, shows = {}, tally = {};
+  if (!n) return null;
+  for (const u of ids) {
+    const st = voteStates[u] || {};
+    for (const [id, v] of Object.entries(st.plan || {})) { const x = tally[id] = tally[id] || {must: 0}; if (v === 'must') x.must++; }
+    for (const id of Object.keys(st.shows || {})) shows[id] = true;
+  }
+  for (const [id, x] of Object.entries(tally)) plan[id] = x.must * 2 >= n ? 'must' : 'bonus';
+  return {plan, shows, n};
+}
+function votePreview() {
+  const m = voteMerge(), vals = m ? Object.values(m.plan) : [];
+  $('#votePreview').textContent = m ? t('vote.preview', {must: vals.filter(v => v === 'must').length, bonus: vals.filter(v => v === 'bonus').length, shows: Object.keys(m.shows).length, n: m.n}) : t('vote.none');
+}
+document.addEventListener('change', ev => { if (ev.target.classList?.contains('voteChk')) votePreview(); });
+function applyVote() {
+  const m = voteMerge();
+  if (!m) return;
+  withUndo(t('vote.done', {n: m.n}), () => { prefs.plan = m.plan; prefs.shows = m.shows; prefs.onboarded = true; });
+  $('#sheet').close();
+}
+
+/* ---------- Rejouer une journée passée ----------
+   On rejoue la journée avec les files réellement relevées ce jour-là (data/hist) :
+   l'itinéraire de l'appli face à « l'ordre du programme » et à « la file la plus courte ».
+   Limite : le profil habituel peut inclure ce jour-là, ce qui avantage un peu l'appli. */
+async function runReplay(day) {
+  const out = $('#replayOut');
+  if (!day) return;
+  out.innerHTML = `<p class="muted">${t('replay.running')}</p>`;
+  let hist;
+  try { hist = await getJSON(`${SERVER}?r=history&d=${day}`, 15000); } catch (e) { out.innerHTML = `<p class="muted">${t('replay.fail')}</p>`; return; }
+  const snaps = (hist.snapshots || []).map(x => ({mod: berlin(x.t * 1000).mod, w: x.w || {}, s: x.s || {}})).sort((a, b) => a.mod - b.mod);
+  const ids = Object.keys(prefs.plan).filter(id => ents.has(id) && hasQueue(id));
+  if (snaps.length < 10 || !ids.length) { out.innerHTML = `<p class="muted">${ids.length ? t('replay.fail') : t('replay.noPlan')}</p>`; return; }
+  const h = hoursFor(day), open = Math.max(snaps[0].mod, h?.open ?? 0), close = h?.close ?? snaps[snaps.length - 1].mod;
+  const at = m => { let x = snaps[0]; for (const sn of snaps) { if (sn.mod <= m) x = sn; else break; } return x; };
+  // Sauvegarde de l'état réel : le simulateur réutilise les fonctions de la page
+  const saved = {prefs, gpsPos, pooled, crowdK, queues: new Map([...live].map(([id, e]) => [id, {status: e.status, w: e.queue?.STANDBY?.waitTime}]))};
+  const applySnap = m => {
+    const sn = at(m);
+    for (const [id, e] of live) {
+      if (!e.queue?.STANDBY) continue;
+      if (sn.w[id] != null) { e.status = 'OPERATING'; e.queue.STANDBY.waitTime = sn.w[id]; }
+      else { e.status = sn.s[id] === 'D' ? 'DOWN' : 'CLOSED'; e.queue.STANDBY.waitTime = null; }
+    }
+  };
+  const left = tm => ids.filter(id => !(prefs.done[id] > 0) && waitOf(id) != null && !((prefs.skip[id] || 0) > tm));
+  const simulate = choose => {
+    prefs = withDefaults(Object.assign({}, saved.prefs, {done: {}, skip: {}, slots: [], queue: null, shows: {}, lastDone: null, samples: [], srSeen: {}, again: {}, meet: null,
+      meal: Object.assign({}, saved.prefs.meal, {on: false})}));
+    gpsPos = null; pooled = null;
+    let tm = open, rides = 0, musts = 0, queue = 0, walk = 0;
+    for (let guard = 0; guard < 80 && tm < close - 3; guard++) {
+      applySnap(tm);
+      const pick = choose(tm);
+      if (!pick) { tm += 15; continue; }   // rien d'ouvert pour l'instant : on attend
+      const e = ents.get(pick), wk = walkMin(currentPos(), e), arr = tm + wk, w = at(arr).w[pick] ?? null;
+      walk += wk;
+      if (w == null) { prefs.skip[pick] = arr + 30; tm = arr; continue; }   // fermée à l'arrivée : on revient plus tard
+      tm = arr + w + rideMin(e); queue += w; rides++; if (prefs.plan[pick] === 'must') musts++;
+      prefs.done[pick] = 1; prefs.lastDone = pick;
+    }
+    return {rides, musts, queue, walk};
+  };
+  let res;
+  try {
+    res = [
+      [t('replay.app'), simulate(tm => computePlan({phase: 'open', day, h: {open, close, early: null}, t0: tm, mod: tm})?.steps.find(x => x.kind === 'ride')?.id || null)],
+      [t('replay.order'), simulate(tm => left(tm)[0] || null)],
+      [t('replay.shortest'), simulate(tm => left(tm).sort((a, b) => waitOf(a) - waitOf(b))[0] || null)],
+    ];
+  } finally {
+    prefs = saved.prefs; gpsPos = saved.gpsPos; pooled = saved.pooled; crowdK = saved.crowdK;
+    for (const [id, e] of live) { const q = saved.queues.get(id); if (q) { e.status = q.status; if (e.queue?.STANDBY) e.queue.STANDBY.waitTime = q.w; } }
+    render();
+  }
+  const app = res[0][1], other = Math.max(...res.slice(1).map(([, r]) => r.musts));
+  out.innerHTML = `<table class="replay"><tr><th></th><th>${t('replay.musts', {n: ids.filter(id => prefs.plan[id] === 'must').length})}</th><th>${t('replay.rides')}</th><th>${t('replay.queue')}</th><th>${t('replay.walk')}</th></tr>
+    ${res.map(([k, r]) => `<tr><td>${k}</td><td><b>${r.musts}</b></td><td>${r.rides}</td><td>${dur(r.queue)}</td><td>${dur(r.walk)}</td></tr>`).join('')}</table>
+    <p class="muted">${t('replay.summary', {day: fmtDay(day), n: ids.length})}${app.musts > other ? ' ' + t('replay.more', {n: app.musts - other}) : ''}</p>`;
+}
+
 /* ---------- Aide ---------- */
 function openHelp(section) {
   const dlg = $('#help');
@@ -2690,7 +2915,7 @@ function startGps() {
     gpsState = err.code === 1 ? 'denied' : 'unavailable';
     if (err.code === 1) { device.gps = false; saveDevice(); }
     scheduleRender();
-  }, {enableHighAccuracy: true, maximumAge: 30000, timeout: 30000});
+  }, device.eco ? {enableHighAccuracy: false, maximumAge: 120000, timeout: 60000} : {enableHighAccuracy: true, maximumAge: 30000, timeout: 30000});
 }
 function stopGps(byUser) {
   if (watchId != null) navigator.geolocation.clearWatch(watchId);
@@ -2727,9 +2952,10 @@ async function loadStatic() {
   if (sc) schedule = sc.data;
 }
 let busy = false;
+let lastRefresh = 0;
 async function refresh() {
   if (busy) return;
-  busy = true; $('#refreshBtn').classList.add('spin');
+  busy = true; lastRefresh = Date.now(); $('#refreshBtn').classList.add('spin');
   try {
     try {
       const uq = remote() ? `&u=${encodeURIComponent(user.id)}&since=${prefs.updatedAt || 0}` : '';
@@ -2779,6 +3005,12 @@ function restoreFromCache() {
   if (!PARK) { $('#nextBox').innerHTML = `<div class="card"><p>${t('boot.fail')}</p></div>`; return; }
   restoreFromCache();
   if (user) { rolloverDay(); syncLang(); }
+  applySun();
+  // Batterie faible (Android) : on propose le mode économie
+  navigator.getBattery?.().then(b => {
+    const chk = () => { lowBattery = b.level <= .2 && !b.charging; scheduleRender(); };
+    b.addEventListener('levelchange', chk); b.addEventListener('chargingchange', chk); chk();
+  }).catch(() => {});
   const initialTab = (location.hash || '').slice(1) || device.tab || 'now';
   device.tab = ['now', 'list', 'map', 'settings'].includes(initialTab) ? initialTab : 'now';
   document.querySelectorAll('[data-tab-panel]').forEach(p => { p.hidden = p.dataset.tabPanel !== device.tab; });
@@ -2791,11 +3023,12 @@ function restoreFromCache() {
   render();
   if (!user) openLogin(true);
   await loadStatic();
+  importMeet();
   await loadWalk();
   loadPoi();
   render();
   await refresh();
-  setInterval(() => { if (!document.hidden) refresh(); }, REFRESH_MS);
+  setInterval(() => { if (!document.hidden && Date.now() - lastRefresh >= (device.eco ? 300000 : REFRESH_MS) - 5000) refresh(); }, 30000);
   setInterval(() => { if (!document.hidden && !$('#sheet').open) { if (user) rolloverDay(); render(); } }, 30000);
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { stopGps(false); pushState(true); return; }

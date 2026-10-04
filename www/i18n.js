@@ -10,6 +10,57 @@ const I18N = {};
 
 I18N.fr = {
   locale: 'fr-FR',
+  // Rejouer : colonne incontournables
+  'replay.musts': 'Incontournables ({n})',
+  // Ajouts : rendez-vous, programme commun, plein soleil, batterie, rejouer une journée
+  'meet.title': 'Rendez-vous',
+  'meet.board': 'Rendez-vous · {place}',
+  'meet.at': 'rendez-vous',
+  'meet.reason': 'Le groupe se retrouve ici : l\'itinéraire s\'arrange pour que tu sois à l\'heure.',
+  'meet.here': 'On s\'est retrouvés',
+  'meet.share': 'Partager',
+  'meet.cancel': 'Annuler',
+  'meet.hint': 'Pour vous séparer puis vous retrouver : chaque sous-groupe garde son profil, l\'itinéraire de chacun finit ici à l\'heure dite. Partage le rendez-vous aux autres.',
+  'meet.time': 'Heure',
+  'meet.set': 'Se retrouver ici',
+  'meet.update': 'Changer l\'heure',
+  'meet.saved': 'Rendez-vous : {place} à {time}',
+  'meet.doneToast': 'Groupe réuni',
+  'meet.cancelled': 'Rendez-vous annulé',
+  'meet.shareText': 'Rendez-vous à {place} à {time} :',
+  'meet.copied': 'Lien du rendez-vous copié',
+  'vote.title': 'Programme commun',
+  'vote.hint': 'Chacun met ses étoiles dans son profil, puis l\'appli fusionne : incontournable si la moitié du groupe le veut, bonus si au moins une personne le veut.',
+  'vote.open': 'Fusionner des programmes',
+  'vote.pick': 'Coche les profils à prendre en compte :',
+  'vote.apply': 'Remplacer le programme de {name}',
+  'vote.count': '{n} attractions',
+  'vote.preview': 'Résultat avec {n} profils : {must} incontournables, {bonus} bonus, {shows} spectacles.',
+  'vote.none': 'Coche au moins un profil.',
+  'vote.done': 'Programme commun de {n} profils appliqué',
+  'vote.fail': 'Profils indisponibles : serveur injoignable.',
+  'sun.title': 'Mode plein soleil',
+  'sun.hint': 'Contraste maximal et textes plus gros, pour lire l\'écran dehors',
+  'eco.title': 'Économie de batterie',
+  'eco.hint': 'GPS moins précis, actualisation toutes les 5 min au lieu de 2',
+  'eco.suggest': '<b>Batterie faible</b> : passer en économie de batterie ?',
+  'eco.on': 'Économie de batterie activée',
+  'replay.title': 'Rejouer une journée',
+  'replay.hint': 'Simule une journée enregistrée par le serveur avec ton programme : l\'itinéraire de l\'appli face à deux stratégies simples, avec les vraies files de ce jour-là.',
+  'replay.day': 'Journée',
+  'replay.run': 'Rejouer',
+  'replay.noDays': 'Aucune journée enregistrée',
+  'replay.running': 'Simulation en cours…',
+  'replay.fail': 'Pas assez de relevés pour ce jour.',
+  'replay.noPlan': 'Ton programme est vide : ajoute des attractions d\'abord.',
+  'replay.app': 'Itinéraire de l\'appli',
+  'replay.order': 'Ordre du programme',
+  'replay.shortest': 'File la plus courte',
+  'replay.rides': 'Tours',
+  'replay.queue': 'Files',
+  'replay.walk': 'Marche',
+  'replay.summary': '{day}, avec les {n} attractions de ton programme et les files réelles de ce jour-là.',
+  'replay.more': 'L\'appli fait {n} incontournable(s) de plus.',
   // Ajouts : VirtualLine, notes, carte, points pratiques, voiture, prévision
   'vl.quick': 'J\'ai réservé {time}',
   'vl.openApp': 'Ouvrir l\'appli',
@@ -232,6 +283,8 @@ I18N.fr = {
       <li><b>Se retrouver</b> : Réglages → « Partager ma position avec le groupe », avec ton prénom. Sur la <b>Carte</b>, chacun apparaît en point plein avec son prénom et le temps de marche jusqu'à lui. Le losange marque le <b>point de rencontre</b> conseillé : l'attraction la plus proche du centre du groupe.</li>
     </ul>
     <p class="muted">Une position partagée est visible par tous ceux qui utilisent l'appli sur ce serveur, et disparaît 20 min après le dernier point. Décoche le partage pour l'effacer tout de suite.</p>
+    <p><b>Programme commun</b> : chacun met ses étoiles dans son profil, puis Réglages → « Fusionner des programmes ». Incontournable si au moins la moitié du groupe le veut, bonus si quelqu'un le veut ; tous les spectacles choisis sont gardés.</p>
+    <p><b>Se séparer puis se retrouver</b> : dans la fiche d'une attraction, « Se retrouver ici » à une heure donnée. L'itinéraire de chacun finit là à l'heure, avec une notification pour partir. Chaque sous-groupe utilise son propre profil ; « Partager » envoie le rendez-vous aux autres par lien.</p>
   `,
   'help.sr': `<summary>Single rider</summary>
     <p>Certaines attractions ont une file « single rider » pour compléter les places vides : beaucoup plus courte, mais le groupe est séparé dans le wagon. Signalée sur Blue Fire, Voltron, CanCan et Arthur, <b>à vérifier sur place</b> (elle peut être fermée certains jours).</p>
@@ -244,6 +297,7 @@ I18N.fr = {
   'help.crowd': `<summary>Affluence</summary>
     <p>Pendant la journée, l'appli compare les files actuelles aux files habituelles à la même heure et en tient compte (« Affluence : +20 % »). La veille, l'aperçu indique l'affluence habituelle de ce jour de la semaine, d'après les jours enregistrés par le serveur. Réglages → Affluence montre les derniers jours et les jours les plus calmes.</p>
     <p><b>Quel jour venir ?</b> (Réglages) : affluence prévue des prochains jours d'ouverture, de calme à très chargé, d'après ton historique (ou le jour de la semaine) et les vacances scolaires et jours fériés des régions d'où viennent les visiteurs (Bade-Wurtemberg, Alsace, Suisse… pour Europa-Park).</p>
+    <p><b>Rejouer une journée</b> (Réglages) : l'appli rejoue un jour enregistré avec ton programme et les vraies files de ce jour-là, et compare son itinéraire à « l'ordre du programme » et à « la file la plus courte ».</p>
   `,
   'help.sync': `<summary>Profil, coupure, changement de téléphone</summary>
     <p>Chaque changement est envoyé au serveur une seconde plus tard. Si le téléphone s'éteint ou que tu en changes, ouvre l'appli et choisis ton pseudo : tu reprends exactement où tu en étais (programme, faits, créneaux, file en cours). Le bouton avec ton pseudo, en haut, permet de changer de profil.</p>
@@ -261,6 +315,8 @@ I18N.fr = {
       <li><b>Attractions aquatiques</b> : on peut en ressortir trempé. Par temps frais, l'appli les place plutôt aux heures chaudes.</li>
       <li><b>Fin de journée</b> : les files ferment à l'heure de fermeture du parc. L'itinéraire s'arrange pour que tu sois dans la dernière à temps.</li>
     </ul>
+    <p><b>Mode plein soleil</b> (Réglages) : contraste maximal et textes plus gros. <b>Économie de batterie</b> : GPS moins précis et actualisation toutes les 5 min ; sur Android, l'appli la propose d'elle-même sous 20 % de batterie.</p>
+    <p><b>Saison</b> : les spectacles de saison (Halloween, Noël…) sont marqués 🎃 et passent en tête de la liste des spectacles.</p>
   `,
   'help.faq': `<summary>Problèmes fréquents</summary>
     <table>
@@ -294,6 +350,8 @@ I18N.fr = {
       <li><b>Toilettes, eau, casiers, distributeurs, parkings</b> sur la carte, et la place de ta <b>voiture</b>.</li>
       <li><b>VirtualLine</b> : créneau noté en un geste, bouton vers l'appli officielle, notification quand une file virtuelle s'ouvre.</li>
       <li><b>Notes</b> des attractions, écart affiché / réel <b>par attraction</b>, calendrier <b>« Quel jour venir ? »</b>.</li>
+      <li><b>Programme commun</b> par vote, <b>rendez-vous</b> pour se séparer puis se retrouver.</li>
+      <li><b>Mode plein soleil</b>, <b>économie de batterie</b>, spectacles de saison 🎃, <b>rejouer une journée</b>.</li>
     </ul>
     <p>Les mises à jour arrivent toutes seules à la prochaine ouverture de l'appli.</p>
   `,
@@ -649,6 +707,57 @@ I18N.fr = {
 
 I18N.en = {
   locale: 'en-GB',
+  // Rejouer : colonne incontournables
+  'replay.musts': 'Must-dos ({n})',
+  // Ajouts : rendez-vous, programme commun, plein soleil, batterie, rejouer une journée
+  'meet.title': 'Meeting point',
+  'meet.board': 'Meeting point · {place}',
+  'meet.at': 'meet',
+  'meet.reason': 'The group meets here: the route makes sure you\'re on time.',
+  'meet.here': 'We\'ve met up',
+  'meet.share': 'Share',
+  'meet.cancel': 'Cancel',
+  'meet.hint': 'To split up and meet again: each subgroup keeps its own profile, and each route ends here on time. Share the meeting point with the others.',
+  'meet.time': 'Time',
+  'meet.set': 'Meet here',
+  'meet.update': 'Change the time',
+  'meet.saved': 'Meeting point: {place} at {time}',
+  'meet.doneToast': 'Group back together',
+  'meet.cancelled': 'Meeting point cancelled',
+  'meet.shareText': 'Meet at {place} at {time}:',
+  'meet.copied': 'Meeting point link copied',
+  'vote.title': 'Shared plan',
+  'vote.hint': 'Everyone stars rides in their own profile, then the app merges them: must-do if half the group wants it, bonus if at least one person does.',
+  'vote.open': 'Merge plans',
+  'vote.pick': 'Tick the profiles to include:',
+  'vote.apply': 'Replace {name}\'s plan',
+  'vote.count': '{n} rides',
+  'vote.preview': 'Result with {n} profiles: {must} must-dos, {bonus} bonus, {shows} shows.',
+  'vote.none': 'Tick at least one profile.',
+  'vote.done': 'Shared plan from {n} profiles applied',
+  'vote.fail': 'Profiles unavailable: server unreachable.',
+  'sun.title': 'Bright sunlight mode',
+  'sun.hint': 'Maximum contrast and bigger text, to read the screen outdoors',
+  'eco.title': 'Battery saver',
+  'eco.hint': 'Less precise GPS, refresh every 5 min instead of 2',
+  'eco.suggest': '<b>Low battery</b>: switch to battery saver?',
+  'eco.on': 'Battery saver on',
+  'replay.title': 'Replay a day',
+  'replay.hint': 'Simulates a day recorded by the server with your plan: the app\'s route against two simple strategies, with that day\'s real queues.',
+  'replay.day': 'Day',
+  'replay.run': 'Replay',
+  'replay.noDays': 'No recorded day',
+  'replay.running': 'Simulating…',
+  'replay.fail': 'Not enough data for that day.',
+  'replay.noPlan': 'Your plan is empty: add rides first.',
+  'replay.app': 'App\'s route',
+  'replay.order': 'Plan order',
+  'replay.shortest': 'Shortest queue',
+  'replay.rides': 'Rides',
+  'replay.queue': 'Queuing',
+  'replay.walk': 'Walking',
+  'replay.summary': '{day}, with the {n} rides in your plan and that day\'s real queues.',
+  'replay.more': 'The app fits in {n} more must-do(s).',
   // Ajouts : VirtualLine, notes, carte, points pratiques, voiture, prévision
   'vl.quick': 'I booked {time}',
   'vl.openApp': 'Open the app',
@@ -869,6 +978,8 @@ I18N.en = {
       <li><b>Meeting up</b>: Settings → “Share my location with the group”, with your first name. On the <b>Map</b>, everyone shows up as a solid dot with their first name and the walking time to them. The diamond marks the suggested <b>meeting point</b>: the ride closest to the centre of the group.</li>
     </ul>
     <p class="muted">A shared location is visible to everyone using the app on this server, and disappears 20 min after the last update. Untick sharing to remove it straight away.</p>
+    <p><b>Shared plan</b>: everyone stars rides in their own profile, then Settings → “Merge plans”. Must-do if at least half the group wants it, bonus if anyone does; all chosen shows are kept.</p>
+    <p><b>Split up and meet again</b>: in a ride's details, “Meet here” at a given time. Each route ends there on time, with a notification to leave. Each subgroup uses its own profile; “Share” sends the meeting point to the others as a link.</p>
   `,
   'help.sr': `<summary>Single rider</summary>
     <p>Some rides have a “single rider” queue to fill empty seats: much shorter, but the group is split up on the ride. Reported on Blue Fire, Voltron, CanCan and Arthur, <b>check on site</b> (it may be closed on some days).</p>
@@ -881,6 +992,7 @@ I18N.en = {
   'help.crowd': `<summary>Crowds</summary>
     <p>During the day, the app compares current queues with the usual queues at the same time and takes it into account (“Crowds: 20% above”). The day before, the preview shows the usual crowds for that day of the week, based on the days recorded by the server. Settings → Crowds shows the last few days and the quietest days.</p>
     <p><b>Which day to come?</b> (Settings): expected crowds on the next opening days, from quiet to very busy, based on your history (or the day of the week) and school and public holidays in the visitors' home regions (Baden-Württemberg, Alsace, Switzerland… for Europa-Park).</p>
+    <p><b>Replay a day</b> (Settings): the app replays a recorded day with your plan and that day's real queues, and compares its route with “plan order” and “shortest queue”.</p>
   `,
   'help.sync': `<summary>Profile, lost connection, new phone</summary>
     <p>Every change is sent to the server a second later. If your phone dies or you switch phones, open the app and choose your nickname: you pick up exactly where you left off (plan, rides done, slots, current queue). The button with your nickname at the top lets you switch profiles.</p>
@@ -898,6 +1010,8 @@ I18N.en = {
       <li><b>Water rides</b>: you can come out soaked. In cool weather, the app tends to place them at the warmest times.</li>
       <li><b>End of the day</b>: queues close at park closing time. The route makes sure you're in the last one in time.</li>
     </ul>
+    <p><b>Bright sunlight mode</b> (Settings): maximum contrast and bigger text. <b>Battery saver</b>: less precise GPS and a refresh every 5 min; on Android the app offers it by itself below 20% battery.</p>
+    <p><b>Seasonal</b>: seasonal shows (Halloween, Christmas…) are marked 🎃 and listed first among shows.</p>
   `,
   'help.faq': `<summary>Common problems</summary>
     <table>
@@ -931,6 +1045,8 @@ I18N.en = {
       <li><b>Toilets, water, lockers, cash machines, car parks</b> on the map, and where your <b>car</b> is parked.</li>
       <li><b>VirtualLine</b>: one-tap slot saving, button to the official app, notification when a virtual queue opens.</li>
       <li>Ride <b>ratings</b>, posted / real wait gap <b>per ride</b>, <b>“Which day to come?”</b> calendar.</li>
+      <li><b>Shared plan</b> by vote, <b>meeting point</b> to split up and meet again.</li>
+      <li><b>Bright sunlight mode</b>, <b>battery saver</b>, seasonal shows 🎃, <b>replay a day</b>.</li>
     </ul>
     <p>Updates arrive on their own the next time you open the app.</p>
   `,
@@ -1270,6 +1386,57 @@ I18N.en = {
 
 I18N.de = {
   locale: 'de-DE',
+  // Rejouer : colonne incontournables
+  'replay.musts': 'Muss ({n})',
+  // Ajouts : rendez-vous, programme commun, plein soleil, batterie, rejouer une journée
+  'meet.title': 'Treffpunkt',
+  'meet.board': 'Treffpunkt · {place}',
+  'meet.at': 'Treffen',
+  'meet.reason': 'Die Gruppe trifft sich hier: Die Route sorgt dafür, dass du pünktlich bist.',
+  'meet.here': 'Wir haben uns getroffen',
+  'meet.share': 'Teilen',
+  'meet.cancel': 'Absagen',
+  'meet.hint': 'Zum Aufteilen und Wiedertreffen: Jede Teilgruppe behält ihr Profil, jede Route endet pünktlich hier. Teile den Treffpunkt mit den anderen.',
+  'meet.time': 'Uhrzeit',
+  'meet.set': 'Hier treffen',
+  'meet.update': 'Uhrzeit ändern',
+  'meet.saved': 'Treffpunkt: {place} um {time}',
+  'meet.doneToast': 'Gruppe wieder vereint',
+  'meet.cancelled': 'Treffpunkt abgesagt',
+  'meet.shareText': 'Treffpunkt {place} um {time}:',
+  'meet.copied': 'Link zum Treffpunkt kopiert',
+  'vote.title': 'Gemeinsamer Plan',
+  'vote.hint': 'Jeder markiert Attraktionen in seinem Profil, dann führt die App zusammen: Muss, wenn die Hälfte der Gruppe es will, Bonus, wenn mindestens eine Person es will.',
+  'vote.open': 'Pläne zusammenführen',
+  'vote.pick': 'Wähle die Profile aus:',
+  'vote.apply': 'Plan von {name} ersetzen',
+  'vote.count': '{n} Attraktionen',
+  'vote.preview': 'Ergebnis mit {n} Profilen: {must} Muss, {bonus} Bonus, {shows} Shows.',
+  'vote.none': 'Wähle mindestens ein Profil.',
+  'vote.done': 'Gemeinsamer Plan aus {n} Profilen übernommen',
+  'vote.fail': 'Profile nicht verfügbar: Server nicht erreichbar.',
+  'sun.title': 'Sonnenmodus',
+  'sun.hint': 'Maximaler Kontrast und größere Schrift, um den Bildschirm draußen zu lesen',
+  'eco.title': 'Akku sparen',
+  'eco.hint': 'Ungenaueres GPS, Aktualisierung alle 5 statt 2 Minuten',
+  'eco.suggest': '<b>Akku schwach</b>: Akku-Sparmodus einschalten?',
+  'eco.on': 'Akku-Sparmodus an',
+  'replay.title': 'Einen Tag nachspielen',
+  'replay.hint': 'Simuliert einen vom Server aufgezeichneten Tag mit deinem Plan: die Route der App gegen zwei einfache Strategien, mit den echten Schlangen dieses Tages.',
+  'replay.day': 'Tag',
+  'replay.run': 'Nachspielen',
+  'replay.noDays': 'Kein aufgezeichneter Tag',
+  'replay.running': 'Simulation läuft…',
+  'replay.fail': 'Nicht genug Daten für diesen Tag.',
+  'replay.noPlan': 'Dein Plan ist leer: Füge zuerst Attraktionen hinzu.',
+  'replay.app': 'Route der App',
+  'replay.order': 'Reihenfolge des Plans',
+  'replay.shortest': 'Kürzeste Schlange',
+  'replay.rides': 'Fahrten',
+  'replay.queue': 'Anstehen',
+  'replay.walk': 'Gehen',
+  'replay.summary': '{day}, mit den {n} Attraktionen deines Plans und den echten Schlangen dieses Tages.',
+  'replay.more': 'Die App schafft {n} Muss-Attraktion(en) mehr.',
   // Ajouts : VirtualLine, notes, carte, points pratiques, voiture, prévision
   'vl.quick': '{time} gebucht',
   'vl.openApp': 'App öffnen',
@@ -1490,6 +1657,8 @@ I18N.de = {
       <li><b>Sich wiederfinden</b>: Einstellungen → „Standort mit der Gruppe teilen“, mit deinem Vornamen. Auf der <b>Karte</b> erscheinen alle als voller Punkt mit Vornamen und Laufzeit bis zu ihnen. Die Raute markiert den empfohlenen <b>Treffpunkt</b>: die Attraktion, die der Mitte der Gruppe am nächsten ist.</li>
     </ul>
     <p class="muted">Ein geteilter Standort ist für alle sichtbar, die die App auf diesem Server nutzen, und verschwindet 20 min nach dem letzten Standort. Deaktiviere das Teilen, um ihn sofort zu löschen.</p>
+    <p><b>Gemeinsamer Plan</b>: Jeder markiert Attraktionen in seinem Profil, dann Einstellungen → „Pläne zusammenführen“. Muss, wenn mindestens die Hälfte der Gruppe es will, Bonus, wenn jemand es will; alle gewählten Shows bleiben.</p>
+    <p><b>Aufteilen und wiedertreffen</b>: Im Steckbrief einer Attraktion „Hier treffen“ zu einer Uhrzeit. Jede Route endet pünktlich dort, mit einer Benachrichtigung zum Losgehen. Jede Teilgruppe nutzt ihr eigenes Profil; „Teilen“ schickt den Treffpunkt per Link an die anderen.</p>
   `,
   'help.sr': `<summary>Single Rider</summary>
     <p>Manche Attraktionen haben eine „Single Rider“-Schlange, um leere Plätze zu füllen: viel kürzer, aber die Gruppe sitzt getrennt. Gemeldet bei Blue Fire, Voltron, CanCan und Arthur, <b>vor Ort prüfen</b> (sie kann an manchen Tagen geschlossen sein).</p>
@@ -1502,6 +1671,7 @@ I18N.de = {
   'help.crowd': `<summary>Andrang</summary>
     <p>Tagsüber vergleicht die App die aktuellen Schlangen mit den üblichen zur gleichen Uhrzeit und berücksichtigt das („Andrang: 20 % über“). Am Vortag zeigt die Vorschau den üblichen Andrang an diesem Wochentag, nach den vom Server erfassten Tagen. Einstellungen → Andrang zeigt die letzten Tage und die ruhigsten Tage.</p>
     <p><b>Welcher Tag ist am besten?</b> (Einstellungen): erwarteter Andrang an den nächsten Öffnungstagen, von ruhig bis sehr voll, nach deinem Verlauf (oder dem Wochentag) und den Schulferien und Feiertagen der Herkunftsregionen (Baden-Württemberg, Elsass, Schweiz… für den Europa-Park).</p>
+    <p><b>Einen Tag nachspielen</b> (Einstellungen): Die App spielt einen aufgezeichneten Tag mit deinem Plan und den echten Schlangen nach und vergleicht ihre Route mit „Reihenfolge des Plans“ und „Kürzeste Schlange“.</p>
   `,
   'help.sync': `<summary>Profil, Abbruch, Handywechsel</summary>
     <p>Jede Änderung geht eine Sekunde später an den Server. Geht dein Handy aus oder wechselst du es, öffne die App und wähl deinen Nickname: Du machst genau da weiter, wo du warst (Programm, Erledigtes, Zeitfenster, aktuelle Schlange). Mit dem Button mit deinem Nickname oben wechselst du das Profil.</p>
@@ -1519,6 +1689,8 @@ I18N.de = {
       <li><b>Wasserbahnen</b>: Man kann klatschnass rauskommen. Bei kühlem Wetter legt die App sie eher in die wärmsten Stunden.</li>
       <li><b>Tagesende</b>: Die Schlangen schließen zur Parkschließung. Die Route sorgt dafür, dass du rechtzeitig in der letzten stehst.</li>
     </ul>
+    <p><b>Sonnenmodus</b> (Einstellungen): maximaler Kontrast und größere Schrift. <b>Akku sparen</b>: ungenaueres GPS und Aktualisierung alle 5 Minuten; auf Android schlägt die App es unter 20 % Akku selbst vor.</p>
+    <p><b>Saison</b>: Saison-Shows (Halloween, Weihnachten…) sind mit 🎃 markiert und stehen in der Showliste oben.</p>
   `,
   'help.faq': `<summary>Häufige Probleme</summary>
     <table>
@@ -1552,6 +1724,8 @@ I18N.de = {
       <li><b>Toiletten, Wasser, Schließfächer, Geldautomaten, Parkplätze</b> auf der Karte und der Platz deines <b>Autos</b>.</li>
       <li><b>VirtualLine</b>: Zeitfenster mit einem Tipp speichern, Knopf zur offiziellen App, Benachrichtigung, wenn sich eine virtuelle Schlange öffnet.</li>
       <li><b>Bewertungen</b> der Attraktionen, Abweichung angezeigt / echt <b>pro Attraktion</b>, Kalender <b>„Welcher Tag ist am besten?“</b>.</li>
+      <li><b>Gemeinsamer Plan</b> per Abstimmung, <b>Treffpunkt</b> zum Aufteilen und Wiedertreffen.</li>
+      <li><b>Sonnenmodus</b>, <b>Akku sparen</b>, Saison-Shows 🎃, <b>einen Tag nachspielen</b>.</li>
     </ul>
     <p>Updates kommen beim nächsten Öffnen der App von selbst.</p>
   `,

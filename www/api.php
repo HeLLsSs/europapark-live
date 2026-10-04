@@ -6,6 +6,8 @@
  * Routes (?r=...) :
  *   config      description du parc de l'instance (parks.json[EP_PARK])
  *   where       GET / POST : positions partagées du groupe
+ *   history     &d=AAAA-MM-JJ : relevés d'une journée passée
+ *   forecast    affluence prévue des prochains jours d'ouverture
  *   bundle      temps d'attente en direct + statistiques + météo (ce qu'appelle la page)
  *               &u=ID&since=ms : ajoute le profil (état synchronisé s'il est plus récent que since)
  *   live        temps d'attente en direct (JSON amont)
@@ -52,6 +54,7 @@ const MSG = [
     'fr' => [
         'go'           => ['Pars maintenant', '{ride} : créneau VirtualLine à {time} · {walk} min à pied'],
         'show'         => ['Spectacle', '{ride} à {time} · pars maintenant ({walk} min à pied)'],
+        'meet'         => ['Rendez-vous', '{ride} à {time} · pars maintenant ({walk} min à pied)'],
         'meal'         => ['Pause repas', "C'est le bon moment : les files sont au plus haut."],
         'last'         => ['Dernier appel', 'Fermeture à {time} : {list}.'],
         'rain'         => ['Pluie', "Pluie annoncée vers {h} h : l'itinéraire passe aux attractions couvertes."],
@@ -67,6 +70,7 @@ const MSG = [
     'en' => [
         'go'           => ['Leave now', '{ride}: VirtualLine slot at {time} · {walk} min walk'],
         'show'         => ['Show', '{ride} at {time} · leave now ({walk} min walk)'],
+        'meet'         => ['Meeting point', '{ride} at {time} · leave now ({walk} min walk)'],
         'meal'         => ['Meal break', "Now's the time: queues are at their longest."],
         'last'         => ['Last call', 'Closing at {time}: {list}.'],
         'rain'         => ['Rain', 'Rain expected around {h}:00: the route switches to indoor rides.'],
@@ -82,6 +86,7 @@ const MSG = [
     'de' => [
         'go'           => ['Jetzt losgehen', '{ride}: VirtualLine-Zeitfenster um {time} · {walk} min zu Fuß'],
         'show'         => ['Show', '{ride} um {time} · jetzt losgehen ({walk} min zu Fuß)'],
+        'meet'         => ['Treffpunkt', '{ride} um {time} · jetzt losgehen ({walk} min zu Fuß)'],
         'meal'         => ['Essenspause', 'Jetzt ist der richtige Moment: Die Schlangen sind am längsten.'],
         'last'         => ['Letzter Aufruf', 'Parkschluss um {time}: {list}.'],
         'rain'         => ['Regen', 'Regen gegen {h} Uhr erwartet: Die Route wechselt zu überdachten Attraktionen.'],
@@ -175,6 +180,15 @@ if (!defined('EP_LIB')) {
                 $weather = weather($DATA);
                 if ($weather === null) throw new HttpError('Météo Open-Meteo injoignable pour le moment.', 502);
                 echo $weather;
+                break;
+
+            case 'history':
+                // Relevés d'une journée passée (pour « Rejouer une journée » dans la page)
+                $d = (string) ($_GET['d'] ?? '');
+                if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) || $d >= date('Y-m-d')) throw new HttpError('Jour invalide : AAAA-MM-JJ, avant aujourd\'hui.', 400);
+                $f = "$DATA/hist/$d.json";
+                if (!is_file($f)) throw new HttpError('Pas de relevés pour ce jour.', 404);
+                echo file_get_contents($f);
                 break;
 
             case 'forecast':
@@ -1183,6 +1197,15 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
             $w = $walk($s['id']);
             if ($now >= $start - $w - 5 - 1 && $now <= $start + 5) {
                 $msgs[] = ["s:{$s['id']}:$start", 86400, ...msg($lang, 'show', ['ride' => $name($s['id']), 'time' => hhmm($start), 'walk' => $w])];
+            }
+        }
+        // Rendez-vous du groupe (sous-groupes séparés) : même règle que les spectacles
+        $mt = $planned['meet'] ?? null;
+        if (is_array($mt) && is_string($mt['id'] ?? null) && is_numeric($mt['start'] ?? null)) {
+            $start = (int) $mt['start'];
+            $w = $walk($mt['id']);
+            if ($now >= $start - $w - 3 - 1 && $now <= $start + 5) {
+                $msgs[] = ["n:{$mt['id']}:$start", 86400, ...msg($lang, 'meet', ['ride' => $name($mt['id']), 'time' => hhmm($start), 'walk' => $w])];
             }
         }
         if (is_numeric($planned['meal'] ?? null) && empty($st['mealDone'])) {

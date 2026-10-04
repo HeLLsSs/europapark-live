@@ -178,6 +178,7 @@
       "eurotower": 6
     },
     "transport": "express station|panorama train|monorail",
+    "seasonal": "hallow|spook|scary|macabra|dark wedding|vampire|traumatica|grusel|horror",
     "virtualQueue": {
       "name": "VirtualLine",
       "url": "https://www.europapark.de/fr/parc-de-loisirs/infos/planifiez-votre-sejour/virtualline-europa-park",
