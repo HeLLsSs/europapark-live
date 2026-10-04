@@ -1,12 +1,12 @@
 # Europa-Park Live
 
-Appli web pour téléphone, à installer sur l'écran d'accueil, qui t'accompagne pendant une journée à Europa-Park :
+Appli web pour téléphone, à installer sur l'écran d'accueil, qui t'accompagne pendant une journée à Europa-Park (ou dans un autre parc, voir « Autres parcs ») :
 
 - elle affiche les temps d'attente en direct ;
 - elle te dit à chaque instant **quelle attraction faire maintenant** et propose **l'itinéraire du reste de la journée** ;
 - elle t'envoie des **notifications**, même téléphone en poche.
 
-Elle s'auto-héberge sur n'importe quel petit serveur avec nginx et PHP 8 (un Raspberry Pi suffit). Il n'y a ni base de données, ni Composer, ni service payant. Projet non officiel, sans lien avec Europa-Park.
+Elle s'auto-héberge sur n'importe quel petit serveur avec nginx et PHP 8 (un Raspberry Pi suffit), ou avec Docker. Il n'y a ni base de données, ni Composer, ni service payant. Projet non officiel, sans lien avec Europa-Park.
 
 Dans ce document, `europapark.example.com` désigne l'adresse de ton installation.
 
@@ -15,10 +15,14 @@ www/                              ← racine web (/var/www/europapark/www)
   index.html                      l'appli complète (style + logique)
   api.php                         relais du serveur : temps d'attente, historique, météo, profils, notifications push
   sw.js, manifest.webmanifest     installation sur l'écran d'accueil, ouverture hors réseau, réception des notifications
+  parks.json                      description des parcs (identifiant, entrée, listes d'attractions…)
+  parks/<parc>.walk.json          distances à pied par les allées (OpenStreetMap), générées par tools/walk-matrix.php
   data/                           créé par api.php, jamais servi, ignoré par git (voir « Données »)
 deploy/
-  nginx/europapark.conf              vhost nginx (à adapter)
-  cron/europapark                    collecte + notifications, chaque minute de 8 h à 21 h
+  nginx/europapark.conf           vhost nginx (à adapter)
+  cron/europapark                 collecte + notifications, chaque minute de 8 h à 21 h
+tools/walk-matrix.php             génère les distances à pied d'un parc
+Dockerfile, docker-compose.yml, docker/   installation avec Docker
 ```
 
 ---
@@ -78,6 +82,7 @@ L'onglet **Maintenant** montre en grand la **prochaine étape** : son nom, l'att
 
 Toucher le nom ouvre la **fiche** de l'attraction :
 - l'attente, l'attente habituelle à cette heure et la courbe de la journée comparée à l'habituel ;
+- les **heures creuses et de pointe** habituelles (« Au plus bas vers 17:30, ~15 min · pic vers 12:15, ~55 min ») ;
 - la taille minimale et l'état du VirtualLine ;
 - les choix « M'alerter sous… » et « À refaire si l'attente passe sous… ».
 
@@ -91,6 +96,8 @@ Toucher le nom ouvre la **fiche** de l'attraction :
 2. Réserve dans l'**appli officielle Europa-Park** (un seul créneau à la fois par billet).
 3. Note ton créneau avec **J'ai un créneau** : l'itinéraire s'organise autour et te dit quand partir.
 4. Après **Fait** sur le créneau, l'appli te dit quoi re-réserver tout de suite.
+
+**La carte** affiche le parc sur un fond OpenStreetMap (allées, bâtiments, lacs), zoomable. Les grosses pastilles correspondent à ton programme et indiquent l'attente en direct ; un pointillé mène à la prochaine étape, et le groupe apparaît s'il partage sa position. Les zones déjà vues restent en mémoire pour les moments où le réseau sature.
 
 **Repas et spectacles** apparaissent dans l'itinéraire comme des étapes à heure fixe. Pour le repas, l'appli indique le resto ouvert le plus proche. *Plus tard* le décale d'au moins 30 min, *Fait* le retire.
 
@@ -106,6 +113,7 @@ Une fois activées (**Réglages → Notifications**), elles arrivent même appli
 | **Pars maintenant** | c'est l'heure de partir pour ton créneau VirtualLine (temps de marche compris) |
 | **Spectacle** | c'est l'heure de partir pour un spectacle choisi (5 min d'avance) |
 | **Pause repas** | c'est le moment de manger prévu par l'itinéraire |
+| **Dernier appel** | 45 min avant la fermeture : les dernières attractions encore faisables, ton programme d'abord |
 | **Pluie** | de la pluie est annoncée dans l'heure alors qu'il ne pleut pas : l'itinéraire passe aux attractions couvertes (aussi en bandeau dans l'appli) |
 
 Les alertes de file courte, d'attraction à refaire et de réouverture sont mises en pause pendant que tu es « dans la file ». Appli ouverte, les mêmes alertes s'affichent aussi en bandeau, avec vibration.
@@ -135,7 +143,10 @@ Le bouton **Partager** l'envoie à qui tu veux. Le récap est aussi disponible �
 - **Temps d'attente, horaires, spectacles, VirtualLine** : themeparks.wiki (service communautaire, non officiel), qui relaie les temps annoncés par le parc. Le serveur les met en cache 1 min ; la page les rafraîchit toutes les 2 min.
 - **Historique** : le cron enregistre l'attente de chaque attraction toutes les 4 min. Pour chaque attraction, le serveur en tire un **profil habituel** par tranche de 30 min, calculé sur les 21 derniers jours, en ne comparant que les jours du même type (semaine ou week-end). Sans historique, l'appli utilise une courbe générique de remplissage du parc.
 - **Météo** : Open-Meteo, prévision heure par heure, mise à jour toutes les 30 min.
-- **Coordonnées GPS des attractions** : themeparks.wiki. Les durées de marche sont calculées à vol d'oiseau × 1,35 (allées), selon le rythme choisi (55, 75 ou 90 m/min).
+- **Coordonnées GPS des attractions** : themeparks.wiki.
+- **Distances à pied** : par les vraies allées du parc, grâce à une matrice précalculée depuis OpenStreetMap (`parks/<parc>.walk.json`). Les files d'attente et les zones réservées au personnel en sont exclues. À Europa-Park, le trajet réel fait en médiane 1,16 fois la ligne droite, et jusqu'à 2,6 fois autour des plans d'eau. Depuis une position GPS, l'appli rejoint le point connu le plus proche, puis suit les allées. Sans matrice, elle compte la ligne droite × 1,35. Le temps dépend du rythme choisi : 55, 75 ou 90 m/min.
+- **Durée des attractions** : `rideMin` dans `parks.json` (par exemple 4 min pour un grand huit, 10 à 12 pour un parcours scénique), 5 min par défaut.
+- **Carte** : tuiles OpenStreetMap affichées avec Leaflet.
 
 ## La prévision d'attente
 
@@ -143,7 +154,7 @@ Pour estimer la file d'une attraction à l'heure où tu y arriveras, l'appli :
 1. part de l'attente **affichée maintenant** ;
 2. rejoint progressivement le **profil habituel** de l'attraction (après environ 1 h 30, c'est surtout l'habituel qui compte) ;
 3. corrige ce profil de l'**affluence du jour** : rapport médian « attente actuelle / attente habituelle » sur tout le parc (affiché « Affluence : +20 % au-dessus d'un jour habituel ») ;
-4. multiplie par ton **facteur temps réel** : avec « Dans la file » puis « Fait », elle compare le temps affiché à l'entrée au temps réellement attendu. Après deux mesures, l'itinéraire utilise la médiane de cet écart (souvent 70 à 90 % de l'affiché).
+4. multiplie par le **facteur temps réel** : avec « Dans la file » puis « Fait », elle compare le temps affiché à l'entrée au temps réellement attendu. Elle utilise la médiane de cet écart (souvent 70 à 90 % de l'affiché). Les mesures de tous les profils du serveur (30 derniers jours) servent à tout le monde ; dès que tu as deux mesures à toi, ce sont les tiennes qui comptent.
 
 ## Le choix de la prochaine étape
 
@@ -249,6 +260,78 @@ sudo htpasswd -c /etc/nginx/europapark.htpasswd groupe
 
 Le manifeste est chargé avec les identifiants (`crossorigin="use-credentials"`), donc l'installation sur l'écran d'accueil fonctionne derrière cette protection. Un portail d'authentification (Authelia, Authentik…) fonctionne aussi. Si la session expire, `api.php` ne répond plus en JSON : la page bascule alors toute seule sur l'API publique, sans historique ni profils, jusqu'à la reconnexion.
 
+## Installation avec Docker
+
+Une seule image contient la page, le relais PHP (nginx + PHP-FPM) et la collecte (cron). Elle écoute en **HTTP sur le port 8080**, sans certificat : place-la derrière ton propre reverse proxy (Caddy, Traefik, nginx…), qui fournit le HTTPS. Le HTTPS est obligatoire pour le GPS, les notifications et l'installation sur l'écran d'accueil, et l'adresse doit être joignable depuis Internet (la page sert depuis le parc, en 4G).
+
+```bash
+git clone <url-du-dépôt> europapark && cd europapark
+docker compose up -d --build
+curl -s http://localhost:8080/api.php?r=health
+# doit afficher "dataWritable": true
+```
+
+La collecte tourne dans le conteneur, chaque minute de 8 h à 20 h 59 (fuseau `TZ`), avec le même utilisateur que PHP-FPM (`www-data`). Démarre le conteneur **quelques jours avant ta visite**. Pour lancer une collecte à la main :
+
+```bash
+docker compose exec -u www-data europapark php /var/www/europapark/www/api.php collect
+```
+
+**Reverse proxy et HTTPS.** Le reverse proxy doit transmettre l'en-tête `Host` d'origine et `X-Forwarded-Proto: https` (c'est le cas par défaut avec Caddy et Traefik). Le plus simple est Caddy, qui obtient et renouvelle tout seul le certificat : décommente le service `caddy` dans `docker-compose.yml`, remplace `europapark.example.com` par ton nom de domaine (il doit pointer vers le serveur, ports 80 et 443 ouverts) et retire `ports` du service `europapark`. Avec un reverse proxy déjà en place, fais-le pointer vers `http://<serveur>:8080`.
+
+Pour le mot de passe commun optionnel, crée le fichier avec `htpasswd -c ./europapark.htpasswd groupe`, décommente le montage correspondant dans `docker-compose.yml` et les lignes `auth_basic` dans `docker/nginx.conf`, puis reconstruis l'image.
+
+| Variable | Par défaut | Rôle |
+|---|---|---|
+| `TZ` | `Europe/Berlin` | fuseau horaire des heures de collecte (mets celui du parc) |
+| `EP_PARK` | premier parc de `parks.json` | parc suivi par l'instance |
+| `EP_VAPID_SUB` | adresse du site | contact transmis aux services push (ex. `mailto:moi@example.com`) |
+| `EP_UPSTREAM` | `https://api.themeparks.wiki/v1/entity` | API des temps d'attente |
+| `EP_DATA_DIR` | `/var/www/europapark/www/data` | dossier des données dans le conteneur |
+
+**Mise à jour** : `git pull && docker compose up -d --build`. Les données sont dans le volume `europapark-data` (historique, profils, clés de notification) et sont conservées.
+
+**Sauvegarde** (la clé VAPID est dedans : sans elle, les abonnements push existants ne fonctionnent plus) :
+
+```bash
+docker compose exec europapark tar czf - -C /var/www/europapark/www data > europapark-data-$(date +%F).tar.gz
+docker compose exec -T europapark tar xzf - -C /var/www/europapark/www < europapark-data-AAAA-MM-JJ.tar.gz   # restauration
+docker compose restart europapark
+```
+
+## Autres parcs
+
+Le parc d'une instance est choisi par la variable d'environnement `EP_PARK` : nginx (`fastcgi_param EP_PARK …;`), PHP-FPM (`env[EP_PARK] = …`) et le cron, ou simplement `environment` avec Docker. Par défaut, c'est le premier parc de `www/parks.json`.
+
+Parcs fournis (`EP_PARK`) :
+
+| `EP_PARK` | Parc | Fuseau | Distances à pied | File virtuelle gratuite |
+|---|---|---|---|---|
+| `europapark` | Europa-Park (Rust) | Europe/Berlin | oui | VirtualLine |
+| `phantasialand` | Phantasialand (Brühl) | Europe/Berlin | à générer | — |
+| `efteling` | Efteling (Kaatsheuvel) | Europe/Amsterdam | à générer | Virtual Queue |
+| `disneylandpark` | Disneyland Park (Paris) | Europe/Paris | à générer | — (Premier Access est payant) |
+| `waltdisneystudios` | Disney Adventure World (Paris) | Europe/Paris | à générer | — |
+| `parcasterix` | Parc Astérix (Plailly) | Europe/Paris | à générer | — |
+
+Pour les parcs autres qu'Europa-Park, les listes (tailles, couvert, mouillé, single rider, durées, programmes types) ont été établies à partir des pages officielles et de sources de fans (voir `sources` dans `parks.json`). Elles sont plus sommaires : corrections bienvenues. Sans fichier de distances, l'appli compte la ligne droite × 1,35.
+
+Utilise un `EP_DATA_DIR` différent par parc : l'historique et les profils d'un parc n'ont pas de sens pour un autre. Les données propres à Europa-Park (VirtualLine, tailles minimales, single rider…) sont sans effet ailleurs quand le parc n'en a pas.
+
+**Ajouter un parc** : dans `www/parks.json`, une entrée par parc avec :
+- l'identifiant themeparks.wiki (`https://api.themeparks.wiki/v1/destinations`) ;
+- le fuseau horaire, les coordonnées de l'entrée et `bounds` : le rectangle du parc, qui exclut les parcs voisins de la même destination ;
+- les listes d'attractions : `tiers`, `presets`, `indoor`, `wet`, `minCm`, `singleRider`, `rideMin`, `transport`, `virtualQueue`.
+
+Les listes contiennent des morceaux de nom normalisé (minuscules, sans accents ni espaces : « blue fire Megacoaster » → `bluefiremegacoaster`, donc `bluefire`). Génère ensuite les distances à pied :
+
+```bash
+php tools/walk-matrix.php --park-id=<id> --bbox=sud,ouest,nord,est --entrance=lat,lon \
+    --out=www/parks/<parc>.walk.json [--osm-cache=osm.json]
+```
+
+Le script récupère les allées du parc sur OpenStreetMap (Overpass) et en garde le plus grand réseau connecté, en ignorant les files d'attente et les accès privés. Il raccroche chaque attraction, spectacle et restaurant à l'allée la plus proche, puis calcule tous les plus courts chemins. Il affiche un résumé : points raccrochés, distance de raccrochement maximale, rapport chemin / ligne droite. Overpass limite les requêtes : `--osm-cache` permet de relancer le calcul sans tout retélécharger.
+
 ## Historique
 
 Le cron tourne chaque minute de 8 h à 21 h : il enregistre un point d'historique toutes les 4 min au plus et envoie les notifications. L'historique est conservé 45 jours ; plus il y a de jours enregistrés, meilleures sont les prévisions.
@@ -259,7 +342,7 @@ Toutes les réponses sont en JSON. Une erreur renvoie `{"error": "…"}` avec le
 
 | Route | Rôle |
 |---|---|
-| `GET ?r=bundle[&u=ID&since=ms]` | temps en direct + statistiques + `weather` (appelé par la page). Avec `u` : `user` = `null` si le profil n'existe pas, sinon `{id, name, updatedAt, push, state}` ; `push` = nombre de téléphones abonnés, `state` seulement s'il est plus récent que `since` |
+| `GET ?r=bundle[&u=ID&since=ms]` | temps en direct + statistiques + `weather` + `where` (positions du groupe) + `real` (écart temps réel/affiché de tous les profils) (appelé par la page). Avec `u` : `user` = `null` si le profil n'existe pas, sinon `{id, name, updatedAt, push, state}` ; `push` = nombre de téléphones abonnés, `state` seulement s'il est plus récent que `since` |
 | `GET ?r=live` · `children` · `schedule` | données brutes themeparks.wiki, avec cache |
 | `GET ?r=weather` | prévisions Open-Meteo brutes (cache 30 min ; après un échec, pas de nouvel essai avant 5 min) |
 | `GET ?r=calendar` | `{days: [{day, avg, peak}]}` : attente moyenne (11 h – 16 h) de chaque jour passé de l'historique |
@@ -273,6 +356,7 @@ Toutes les réponses sont en JSON. Une erreur renvoie `{"error": "…"}` avec le
 | `GET ?r=where` · `POST ?r=where` `{device, nick, lat, lon}` | positions partagées de moins de 20 min (`lat: null` arrête le partage) ; aussi renvoyées par `bundle` (`where`) |
 | `POST ?r=push-test&u=ID` | notification de test vers tous les téléphones du profil → `{sent, codes}` |
 | `?r=collect` | collecte + notifications (aussi `php api.php collect`, utilisé par le cron) |
+| `GET ?r=config` | description du parc de l'instance (`parks.json[EP_PARK]` + `slug`) |
 | `GET ?r=health` | état du cache, de l'historique, nombre de profils, clés VAPID |
 
 Un profil n'a pas de mot de passe : son identifiant est dérivé du pseudo (16 caractères hexadécimaux). Toute personne qui connaît l'adresse de la page peut voir la liste des pseudos et modifier un profil : voir « Protéger l'accès ».
@@ -302,7 +386,7 @@ L'historique est conservé 45 jours. Les fichiers sont écrits de façon atomiqu
 ## Limites
 
 - Les temps sont ceux annoncés par le parc, relayés par themeparks.wiki (service communautaire, non officiel).
-- Les durées de marche sont estimées à vol d'oiseau, avec une correction pour les allées.
+- Les distances à pied suivent les allées d'OpenStreetMap, entre les coordonnées des attractions (souvent leur centre, pas leur entrée) : ±50 m possibles.
 - La réservation VirtualLine se fait uniquement dans l'appli officielle Europa-Park.
 - Les tailles minimales sont indicatives : le panneau à l'entrée de l'attraction fait foi.
 - Les files single rider ne sont pas fournies par l'API : la liste et l'estimation sont indicatives.

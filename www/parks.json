@@ -1,0 +1,909 @@
+{
+  "europapark": {
+    "name": "Europa-Park",
+    "place": "Rust",
+    "id": "639738d3-9574-4f60-ab5b-4c392901320b",
+    "tz": "Europe/Berlin",
+    "entrance": {
+      "lat": 48.2689,
+      "lon": 7.7232
+    },
+    "bounds": {
+      "south": 48.256,
+      "north": 48.2715,
+      "west": 7.715,
+      "east": 7.73
+    },
+    "tiers": {
+      "A": [
+        "voltron",
+        "bluefiremega",
+        "silverstar",
+        "wodan",
+        "cancan",
+        "poseidon",
+        "arthur",
+        "voletarium",
+        "supersplash",
+        "matterhorn"
+      ],
+      "B": [
+        "fjordrafting",
+        "swissbob",
+        "euromir",
+        "pegasus",
+        "tirollog",
+        "batavia",
+        "jungfrau",
+        "atlantisadventure",
+        "cassandra",
+        "alpineexpress",
+        "josefina",
+        "eurosatcoastiality",
+        "jimbutton",
+        "whaleadventures"
+      ]
+    },
+    "presets": {
+      "sensations": {
+        "must": [
+          "voltron",
+          "bluefiremega",
+          "silverstar",
+          "wodan",
+          "cancan",
+          "poseidon",
+          "arthur",
+          "voletarium",
+          "supersplash",
+          "euromir",
+          "matterhorn",
+          "fjordrafting",
+          "batavia"
+        ],
+        "bonus": [
+          "swissbob",
+          "pegasus",
+          "tirollog",
+          "atlantisadventure",
+          "alpineexpress",
+          "jungfrau",
+          "eurosatcoastiality",
+          "cassandra"
+        ]
+      },
+      "famille": {
+        "must": [
+          "arthur",
+          "voletarium",
+          "batavia",
+          "fjordrafting",
+          "supersplash",
+          "tirollog",
+          "jungfrau",
+          "jimbutton",
+          "whaleadventures",
+          "swissbob",
+          "pegasus",
+          "alpineexpress"
+        ],
+        "bonus": [
+          "castello",
+          "volodavinci",
+          "freudenreich",
+          "josefina",
+          "baaaexpress",
+          "oldmacdonald",
+          "poppytowers",
+          "cassandra",
+          "atlantisadventure",
+          "eurotower"
+        ]
+      }
+    },
+    "indoor": [
+      "voletarium",
+      "cancan",
+      "eurosatcoastiality",
+      "arthur",
+      "batavia",
+      "jimbutton",
+      "freudenreich",
+      "snorri",
+      "atlantisadventure",
+      "josefina",
+      "queensdiamonds",
+      "tartaros"
+    ],
+    "wet": [
+      "poseidon",
+      "supersplash",
+      "fjordrafting",
+      "tirollog",
+      "whaleadventures"
+    ],
+    "minCm": {
+      "silverstar": 140,
+      "bluefiremega": 130,
+      "voltron": 130,
+      "euromir": 130,
+      "wodan": 120,
+      "cancan": 120,
+      "eurotower": 120,
+      "swissbob": 120,
+      "poseidon": 120,
+      "matterhorn": 120,
+      "vindjammer": 120,
+      "supersplash": 100,
+      "fjordrafting": 100,
+      "arthur": 100,
+      "pegasus": 100,
+      "alpineexpress": 90
+    },
+    "singleRider": [
+      "bluefiremega",
+      "voltron",
+      "cancan",
+      "arthur"
+    ],
+    "rideMin": {
+      "silverstar": 4,
+      "bluefiremega": 4,
+      "wodan": 4,
+      "voltron": 4,
+      "cancan": 5,
+      "euromir": 6,
+      "poseidon": 6,
+      "arthur": 6,
+      "voletarium": 8,
+      "supersplash": 5,
+      "matterhorn": 4,
+      "fjordrafting": 8,
+      "batavia": 9,
+      "swissbob": 4,
+      "pegasus": 4,
+      "tirollog": 7,
+      "atlantisadventure": 7,
+      "alpineexpress": 4,
+      "jungfrau": 4,
+      "jimbutton": 10,
+      "josefina": 12,
+      "whaleadventures": 8,
+      "cassandra": 7,
+      "eurosatcoastiality": 6,
+      "freudenreich": 8,
+      "snorri": 8,
+      "castello": 5,
+      "volodavinci": 6,
+      "eurotower": 6
+    },
+    "transport": "express station|panorama train|monorail",
+    "virtualQueue": {
+      "name": "VirtualLine",
+      "url": "https://www.europapark.de/fr/parc-de-loisirs/infos/planifiez-votre-sejour/virtualline-europa-park",
+      "app": "l'appli officielle Europa-Park"
+    },
+    "sources": [
+      "https://api.themeparks.wiki/v1/entity/639738d3-9574-4f60-ab5b-4c392901320b/children",
+      "https://www.europapark.de/fr/parc-de-loisirs/infos/planifiez-votre-sejour/virtualline-europa-park"
+    ]
+  },
+  "phantasialand": {
+    "name": "Phantasialand",
+    "place": "Brühl",
+    "id": "abb67808-61e3-49ef-996c-1b97ed64fac6",
+    "tz": "Europe/Berlin",
+    "entrance": {
+      "lat": 50.79897,
+      "lon": 6.87931
+    },
+    "bounds": {
+      "south": 50.7968,
+      "north": 50.8027,
+      "west": 6.8748,
+      "east": 6.8864
+    },
+    "tiers": {
+      "A": [
+        "taron",
+        "blackmamba",
+        "fly",
+        "chiapas"
+      ],
+      "B": [
+        "riverquest",
+        "coloradoadventure",
+        "mysterycastle",
+        "talocan",
+        "winjasfear",
+        "winjasforce",
+        "crazybats",
+        "mausauchocolat",
+        "raik",
+        "geisterrikscha",
+        "die3mausketiere"
+      ]
+    },
+    "presets": {
+      "sensations": {
+        "must": [
+          "taron",
+          "fly",
+          "blackmamba",
+          "chiapas",
+          "riverquest",
+          "mysterycastle",
+          "talocan",
+          "coloradoadventure",
+          "winjasfear",
+          "winjasforce"
+        ],
+        "bonus": [
+          "crazybats",
+          "raik",
+          "geisterrikscha",
+          "die3mausketiere"
+        ]
+      },
+      "famille": {
+        "must": [
+          "chiapas",
+          "coloradoadventure",
+          "raik",
+          "mausauchocolat",
+          "crazybats",
+          "die3mausketiere",
+          "geisterrikscha"
+        ],
+        "bonus": [
+          "tikal",
+          "hoteltartuff",
+          "fengjupalace",
+          "wakobato",
+          "bollesriesenrad",
+          "wellenflug"
+        ]
+      }
+    },
+    "indoor": [
+      "winjasfear",
+      "winjasforce",
+      "crazybats",
+      "mausauchocolat",
+      "geisterrikscha",
+      "fengjupalace",
+      "hoteltartuff",
+      "mysterycastle",
+      "die3mausketiere"
+    ],
+    "wet": [
+      "chiapas",
+      "riverquest"
+    ],
+    "minCm": {
+      "taron": 130,
+      "blackmamba": 140,
+      "fly": 130,
+      "chiapas": 120,
+      "coloradoadventure": 100,
+      "raik": 100,
+      "riverquest": 140,
+      "mysterycastle": 130,
+      "talocan": 140,
+      "winjasfear": 120,
+      "winjasforce": 120,
+      "crazybats": 100,
+      "mausauchocolat": 90,
+      "tikal": 100,
+      "wellenflug": 100,
+      "hoteltartuff": 100,
+      "die3mausketiere": 90
+    },
+    "singleRider": [
+      "taron"
+    ],
+    "rideMin": {
+      "taron": 3,
+      "blackmamba": 3,
+      "fly": 4,
+      "chiapas": 8,
+      "riverquest": 6,
+      "coloradoadventure": 5,
+      "mysterycastle": 4,
+      "talocan": 4,
+      "winjasfear": 4,
+      "winjasforce": 4,
+      "crazybats": 6,
+      "mausauchocolat": 7,
+      "raik": 3,
+      "geisterrikscha": 6,
+      "die3mausketiere": 10
+    },
+    "transport": null,
+    "virtualQueue": null,
+    "sources": [
+      "https://api.themeparks.wiki/v1/entity/abb67808-61e3-49ef-996c-1b97ed64fac6/children",
+      "https://www.phantasialand.de/en/theme-park/one-of-a-kind-attractions/attractions-overview-summer/",
+      "https://www.phantasialand.de/en/theme-park/rookburgh/f-l-y/",
+      "https://www.phantasialand.de/en/theme-park/one-of-a-kind-attractions/taron/",
+      "https://www.openstreetmap.org/#map=18/50.7990/6.8793",
+      "https://forums.coasterforce.com/threads/3-days-at-phantasialand-day-somehow-forgetfulness.46696/post-1166971"
+    ]
+  },
+  "efteling": {
+    "name": "Efteling",
+    "place": "Kaatsheuvel",
+    "id": "30713cf6-69a9-47c9-a505-52bb965f01be",
+    "tz": "Europe/Amsterdam",
+    "entrance": {
+      "lat": 51.6494,
+      "lon": 5.0438
+    },
+    "bounds": {
+      "south": 51.6455,
+      "north": 51.6547,
+      "west": 5.0414,
+      "east": 5.0565
+    },
+    "tiers": {
+      "A": [
+        "baron1898",
+        "dansemacabre",
+        "symbolica",
+        "droomvlucht",
+        "jorisendedraak",
+        "vliegendehollander"
+      ],
+      "B": [
+        "python",
+        "maxmoritz",
+        "fatamorgana",
+        "pirana",
+        "vogelrok",
+        "carnavalfestival",
+        "villavolta",
+        "halvemaen",
+        "sirocco",
+        "pagode",
+        "gondoletta",
+        "fabula"
+      ]
+    },
+    "presets": {
+      "sensations": {
+        "must": [
+          "baron1898",
+          "dansemacabre",
+          "jorisendedraak",
+          "python",
+          "vliegendehollander",
+          "vogelrok",
+          "symbolica",
+          "pirana"
+        ],
+        "bonus": [
+          "halvemaen",
+          "villavolta",
+          "maxmoritz",
+          "fatamorgana",
+          "droomvlucht",
+          "sirocco"
+        ]
+      },
+      "famille": {
+        "must": [
+          "symbolica",
+          "droomvlucht",
+          "carnavalfestival",
+          "fatamorgana",
+          "maxmoritz",
+          "jorisendedraak",
+          "pirana"
+        ],
+        "bonus": [
+          "villavolta",
+          "gondoletta",
+          "pagode",
+          "sirocco",
+          "stoomcarrousel",
+          "oudetufferbaan",
+          "halvemaen",
+          "vliegendehollander",
+          "fabula"
+        ]
+      }
+    },
+    "indoor": [
+      "dansemacabre",
+      "carnavalfestival",
+      "droomvlucht",
+      "fabula",
+      "fatamorgana",
+      "symbolica",
+      "villavolta",
+      "vogelrok",
+      "sirocco",
+      "stoomcarrousel",
+      "pagode"
+    ],
+    "wet": [
+      "pirana",
+      "vliegendehollander"
+    ],
+    "minCm": {
+      "baron1898": 132,
+      "dansemacabre": 120,
+      "vliegendehollander": 120,
+      "python": 120,
+      "vogelrok": 120,
+      "jorisendedraak": 110,
+      "maxmoritz": 90,
+      "hooghmoed": 90
+    },
+    "singleRider": [
+      "baron1898",
+      "dansemacabre",
+      "jorisendedraak",
+      "maxmoritz",
+      "python",
+      "symbolica"
+    ],
+    "rideMin": {
+      "baron1898": 3,
+      "dansemacabre": 7,
+      "jorisendedraak": 3,
+      "python": 3,
+      "vliegendehollander": 6,
+      "vogelrok": 4,
+      "symbolica": 10,
+      "droomvlucht": 7,
+      "fatamorgana": 10,
+      "carnavalfestival": 9,
+      "maxmoritz": 4,
+      "pirana": 8,
+      "villavolta": 10,
+      "halvemaen": 5,
+      "sirocco": 5,
+      "gondoletta": 15,
+      "pagode": 8,
+      "fabula": 15,
+      "stoomcarrousel": 5,
+      "oudetufferbaan": 6
+    },
+    "transport": "stoomtrein",
+    "virtualQueue": {
+      "name": "Virtual Queue",
+      "url": "https://www.efteling.com/nl/park/informatie/wachtrijen",
+      "app": "l'appli officielle Efteling"
+    },
+    "sources": [
+      "https://api.themeparks.wiki/v1/entity/30713cf6-69a9-47c9-a505-52bb965f01be/children",
+      "https://www.efteling.com/en/park/attractions",
+      "https://www.efteling.com/en/park/attractions/baron-1898",
+      "https://www.efteling.com/nl/park/informatie/wachtrijen",
+      "https://www.looopings.nl/weblog/26051/Zo-werkt-de-nieuwe-virtuele-wachtrij-bij-Droomvlucht-in-de-Efteling.html",
+      "https://www.openstreetmap.org/#map=18/51.6494/5.0438"
+    ]
+  },
+  "disneylandpark": {
+    "name": "Disneyland Park",
+    "place": "Marne-la-Vallée",
+    "id": "dae968d5-630d-4719-8b06-3d107e944401",
+    "tz": "Europe/Paris",
+    "entrance": {
+      "lat": 48.8704,
+      "lon": 2.7795
+    },
+    "bounds": {
+      "south": 48.8694,
+      "north": 48.8766,
+      "west": 2.77,
+      "east": 2.782
+    },
+    "tiers": {
+      "A": [
+        "bigthundermountain",
+        "hyperspacemountain",
+        "peterpansflight",
+        "buzzlightyear",
+        "piratesofthecaribbean",
+        "phantommanor"
+      ],
+      "B": [
+        "indianajones",
+        "startours",
+        "itsasmallworld",
+        "autopia",
+        "dumbo",
+        "orbitron",
+        "madhatter",
+        "voyagesdepinocchio",
+        "blancheneige",
+        "caseyjr",
+        "paysdescontesdefees",
+        "philharmagic",
+        "carrouseldelancelot"
+      ]
+    },
+    "presets": {
+      "sensations": {
+        "must": [
+          "bigthundermountain",
+          "hyperspacemountain",
+          "indianajones",
+          "startours",
+          "phantommanor",
+          "piratesofthecaribbean"
+        ],
+        "bonus": [
+          "peterpansflight",
+          "buzzlightyear",
+          "orbitron",
+          "autopia"
+        ]
+      },
+      "famille": {
+        "must": [
+          "peterpansflight",
+          "itsasmallworld",
+          "piratesofthecaribbean",
+          "buzzlightyear",
+          "bigthundermountain",
+          "phantommanor",
+          "dumbo",
+          "autopia"
+        ],
+        "bonus": [
+          "startours",
+          "madhatter",
+          "voyagesdepinocchio",
+          "blancheneige",
+          "caseyjr",
+          "paysdescontesdefees",
+          "philharmagic",
+          "carrouseldelancelot",
+          "orbitron",
+          "alicescuriouslabyrinth"
+        ]
+      }
+    },
+    "indoor": [
+      "piratesofthecaribbean",
+      "phantommanor",
+      "peterpansflight",
+      "itsasmallworld",
+      "buzzlightyear",
+      "startours",
+      "hyperspacemountain",
+      "blancheneige",
+      "voyagesdepinocchio",
+      "mysteresdunautilus",
+      "philharmagic"
+    ],
+    "wet": [],
+    "minCm": {
+      "indianajones": 140,
+      "hyperspacemountain": 120,
+      "bigthundermountain": 102,
+      "startours": 102,
+      "autopia": 81
+    },
+    "singleRider": [
+      "indianajones",
+      "hyperspacemountain"
+    ],
+    "rideMin": {
+      "bigthundermountain": 5,
+      "hyperspacemountain": 4,
+      "indianajones": 3,
+      "phantommanor": 8,
+      "piratesofthecaribbean": 12,
+      "peterpansflight": 4,
+      "itsasmallworld": 12,
+      "buzzlightyear": 6,
+      "startours": 7,
+      "autopia": 6,
+      "orbitron": 3,
+      "dumbo": 3,
+      "caseyjr": 4,
+      "voyagesdepinocchio": 4,
+      "blancheneige": 4,
+      "paysdescontesdefees": 12,
+      "madhatter": 3,
+      "carrouseldelancelot": 3,
+      "philharmagic": 15
+    },
+    "transport": "railroad|streetcars|main street vehicles",
+    "virtualQueue": null,
+    "sources": [
+      "https://api.themeparks.wiki/v1/destinations",
+      "https://api.themeparks.wiki/v1/entity/dae968d5-630d-4719-8b06-3d107e944401/children",
+      "https://api.themeparks.wiki/v1/entity/dae968d5-630d-4719-8b06-3d107e944401/live",
+      "https://dlptips.com/advice/ride-restrictions/",
+      "https://www.openstreetmap.org/#map=18/48.8704/2.7795"
+    ]
+  },
+  "waltdisneystudios": {
+    "name": "Disney Adventure World",
+    "place": "Marne-la-Vallée",
+    "id": "ca888437-ebb4-4d50-aed2-d227f7096968",
+    "tz": "Europe/Paris",
+    "entrance": {
+      "lat": 48.8682,
+      "lon": 2.7807
+    },
+    "bounds": {
+      "south": 48.8627,
+      "north": 48.869,
+      "west": 2.7715,
+      "east": 2.7835
+    },
+    "tiers": {
+      "A": [
+        "crushscoaster",
+        "frozeneverafter",
+        "ratatouille",
+        "avengersassemble",
+        "towerofterror"
+      ],
+      "B": [
+        "spidermanweb",
+        "rcracer",
+        "toysoldiers",
+        "slinkydog",
+        "carsroadtrip",
+        "tapisvolants",
+        "raiponce",
+        "carsquatreroues"
+      ]
+    },
+    "presets": {
+      "sensations": {
+        "must": [
+          "avengersassemble",
+          "towerofterror",
+          "crushscoaster",
+          "rcracer",
+          "ratatouille",
+          "spidermanweb"
+        ],
+        "bonus": [
+          "toysoldiers",
+          "frozeneverafter",
+          "raiponce",
+          "slinkydog"
+        ]
+      },
+      "famille": {
+        "must": [
+          "ratatouille",
+          "frozeneverafter",
+          "spidermanweb",
+          "crushscoaster",
+          "carsroadtrip",
+          "slinkydog",
+          "toysoldiers"
+        ],
+        "bonus": [
+          "tapisvolants",
+          "raiponce",
+          "carsquatreroues",
+          "towerofterror",
+          "rcracer"
+        ]
+      }
+    },
+    "indoor": [
+      "ratatouille",
+      "spidermanweb",
+      "crushscoaster",
+      "avengersassemble",
+      "towerofterror",
+      "frozeneverafter"
+    ],
+    "wet": [],
+    "minCm": {
+      "avengersassemble": 120,
+      "rcracer": 120,
+      "crushscoaster": 107,
+      "towerofterror": 102,
+      "toysoldiers": 81
+    },
+    "singleRider": [
+      "avengersassemble",
+      "crushscoaster",
+      "frozeneverafter",
+      "rcracer",
+      "ratatouille",
+      "spidermanweb",
+      "toysoldiers"
+    ],
+    "rideMin": {
+      "avengersassemble": 4,
+      "crushscoaster": 5,
+      "frozeneverafter": 7,
+      "ratatouille": 7,
+      "towerofterror": 6,
+      "spidermanweb": 7,
+      "rcracer": 3,
+      "toysoldiers": 3,
+      "slinkydog": 3,
+      "carsroadtrip": 12,
+      "tapisvolants": 3,
+      "raiponce": 3,
+      "carsquatreroues": 3
+    },
+    "transport": null,
+    "virtualQueue": null,
+    "sources": [
+      "https://api.themeparks.wiki/v1/destinations",
+      "https://api.themeparks.wiki/v1/entity/ca888437-ebb4-4d50-aed2-d227f7096968/children",
+      "https://api.themeparks.wiki/v1/entity/ca888437-ebb4-4d50-aed2-d227f7096968/live",
+      "https://dlptips.com/advice/ride-restrictions/",
+      "https://www.openstreetmap.org/#map=18/48.8682/2.7807"
+    ]
+  },
+  "parcasterix": {
+    "name": "Parc Astérix",
+    "place": "Plailly",
+    "id": "9e938687-fd99-46f3-986a-1878210378f8",
+    "tz": "Europe/Paris",
+    "entrance": {
+      "lat": 49.1361,
+      "lon": 2.5727
+    },
+    "bounds": {
+      "south": 49.13,
+      "north": 49.1381,
+      "west": 2.5635,
+      "east": 2.576
+    },
+    "tiers": {
+      "A": [
+        "bytoutatis",
+        "osirisconvolvulis",
+        "thunder2zeus",
+        "piratesrevenge",
+        "romulusandrapidus",
+        "menhirexpress",
+        "fulliautomatix"
+      ],
+      "B": [
+        "hurrahtrail",
+        "discobelix",
+        "pegasusexpress",
+        "descentofthenile",
+        "trojanhorse",
+        "towerofedifis",
+        "hydraoflerna",
+        "icarussflight",
+        "flightofibis",
+        "thegalley",
+        "soshieroglyphix",
+        "caesarsspies",
+        "gyrotechnix",
+        "justforkix"
+      ]
+    },
+    "presets": {
+      "sensations": {
+        "must": [
+          "bytoutatis",
+          "osirisconvolvulis",
+          "thunder2zeus",
+          "discobelix",
+          "hurrahtrail",
+          "trojanhorse",
+          "piratesrevenge",
+          "romulusandrapidus",
+          "menhirexpress",
+          "descentofthenile"
+        ],
+        "bonus": [
+          "pegasusexpress",
+          "towerofedifis",
+          "flightofibis",
+          "thegalley",
+          "justforkix",
+          "fulliautomatix",
+          "icarussflight"
+        ]
+      },
+      "famille": {
+        "must": [
+          "pegasusexpress",
+          "menhirexpress",
+          "piratesrevenge",
+          "romulusandrapidus",
+          "fulliautomatix",
+          "icarussflight",
+          "hydraoflerna",
+          "soshieroglyphix",
+          "caesarsspies",
+          "bewaremenhirs"
+        ],
+        "bonus": [
+          "gyrotechnix",
+          "thecauldrons",
+          "ministorm",
+          "ekonomikrisis",
+          "riverinilia",
+          "caesarscarousel",
+          "minidragonships",
+          "towerofedifis"
+        ]
+      }
+    },
+    "indoor": [
+      "bewaremenhirs"
+    ],
+    "wet": [
+      "romulusandrapidus",
+      "piratesrevenge",
+      "menhirexpress",
+      "descentofthenile"
+    ],
+    "minCm": {
+      "trojanhorse": 140,
+      "justforkix": 140,
+      "osirisconvolvulis": 130,
+      "thunder2zeus": 120,
+      "bytoutatis": 120,
+      "hurrahtrail": 120,
+      "discobelix": 120,
+      "towerofedifis": 120,
+      "flightofibis": 120,
+      "thegalley": 120,
+      "piratesrevenge": 100,
+      "romulusandrapidus": 100,
+      "pegasusexpress": 100,
+      "descentofthenile": 100,
+      "hydraoflerna": 100,
+      "icarussflight": 100,
+      "gyrotechnix": 100,
+      "fulliautomatix": 100,
+      "menhirexpress": 100,
+      "soshieroglyphix": 90,
+      "caesarsspies": 90,
+      "ministorm": 90
+    },
+    "singleRider": [
+      "bytoutatis",
+      "osirisconvolvulis",
+      "fulliautomatix"
+    ],
+    "rideMin": {
+      "bytoutatis": 3,
+      "osirisconvolvulis": 3,
+      "thunder2zeus": 3,
+      "discobelix": 3,
+      "hurrahtrail": 3,
+      "trojanhorse": 3,
+      "piratesrevenge": 7,
+      "romulusandrapidus": 6,
+      "menhirexpress": 5,
+      "descentofthenile": 3,
+      "pegasusexpress": 3,
+      "towerofedifis": 7,
+      "flightofibis": 3,
+      "thegalley": 3,
+      "justforkix": 3,
+      "fulliautomatix": 3,
+      "icarussflight": 2,
+      "hydraoflerna": 3,
+      "soshieroglyphix": 5,
+      "caesarsspies": 5,
+      "bewaremenhirs": 15
+    },
+    "transport": null,
+    "virtualQueue": null,
+    "sources": [
+      "https://api.themeparks.wiki/v1/entity/9e938687-fd99-46f3-986a-1878210378f8/children",
+      "https://www.parcasterix.fr/en/attractions",
+      "https://www.parcasterix.fr/en/attractions/thrill/by-toutatis",
+      "https://www.parcasterix.fr/en/attractions/thrill/osiris-convolvulis",
+      "https://www.parcasterix.fr/en/attractions/family/fulliautomatix",
+      "https://www.openstreetmap.org/#map=18/49.1361/2.5727"
+    ]
+  }
+}

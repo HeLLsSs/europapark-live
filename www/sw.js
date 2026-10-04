@@ -1,8 +1,9 @@
 /* Service worker : garde la page et les polices en cache pour qu'elle s'ouvre
    instantanément, même quand le réseau du parc est saturé.
    Les temps d'attente (api.php / themeparks.wiki) passent toujours par le réseau. */
-const CACHE = 'ep-live-v2';
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
+const CACHE = 'ep-live-v3';
+const TILES = 'ep-tiles';   // fond de carte et Leaflet : gardés d'une version à l'autre
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'parks.json', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -11,7 +12,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== TILES).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -22,6 +23,18 @@ self.addEventListener('fetch', e => {
 
   // Données en direct : jamais depuis le cache du service worker
   if (url.pathname.endsWith('/api.php') || url.hostname === 'api.themeparks.wiki') return;
+
+  // Tuiles OpenStreetMap et Leaflet : cache d'abord, le réseau seulement pour ce qui manque
+  if (url.hostname === 'tile.openstreetmap.org' || (url.hostname === 'cdnjs.cloudflare.com' && url.pathname.includes('/leaflet/'))) {
+    e.respondWith(caches.open(TILES).then(async cache => {
+      const hit = await cache.match(e.request);
+      if (hit) return hit;
+      const r = await fetch(e.request);
+      if (r.ok || r.type === 'opaque') cache.put(e.request, r.clone());
+      return r;
+    }));
+    return;
+  }
 
   // Polices Google : cache d'abord
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {

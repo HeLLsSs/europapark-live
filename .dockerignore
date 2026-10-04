@@ -1,0 +1,15 @@
+# Contexte de build Docker : seul le code est utile
+.git
+.gitignore
+.dockerignore
+**/.idea
+**/.DS_Store
+**/*.swp
+Dockerfile
+docker-compose.yml
+README.md
+deploy
+
+# Données générées par api.php : elles vivent dans le volume
+www/data/*
+!www/data/.htaccess

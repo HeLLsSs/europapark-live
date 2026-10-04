@@ -1,0 +1,38 @@
+# Europa-Park Live : docker compose up -d --build
+# L'appli écoute en HTTP sur le port 8080 : mets-la derrière un reverse proxy HTTPS
+# (Caddy, Traefik, nginx…). HTTPS obligatoire pour le GPS, les notifications et l'installation.
+services:
+  europapark:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      # Fuseau horaire du parc (heures de la collecte, de 8 h à 20 h 59)
+      TZ: Europe/Berlin
+      # Parc suivi
+      EP_PARK: europapark
+      # Contact transmis aux services push (sinon l'adresse du site)
+      #EP_VAPID_SUB: mailto:moi@example.com
+    volumes:
+      - europapark-data:/var/www/europapark/www/data
+      # Mot de passe commun optionnel (voir docker/nginx.conf)
+      #- ./europapark.htpasswd:/etc/nginx/europapark.htpasswd:ro
+    restart: unless-stopped
+
+  # Exemple : Caddy obtient et renouvelle tout seul le certificat HTTPS.
+  # Le nom de domaine doit pointer vers ce serveur, ports 80 et 443 ouverts.
+  # Avec Caddy, retire « ports » du service europapark (plus besoin d'exposer 8080).
+  #caddy:
+  #  image: caddy:2-alpine
+  #  command: caddy reverse-proxy --from europapark.example.com --to europapark:8080
+  #  ports:
+  #    - "80:80"
+  #    - "443:443"
+  #    - "443:443/udp"
+  #  volumes:
+  #    - caddy-data:/data
+  #  restart: unless-stopped
+
+volumes:
+  europapark-data:
+  #caddy-data:

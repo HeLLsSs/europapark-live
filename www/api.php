@@ -1,8 +1,11 @@
 <?php
 /**
- * Europa-Park — relais des temps d'attente (source : api.themeparks.wiki)
+ * Europa-Park Live — relais des temps d'attente (source : api.themeparks.wiki)
+ * Le parc de l'instance est décrit dans parks.json et choisi par la variable EP_PARK.
  *
  * Routes (?r=...) :
+ *   config      description du parc de l'instance (parks.json[EP_PARK])
+ *   where       GET / POST : positions partagées du groupe
  *   bundle      temps d'attente en direct + statistiques + météo (ce qu'appelle la page)
  *               &u=ID&since=ms : ajoute le profil (état synchronisé s'il est plus récent que since)
  *   live        temps d'attente en direct (JSON amont)
@@ -26,8 +29,6 @@
 
 declare(strict_types=1);
 
-const PARK_ID       = '639738d3-9574-4f60-ab5b-4c392901320b'; // Europa-Park (themeparks.wiki)
-const TZ            = 'Europe/Berlin';
 const TTL_LIVE      = 60;      // s — cache des temps d'attente
 const TTL_CHILDREN  = 86400;   // s — liste des attractions
 const TTL_SCHEDULE  = 21600;   // s — horaires
@@ -42,11 +43,24 @@ const MAX_PUSH_RUN  = 3;       // notifications max par profil et par collecte
 const WHERE_KEEP    = 7200000; // ms — positions du groupe effacées après 2 h
 const WHERE_FRESH   = 1200000; // ms — positions du groupe affichées si moins de 20 min
 const PACES         = ['enfants' => 55, 'normal' => 75, 'rapide' => 90]; // mètres par minute, comme PACES dans index.html
-const ENTRANCE      = [48.2689, 7.7232]; // entrée principale, comme ENTRANCE dans index.html
 const JSON_OUT      = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
 
+// Parc de l'instance : parks.json, choisi par EP_PARK (par défaut le premier du fichier)
+$PARKS = json_decode((string) @file_get_contents(__DIR__ . '/parks.json'), true);
+$PARK_SLUG = getenv('EP_PARK') ?: (is_array($PARKS) && $PARKS ? (string) array_key_first($PARKS) : '');
+$PARK = is_array($PARKS) ? ($PARKS[$PARK_SLUG] ?? null) : null;
+if (!is_array($PARK) || !isset($PARK['id'], $PARK['tz'], $PARK['entrance']['lat'], $PARK['entrance']['lon'])) {
+    if (PHP_SAPI !== 'cli') { http_response_code(500); header('Content-Type: application/json; charset=utf-8'); }
+    echo json_encode(['error' => "Parc « $PARK_SLUG » introuvable ou incomplet dans parks.json (variable EP_PARK). Parcs disponibles : "
+        . implode(', ', is_array($PARKS) ? array_keys($PARKS) : [])], JSON_UNESCAPED_UNICODE) . "\n";
+    exit(1);
+}
+define('PARK_ID', (string) $PARK['id']);
+define('TZ', (string) $PARK['tz']);
+define('ENTRANCE', [(float) $PARK['entrance']['lat'], (float) $PARK['entrance']['lon']]); // comme ENTRANCE dans index.html
 // Même URL que WEATHER_URL dans index.html (repli quand le relais ne répond pas)
-const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=48.266&longitude=7.722&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_gusts_10m&timezone=Europe%2FBerlin&forecast_days=3';
+define('WEATHER_URL', 'https://api.open-meteo.com/v1/forecast?latitude=' . ENTRANCE[0] . '&longitude=' . ENTRANCE[1]
+    . '&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_gusts_10m&timezone=' . rawurlencode(TZ) . '&forecast_days=3');
 
 /** Erreur renvoyée telle quelle au client, avec son code HTTP. */
 class HttpError extends RuntimeException {}
@@ -68,6 +82,10 @@ if (!defined('EP_LIB')) {
     try {
         ensure_dirs($DATA);
         switch ($route) {
+            case 'config':
+                send(200, ['slug' => $PARK_SLUG] + $PARK);
+                break;
+
             case 'bundle':
                 $uid = isset($_GET['u']) ? user_param() : null;
                 [$live, $stale, $at] = cached($DATA, 'live', TTL_LIVE, $UPSTREAM . PARK_ID . '/live');
@@ -79,6 +97,7 @@ if (!defined('EP_LIB')) {
                     . ',"weather":' . ($weather ?? 'null')
                     . ($uid === null ? '' : ',"user":' . json_encode(user_summary($DATA, $uid, (float) ($_GET['since'] ?? 0)), JSON_OUT))
                     . ',"where":' . json_encode(where_list($DATA), JSON_OUT)
+                    . ',"real":' . json_encode(pooled_real($DATA), JSON_OUT)
                     . ',"live":' . $live . '}';
                 break;
 
@@ -656,6 +675,25 @@ function with_lock(string $file, callable $fn)
     }
 }
 
+/** Écart « attente réelle / attente affichée » mesuré par tous les profils (30 derniers jours), médiane. Cache 5 min. */
+function pooled_real(string $data): ?array
+{
+    $cache = "$data/cache/real.json";
+    if (is_file($cache) && time() - filemtime($cache) < 300) return json_decode((string) file_get_contents($cache), true);
+    $r = [];
+    $since = now_ms() - 30 * 86400000;
+    foreach (user_files($data) as $f) {
+        $u = json_decode((string) file_get_contents($f), true);
+        foreach ((array) ($u['state']['samples'] ?? []) as $x) {
+            if (($x['posted'] ?? 0) >= 10 && is_numeric($x['real'] ?? null) && ($x['t'] ?? 0) > $since) $r[] = $x['real'] / $x['posted'];
+        }
+    }
+    sort($r);
+    $out = $r ? ['f' => round($r[intdiv(count($r), 2)], 3), 'n' => count($r)] : null;
+    write_json($cache, $out);
+    return $out;
+}
+
 /* ------------------------------------------------------------------ */
 /* Positions du groupe : data/where.json = {appareil: {nick, lat, lon, ts}} */
 
@@ -913,16 +951,32 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
     } catch (Throwable $e) {
         // sans coordonnées : 6 min de marche partout
     }
+    global $PARK;
+    $transport = !empty($PARK['transport']) ? '/' . str_replace('/', '\\/', (string) $PARK['transport']) . '/i' : null;
     $wait = []; $status = [];
     foreach ($live['liveData'] ?? [] as $e) {
         $id = $e['id'] ?? null;
         if (!is_string($id)) continue;
         if (!isset($ents[$id])) $ents[$id] = ['name' => short_name((string) ($e['name'] ?? '?')), 'pos' => null];
         $status[$id] = $e['status'] ?? '';
+        if ($transport && preg_match($transport, (string) ($e['name'] ?? ''))) continue; // trains et gares : pas des attractions
         $w = $e['queue']['STANDBY']['waitTime'] ?? null;
         if ($status[$id] === 'OPERATING' && is_numeric($w)) $wait[$id] = (int) $w;
     }
     $prevStatus = (array) ($prev['s'] ?? []);
+
+    // Heure de fermeture du jour, pour le « dernier appel »
+    $close = null;
+    if ($wait) {
+        try {
+            [$sch] = cached($data, 'schedule', TTL_SCHEDULE, $upstream . PARK_ID . '/schedule');
+            foreach (json_decode($sch, true)['schedule'] ?? [] as $x) {
+                if (($x['date'] ?? '') === $today && ($x['type'] ?? '') === 'OPERATING' && ($t = strtotime((string) ($x['closingTime'] ?? ''))) !== false) $close = minute_of_day($t);
+            }
+        } catch (Throwable $e) {
+            // pas d'horaires : pas de dernier appel
+        }
+    }
 
     // Pluie dans l'heure qui vient alors qu'il ne pleut pas (mêmes seuils que rainy() dans index.html)
     $rain = null;
@@ -978,6 +1032,22 @@ function notify_users(string $data, array $live, ?array $prev, string $upstream)
             $meal = (int) $planned['meal'];
             if ($now >= $meal - 2 && $now <= $meal + 20) {
                 $msgs[] = ["m:$meal", 86400, 'Pause repas', "C'est le bon moment : les files sont au plus haut."];
+            }
+        }
+
+        // Dernier appel, une fois, entre 45 et 30 min avant la fermeture : programme d'abord, puis les plus rapides
+        if ($close !== null && $now >= $close - 45 && $now < $close - 30) {
+            $plan = (array) ($st['plan'] ?? []);
+            $picks = [];
+            foreach ($wait as $id => $w) {
+                $wk = $walk($id);
+                if (!$isDone($id) && $wk + 1 < $close - $now) $picks[] = [isset($plan[$id]) ? 0 : 1, $w + 1.5 * $wk, $id, $w];
+            }
+            sort($picks);
+            $picks = array_slice($picks, 0, 3);
+            if ($picks) {
+                $msgs[] = ["l:$today", 86400, 'Dernier appel', 'Fermeture à ' . hhmm($close) . ' : '
+                    . implode(', ', array_map(function ($p) use ($name) { return $name($p[2]) . " ({$p[3]} min)"; }, $picks)) . '.'];
             }
         }
 
