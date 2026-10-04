@@ -84,6 +84,14 @@ Les libellés sont simples : ⭐ *J'adore* (incontournable), 👍 *Si on a le te
 
 ## 5. Préparer la journée (la veille)
 
+**🧳 Prêt pour demain ?** (Réglages, ou bouton dans l'aperçu de la veille) teste le téléphone en un bouton et affiche ✅ ou ❌ pour chaque point :
+- serveur joignable, profil enregistré ;
+- position GPS (avec sa précision) et boussole ;
+- notifications, avec un bouton pour envoyer un test ;
+- carte téléchargée, appli installée sur l'écran d'accueil.
+
+Il reste ensuite à cocher soi-même les billets liés dans l'appli officielle (pour VirtualLine), la batterie externe et le rappel d'enregistrer la place de la voiture. Lance-le sur chaque téléphone du groupe.
+
 1. **Programme** : touche *Sensations fortes* ou *En famille*, puis ajuste dans **Attractions** avec les étoiles.
    - étoile pleine = **incontournable** ;
    - demi-étoile = **bonus** (fait seulement s'il reste du temps) ;
@@ -182,6 +190,8 @@ Chaque « Fait » est noté. Une fois le parc fermé, l'onglet **Maintenant** af
 - la distance à pied, estimée entre les attractions ;
 - l'attente gagnée par rapport à l'attente moyenne relevée ce jour-là sur les mêmes attractions ;
 - le meilleur coup, l'attraction préférée et **vos mieux notées**.
+
+**Badges** : 🎢 5 gros frissons, 💦 Trempé (3 attractions mouillées), 🔁 Encore ! (même attraction ×3), ⚡ Éclair (grosse attraction à 10 min ou moins), 🌅 Lève-tôt, 🦉 Dernier tour, 🏅 15 tours, 🏆 Toutes les préférées, 🚶 Marathonien (8 km), 🎭 Spectateur, 🎟 Pro du coupe-file, 🧠 Malin (1 h de file gagnée). Ils s'annoncent dans la journée, s'affichent dans le récap et partent avec le texte partagé.
 
 **Notes** : après chaque « Fait », un bandeau te demande une note de 1 à 5 étoiles ; tu peux aussi noter depuis la fiche. 4 étoiles ajoutent l'attraction à « À refaire » sous 15 min, 5 étoiles sous 20 min, si rien n'est déjà réglé. La liste des attractions affiche la note moyenne de tous les profils du serveur.
 

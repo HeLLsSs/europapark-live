@@ -223,6 +223,16 @@ details.adv{border-top:1px solid var(--line);padding-top:14px}
 details.adv > summary{font-weight:700;cursor:pointer;padding:6px 0}
 details.adv > .set{padding-top:14px}
 
+/* Test du téléphone, badges */
+.diag{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.diag-row{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.diag-row:last-child{border-bottom:0}
+.d-icon{font-size:1.3rem;flex:none}
+.d-text{flex:1;min-width:0}
+.d-score{font:800 1.3rem var(--font-display);margin:0}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{background:var(--accent-soft);color:var(--ink);border-radius:99px;padding:4px 10px;font-weight:700;font-size:.9rem}
+
 /* Mode plein soleil : clair, contraste maximal, textes plus gros (réglage de l'appareil) */
 :root[data-sun="1"]{--bg:#FFFFFF;--surface:#FFFFFF;--sunk:#EDEDED;--ink:#000000;--muted:#262626;--line:#8A8A8A;
   --accent:#3A12B8;--accent-ink:#FFFFFF;--accent-soft:#E4DCFF;--board:#000000;--board-ink:#FFFFFF;--board-muted:#E0E0E0;--board-line:#555555;
@@ -446,6 +456,11 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
             <button class="btn small" id="pushBtn" data-act="push-on" type="button" data-i18n="set.pushOn">Activer les notifications</button>
             <button class="btn small" id="pushTest" data-act="push-test" type="button" hidden data-i18n="set.pushTest">Tester</button>
           </div>
+        </div>
+        <div class="set">
+          <h2 data-i18n="d.title">Prêt pour demain ?</h2>
+          <p class="muted" data-i18n="d.hint">Vérifie en un bouton que tout marche sur ce téléphone : serveur, position, boussole, notifications, carte hors ligne.</p>
+          <div class="row-inline"><button class="btn small primary" data-act="diag" type="button" data-i18n="d.run">Tester mon téléphone</button></div>
         </div>
         <div class="set">
           <h2 data-i18n="set.help">Aide et mises à jour</h2>
@@ -682,6 +697,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
   <details id="help-recap" data-i18n-html="help.recap"><summary>Récap de la journée</summary>
     <p>Chaque « Fait » est noté. Le soir, l'onglet Maintenant affiche ta journée : nombre de tours, temps passé dans les files, distance à pied (estimée entre les attractions), attente gagnée par rapport à la moyenne de la journée, meilleur coup et attraction préférée. Bouton <b>Partager</b> pour l'envoyer au groupe. À tout moment : Réglages → <i>Récap de ma journée</i>.</p>
     <p><b>Notes</b> : après chaque « Fait », l'appli te demande une note de 1 à 5 étoiles (aussi dans la fiche). 4 ou 5 étoiles ajoutent l'attraction à « À refaire » si rien n'est réglé. Le récap affiche vos préférées, et la liste montre la note moyenne de tous les profils.</p>
+    <p><b>Badges</b> : 🎢 5 gros frissons, 💦 Trempé, 🔁 Encore !, ⚡ Éclair, 🌅 Lève-tôt, 🦉 Dernier tour, 🏆 Toutes les préférées… Ils s'annoncent au fil de la journée et apparaissent dans le récap partagé.</p>
   </details>
 
   <details id="help-crowd" data-i18n-html="help.crowd"><summary>Affluence</summary>
@@ -709,6 +725,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     </ul>
     <p><b>Mode plein soleil</b> (Réglages) : contraste maximal et textes plus gros. <b>Économie de batterie</b> : GPS moins précis et actualisation toutes les 5 min ; sur Android, l'appli la propose d'elle-même sous 20 % de batterie.</p>
     <p><b>Saison</b> : les spectacles de saison (Halloween, Noël…) sont marqués 🎃 et passent en tête de la liste des spectacles.</p>
+    <p><b>🧳 Prêt pour demain ?</b> (Réglages) : la veille, teste chaque téléphone en un bouton (serveur, profil, position, boussole, notifications, carte hors ligne, installation) et coche le reste (billets liés, batterie externe).</p>
   </details>
 
   <details id="help-faq" data-i18n-html="help.faq"><summary>Problèmes fréquents</summary>
@@ -747,6 +764,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
       <li><b>Programme commun</b> par vote, <b>rendez-vous</b> pour se séparer puis se retrouver.</li>
       <li><b>Mode plein soleil</b>, <b>économie de batterie</b>, spectacles de saison 🎃, <b>rejouer une journée</b>.</li>
       <li><b>Mode simple</b> par défaut, avec une <b>flèche</b> vers la prochaine étape, et démarrage en 3 questions.</li>
+      <li><b>🧳 Prêt pour demain ?</b> : test du téléphone en un bouton, et <b>badges</b> de la journée.</li>
     </ul>
     <p>Les mises à jour arrivent toutes seules à la prochaine ouverture de l'appli.</p>
   </details>
@@ -769,7 +787,7 @@ const PACES = {enfants: 55, normal: 75, rapide: 90}; // mètres par minute
 // Poids d'une minute de marche face à une minute de file gagnée.
 // Au-delà de 8 min de trajet, chaque minute compte double : on ne traverse le parc que si ça vaut vraiment le coup.
 const ROUTE = {attente: 1, equilibre: 1.6, marche: 2.4};
-const APP_VERSION = '2026.10.06.4';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
+const APP_VERSION = '2026.10.06.5';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
 const PEAK = {A: 45, B: 20, C: 8};
 // Courbe générique de remplissage d'un parc sur la journée (multiplicateur), minute du jour -> facteur
 const PRIOR = [[480,.4],[540,.45],[600,.75],[660,.95],[720,1],[900,.95],[960,.85],[1020,.65],[1050,.5],[1080,.3],[1140,.2]];
@@ -871,7 +889,7 @@ function saveJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } ca
 const cacheGet = k => loadJSON('ep-cache-' + k), cacheSet = (k, v) => saveJSON('ep-cache-' + k, v);
 
 const DEFAULTS = {plan:{}, shows:{}, again:{}, done:{}, skip:{}, slots:[], alerts:{}, alerted:{}, pace:'normal', hotel:false,
-  route:'equilibre', meal:{on:true, dur:45, from:690, to:840}, mealDone:false, mealSkip:0, height:0, queue:null, samples:[], planned:null, pos:null, single:false, srSeen:{}, log:[], ratings:{}, car:null, meet:null,
+  route:'equilibre', meal:{on:true, dur:45, from:690, to:840}, mealDone:false, mealSkip:0, height:0, queue:null, samples:[], planned:null, pos:null, single:false, srSeen:{}, log:[], ratings:{}, car:null, meet:null, badges:[],
   day:null, lastDone:null, onboarded:false, updatedAt:0};
 function withDefaults(st) {
   const p = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), st || {});
@@ -904,7 +922,7 @@ function setLang(lang) {
 function rolloverDay() {
   const d = berlin(now()).day;
   if (prefs.day !== d) {
-    Object.assign(prefs, {day: d, done: {}, skip: {}, alerted: {}, lastDone: null, mealDone: false, mealSkip: 0, queue: null, planned: null, srSeen: {}, log: []});
+    Object.assign(prefs, {day: d, done: {}, skip: {}, alerted: {}, lastDone: null, mealDone: false, mealSkip: 0, queue: null, planned: null, srSeen: {}, log: [], badges: []});
     prefs.slots = (prefs.slots || []).filter(s => s.day >= d);
     if (prefs.meet && prefs.meet.day < d) prefs.meet = null;
     savePrefs(false);
@@ -1664,7 +1682,8 @@ function renderNow(P, plan) {
       + (fd ? `<p>${t('fc.tip', {level: esc(t('fc.levels')[fd.level - 1]), why: fd.why.length ? ' (' + esc(fcWhy(fd)) + ')' : ''})}</p>` : '')
       + `<p>${t('tips.early', {time: hhmm(P.h.open)})}</p>
       <p>${t('tips.vl')}</p>
-      <p>${t('tips.notif')}</p>`;
+      <p>${t('tips.notif')}</p>
+      <div class="row-inline"><button class="btn small primary" type="button" data-act="diag">🧳 ${t('d.title')}</button></div>`;
   }
   renderVL(P, plan);
   // Mode simple : une seule carte en gros ; le reste seulement si « Voir toute la journée »
@@ -2047,6 +2066,7 @@ async function downloadMap() {
   if (failed > done / 10) toast(t('map.dlFail'));
   else { device.mapAt = Date.now(); device.mapFor = PARK.slug; saveDevice(); toast(t('map.dlDone', {n: done})); }
   renderMapTools();
+  renderDiag();
 }
 function renderMapTools(pct) {
   const n = mapTiles().length, mb = Math.max(1, Math.round(n * 22 / 1024));
@@ -2386,7 +2406,7 @@ function markDone(id) {
       if (real != null && q.posted > 0) prefs.samples = (prefs.samples || []).concat([{id, posted: q.posted, real, t: Date.now()}]).slice(-40);
     }
     const sr = srFactor(id, ents.get(id)), w = q && q.id === id ? q.posted : waitOf(id);
-    prefs.log = (prefs.log || []).concat([{id, t: berlin(now()).mod, w: w != null && sr < 1 ? Math.round(w * sr) : w, real}]);
+    prefs.log = (prefs.log || []).concat([{id, t: berlin(now()).mod, w: w != null && sr < 1 ? Math.round(w * sr) : w, real, vl: hadSlot}]);
     prefs.queue = null;
     prefs.done[id] = (prefs.done[id] || 0) + 1;
     prefs.lastDone = id;
@@ -2395,6 +2415,7 @@ function markDone(id) {
   });
   gpsPrompt = null;
   if (ents.get(id)?.type === 'ATTRACTION') { pendingRate = id; renderBanner(lastP || phaseInfo(), lastPlan); }
+  checkBadges();
   // Un seul créneau VirtualLine à la fois : le suivant se réserve dès que celui-ci est utilisé
   if (hadSlot && P.phase === 'open') {
     const pick = vlPick(P, id);
@@ -2492,6 +2513,10 @@ document.addEventListener('click', ev => {
     case 'car-clear': withUndo(t('car.cleared'), () => { prefs.car = null; }); $('#sheet').close(); break;
     case 'car-show': $('#sheet').close(); switchTab('map'); setTimeout(() => { follow = false; lmap?.setView([prefs.car.lat, prefs.car.lon], 17); }, 100); break;
     case 'map-dl': downloadMap(); break;
+    case 'diag': openDiag(); break;
+    case 'diag-run': runDiag(); break;
+    case 'diag-check': device.checks = Object.assign({}, device.checks, {[id]: !device.checks?.[id]}); saveDevice(); renderDiag(); break;
+    case 'diag-compass': enableCompass().then(() => setTimeout(renderDiag, 2500)); break;
     case 'show-all': showAll = !showAll; render(); break;
     case 'compass': enableCompass(); break;
     case 'wizard': openWizard(); break;
@@ -2683,6 +2708,7 @@ async function enablePush() {
     toast(t('push.enabled'));
   } catch (e) { toast(t('push.fail', {msg: e.message})); }
   renderSettings();
+  renderDiag();
 }
 function renderPushStatus() {
   const np = 'Notification' in window ? Notification.permission : 'unsupported';
@@ -2736,6 +2762,7 @@ function recapHTML(r) {
   return `<article class="card"><div class="eyebrow">${t('recap.eyebrow', {from: hhmm(r.from), to: hhmm(r.to)})}</div>
     <div class="stats"><div class="stat"><span>${t('recap.rides')}</span><b>${r.rides}</b></div><div class="stat"><span>${t('recap.queues')}</span><b>${dur(r.queue)}</b></div><div class="stat"><span>${t('sheet.walk')}</span><b>≈ ${km(r.km)} km</b></div></div>
     ${lines.length ? `<p>${lines.join(' ')}</p>` : ''}
+    ${badgesHTML(badges())}
     <div class="row-inline"><button class="btn small primary" type="button" data-act="recap-share">${t('recap.share')}</button></div></article>`;
 }
 function openRecap() {
@@ -2750,7 +2777,8 @@ function shareRecap() {
   const r = recapData();
   if (!r) return;
   const text = t('share.text', {park: PARK.name, day: fmtDay(berlin(now()).day), rides: r.rides, distinct: r.distinct, queue: dur(r.queue), km: km(r.km)})
-    + (r.gained >= 10 ? t('share.gained', {d: dur(r.gained)}) : '') + (r.fav ? t('share.fav', {name: shortName(ents.get(r.fav[0])), n: r.fav[1]}) : '') + '.';
+    + (r.gained >= 10 ? t('share.gained', {d: dur(r.gained)}) : '') + (r.fav ? t('share.fav', {name: shortName(ents.get(r.fav[0])), n: r.fav[1]}) : '') + '.'
+    + (badges().length ? ' ' + badges().map(b => `${b.emoji} ${badgeName(b.id)}`).join(' · ') : '');
   if (navigator.share) navigator.share({title: t('share.title', {park: PARK.name}), text}).catch(() => {});
   else navigator.clipboard?.writeText(text).then(() => toast(t('toast.recapCopied'))).catch(() => toast(text));
 }
@@ -2804,7 +2832,8 @@ function simpleHTML(P, plan) {
     return `<article class="simple"><div class="s-emoji">${P.phase === 'before' ? '🌅' : '🌙'}</div>
       <div class="s-label">${P.phase === 'before' ? t('s.today') : esc(fmtDay(P.day))}</div>
       <div class="s-title">${t('s.beAt', {time: hhmm(Math.max(0, P.h.open - 15))})}</div>
-      ${rides.length ? `<p>${t('s.startWith', {list: rides.join(', ')})}</p>` : ''}${more}</article>`;
+      ${rides.length ? `<p>${t('s.startWith', {list: rides.join(', ')})}</p>` : ''}
+      <div class="s-actions">${bigBtn('diag', '🧳 ' + t('d.title'), false)}</div>${more}</article>`;
   }
   if (!first) {
     const easy = [...live.keys()].filter(id => hasQueue(id) && waitOf(id) != null && !tooSmall(id)).sort((a, b) => waitOf(a) - waitOf(b)).slice(0, 3);
@@ -2935,6 +2964,97 @@ function presetPlan(name) {
   }
   return plan;
 }
+
+/* ---------- « Prêt pour demain ? » : test du téléphone ----------
+   Vérifications automatiques (serveur, profil, position, boussole, notifications, carte, installation)
+   et points à cocher soi-même (gardés sur ce téléphone). */
+let diag = {};
+async function runDiag() {
+  diag = {server: 'wait', profile: 'wait', gps: 'wait', compass: heading != null ? 'ok' : 'todo'};
+  renderDiag();
+  getJSON(`${SERVER}?r=health`, 8000).then(h => { diag.server = h.ok && h.dataWritable ? 'ok' : 'ko'; }).catch(() => { diag.server = 'ko'; })
+    .finally(() => {
+      if (!remote()) { diag.profile = 'ko'; renderDiag(); return; }
+      getJSON(`${SERVER}?r=state&u=${encodeURIComponent(user.id)}`, 8000).then(j => { diag.profile = j.state ? 'ok' : 'ko'; }).catch(() => { diag.profile = 'ko'; }).finally(renderDiag);
+    });
+  if (!navigator.geolocation) diag.gps = 'ko';
+  else navigator.geolocation.getCurrentPosition(p => { diag.gps = 'ok'; diag.gpsAcc = Math.round(p.coords.accuracy); lastGps = {lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy, ts: Date.now()}; renderDiag(); },
+    err => { diag.gps = err.code === 1 ? 'denied' : 'ko'; renderDiag(); }, {enableHighAccuracy: true, timeout: 20000, maximumAge: 60000});
+}
+function diagRow(state, label, hint, action) {
+  const icon = {ok: '✅', ko: '❌', denied: '❌', wait: '⏳', todo: '⬜'}[state] || '⬜';
+  return `<li class="diag-row"><span class="d-icon">${icon}</span><span class="d-text"><b>${label}</b>${hint ? `<br><span class="muted">${hint}</span>` : ''}</span>${action || ''}</li>`;
+}
+function renderDiag() {
+  const box = $('#diagBox');
+  if (!box) return;
+  const btn = (act, label) => `<button class="btn small" type="button" data-act="${act}">${label}</button>`;
+  const check = (k, label) => diagRow(device.checks?.[k] ? 'ok' : 'todo', label, '', `<button class="btn small" type="button" data-act="diag-check" data-id="${k}">${device.checks?.[k] ? t('d.undo') : t('d.done')}</button>`);
+  const np = 'Notification' in window ? Notification.permission : 'unsupported';
+  const mapOk = device.mapAt && device.mapFor === PARK.slug;
+  const rows = [
+    diagRow(diag.server, t('d.server'), diag.server === 'ko' ? t('d.serverKo') : ''),
+    diagRow(diag.profile, t('d.profile', {name: esc(user?.name || '?')}), diag.profile === 'ko' ? t('d.profileKo') : ''),
+    diagRow(diag.gps, t('d.gps'), diag.gps === 'ok' ? t('d.gpsAcc', {m: diag.gpsAcc}) : diag.gps === 'denied' ? t('d.gpsDenied') : diag.gps === 'ko' ? t('d.gpsKo') : ''),
+    diagRow(heading != null ? 'ok' : 'todo', t('d.compass'), heading != null ? '' : t('d.compassHint'), heading != null ? '' : btn('diag-compass', t('d.test'))),
+    diagRow(pushOn ? 'ok' : np === 'denied' ? 'ko' : 'todo', t('d.notif'), pushOn ? t('d.notifTest') : np === 'denied' ? t('d.notifDenied') : isIOS && !standalone() ? t('d.notifIos') : '',
+      pushOn ? btn('push-test', t('d.test')) : np === 'denied' ? '' : btn('push-on', t('d.enable'))),
+    diagRow(mapOk ? 'ok' : 'todo', t('d.map'), mapOk ? '' : t('d.mapHint'), mapOk ? '' : btn('map-dl', t('d.download'))),
+    diagRow(standalone() ? 'ok' : 'todo', t('d.install'), standalone() ? '' : isIOS ? t('d.installIos') : t('d.installAndroid'), !standalone() && installEvt ? btn('install', t('d.install')) : ''),
+    VQ ? check('tickets', t('d.tickets', {vl: esc(VQ.name)})) : '',
+    check('battery', t('d.battery')),
+    check('car', t('d.car')),
+  ].filter(Boolean);
+  const done = rows.filter(r => r.includes('✅')).length;
+  box.innerHTML = `<p class="d-score">${done === rows.length ? t('d.allGood') : t('d.score', {n: done, total: rows.length})}</p><ul class="diag">${rows.join('')}</ul>
+    <div class="row-inline"><button class="btn" type="button" data-act="diag-run">${t('d.again')}</button></div>`;
+}
+function openDiag() {
+  $('#sheet').innerHTML = `<div class="sheet-in"><div class="sheet-head"><div><div class="eyebrow">🧳</div><h2 class="sheet-title" id="sheetTitle">${t('d.title')}</h2></div>
+    <button class="icon-btn" type="button" data-act="sheet-close" aria-label="${t('close')}">✕</button></div><div id="diagBox"></div></div>`;
+  const dlg = $('#sheet');
+  if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
+  runDiag();
+}
+
+/* ---------- Badges de la journée (calculés depuis les tours notés « Fait ») ---------- */
+function badges() {
+  const log = (prefs.log || []).filter(l => ents.has(l.id)), rides = log.filter(l => ents.get(l.id).type === 'ATTRACTION');
+  if (!rides.length) return [];
+  const P = lastP || phaseInfo(), h = hoursFor(prefs.day || P.day), r = recapData() || {};
+  const counts = {};
+  for (const l of rides) counts[l.id] = (counts[l.id] || 0) + 1;
+  const big = rides.filter(l => minCm(ents.get(l.id)) >= 120).length;
+  const wet = new Set(rides.filter(l => keyIn(ents.get(l.id), WET)).map(l => l.id)).size;
+  const musts = Object.keys(prefs.plan).filter(id => prefs.plan[id] === 'must' && ents.has(id) && hasQueue(id));
+  const out = [];
+  const add = (id, emoji, ok) => { if (ok) out.push({id, emoji}); };
+  add('first', '🎟', true);
+  add('thrill5', '🎢', big >= 5);
+  add('wet3', '💦', wet >= 3);
+  add('again3', '🔁', Object.values(counts).some(n => n >= 3));
+  add('flash', '⚡', rides.some(l => tierOf(ents.get(l.id)) === 'A' && l.w != null && l.w <= 10));
+  add('early', '🌅', !!h && rides.some(l => l.t <= h.open + 20));
+  add('owl', '🦉', !!h && rides.some(l => l.t >= h.close - 20));
+  add('rides15', '🏅', rides.length >= 15);
+  add('allMusts', '🏆', musts.length >= 3 && musts.every(id => counts[id]));
+  add('walker', '🚶', (r.km || 0) >= 8);
+  add('shows2', '🎭', log.length - rides.length >= 2);
+  add('vl2', '🎟', rides.filter(l => l.vl).length >= 2);
+  add('smart', '🧠', (r.gained || 0) >= 60);
+  return out;
+}
+const badgeName = id => ({first: t('b.first'), thrill5: t('b.thrill5'), wet3: t('b.wet3'), again3: t('b.again3'), flash: t('b.flash'), early: t('b.early'), owl: t('b.owl'),
+  rides15: t('b.rides15'), allMusts: t('b.allMusts'), walker: t('b.walker'), shows2: t('b.shows2'), vl2: t('b.vl2'), smart: t('b.smart')})[id] || id;
+/* Nouveau badge depuis le dernier « Fait » : annoncé une fois, après le toast « Annuler » */
+function checkBadges() {
+  const got = badges(), seen = new Set(prefs.badges || []), fresh = got.filter(b => !seen.has(b.id));
+  if (!fresh.length) return;
+  prefs.badges = got.map(b => b.id);
+  savePrefs(false);
+  setTimeout(() => toast(t('b.new', {list: fresh.map(b => `${b.emoji} ${badgeName(b.id)}`).join(', ')})), 6200);
+}
+const badgesHTML = list => list.length ? `<div class="badges">${list.map(b => `<span class="badge">${b.emoji} ${esc(badgeName(b.id))}</span>`).join('')}</div>` : '';
 
 /* ---------- Plein soleil, batterie ---------- */
 let lowBattery = false;

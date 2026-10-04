@@ -10,6 +10,54 @@ const I18N = {};
 
 I18N.fr = {
   locale: 'fr-FR',
+  // Ajouts : test du téléphone, badges
+  'd.title': 'Prêt pour demain ?',
+  'd.hint': 'Vérifie en un bouton que tout marche sur ce téléphone : serveur, position, boussole, notifications, carte hors ligne.',
+  'd.run': 'Tester mon téléphone',
+  'd.again': 'Refaire le test',
+  'd.score': '{n} sur {total} : encore quelques points à régler.',
+  'd.allGood': 'Tout est prêt, bonne journée ! 🎉',
+  'd.done': 'C\'est fait',
+  'd.undo': 'Pas encore',
+  'd.test': 'Tester',
+  'd.enable': 'Activer',
+  'd.download': 'Télécharger',
+  'd.server': 'Serveur joignable',
+  'd.serverKo': 'Le serveur ne répond pas : vérifie le réseau, ou que ton serveur tourne.',
+  'd.profile': 'Profil « {name} » enregistré sur le serveur',
+  'd.profileKo': 'Profil local ou introuvable : choisis ton pseudo (bouton en haut à droite).',
+  'd.gps': 'Position GPS',
+  'd.gpsAcc': 'précision ~{m} m',
+  'd.gpsDenied': 'Refusée : autorise la localisation pour ce site dans les réglages du téléphone.',
+  'd.gpsKo': 'Pas de position pour l\'instant : réessaie dehors.',
+  'd.compass': 'Boussole (flèche)',
+  'd.compassHint': 'Touche « Tester » puis tourne un peu le téléphone.',
+  'd.notif': 'Notifications',
+  'd.notifTest': 'Actives : « Tester » envoie une notification à ce téléphone.',
+  'd.notifDenied': 'Bloquées : autorise-les dans les réglages du téléphone.',
+  'd.notifIos': 'Sur iPhone : ouvre d\'abord l\'appli depuis l\'icône de l\'écran d\'accueil.',
+  'd.map': 'Carte téléchargée (hors ligne)',
+  'd.mapHint': 'À faire en wifi : quelques Mo.',
+  'd.install': 'Appli sur l\'écran d\'accueil',
+  'd.installIos': 'Safari → Partager → Sur l\'écran d\'accueil.',
+  'd.installAndroid': 'Menu ⋮ → Installer l\'application.',
+  'd.tickets': 'Billets liés dans l\'appli officielle (pour {vl})',
+  'd.battery': 'Batterie externe chargée',
+  'd.car': 'Penser à enregistrer la place de la voiture en arrivant',
+  'b.new': '🏅 Nouveau badge : {list}',
+  'b.first': 'C\'est parti',
+  'b.thrill5': '5 gros frissons',
+  'b.wet3': 'Trempé',
+  'b.again3': 'Encore ! (×3)',
+  'b.flash': 'Éclair (grosse attraction ≤ 10 min)',
+  'b.early': 'Lève-tôt',
+  'b.owl': 'Dernier tour',
+  'b.rides15': '15 tours',
+  'b.allMusts': 'Toutes les préférées',
+  'b.walker': 'Marathonien (8 km)',
+  'b.shows2': 'Spectateur',
+  'b.vl2': 'Pro du coupe-file',
+  'b.smart': 'Malin (1 h de file gagnée)',
   // Ajouts : mode simple, flèche, démarrage en 3 questions
   'mode.title': 'Affichage',
   'mode.simple': '😊 Simple',
@@ -353,6 +401,7 @@ I18N.fr = {
   'help.recap': `<summary>Récap de la journée</summary>
     <p>Chaque « Fait » est noté. Le soir, l'onglet Maintenant affiche ta journée : nombre de tours, temps passé dans les files, distance à pied (estimée entre les attractions), attente gagnée par rapport à la moyenne de la journée, meilleur coup et attraction préférée. Bouton <b>Partager</b> pour l'envoyer au groupe. À tout moment : Réglages → <i>Récap de ma journée</i>.</p>
     <p><b>Notes</b> : après chaque « Fait », l'appli te demande une note de 1 à 5 étoiles (aussi dans la fiche). 4 ou 5 étoiles ajoutent l'attraction à « À refaire » si rien n'est réglé. Le récap affiche vos préférées, et la liste montre la note moyenne de tous les profils.</p>
+    <p><b>Badges</b> : 🎢 5 gros frissons, 💦 Trempé, 🔁 Encore !, ⚡ Éclair, 🌅 Lève-tôt, 🦉 Dernier tour, 🏆 Toutes les préférées… Ils s'annoncent au fil de la journée et apparaissent dans le récap partagé.</p>
   `,
   'help.crowd': `<summary>Affluence</summary>
     <p>Pendant la journée, l'appli compare les files actuelles aux files habituelles à la même heure et en tient compte (« Affluence : +20 % »). La veille, l'aperçu indique l'affluence habituelle de ce jour de la semaine, d'après les jours enregistrés par le serveur. Réglages → Affluence montre les derniers jours et les jours les plus calmes.</p>
@@ -377,6 +426,7 @@ I18N.fr = {
     </ul>
     <p><b>Mode plein soleil</b> (Réglages) : contraste maximal et textes plus gros. <b>Économie de batterie</b> : GPS moins précis et actualisation toutes les 5 min ; sur Android, l'appli la propose d'elle-même sous 20 % de batterie.</p>
     <p><b>Saison</b> : les spectacles de saison (Halloween, Noël…) sont marqués 🎃 et passent en tête de la liste des spectacles.</p>
+    <p><b>🧳 Prêt pour demain ?</b> (Réglages) : la veille, teste chaque téléphone en un bouton (serveur, profil, position, boussole, notifications, carte hors ligne, installation) et coche le reste (billets liés, batterie externe).</p>
   `,
   'help.faq': `<summary>Problèmes fréquents</summary>
     <table>
@@ -413,6 +463,7 @@ I18N.fr = {
       <li><b>Programme commun</b> par vote, <b>rendez-vous</b> pour se séparer puis se retrouver.</li>
       <li><b>Mode plein soleil</b>, <b>économie de batterie</b>, spectacles de saison 🎃, <b>rejouer une journée</b>.</li>
       <li><b>Mode simple</b> par défaut, avec une <b>flèche</b> vers la prochaine étape, et démarrage en 3 questions.</li>
+      <li><b>🧳 Prêt pour demain ?</b> : test du téléphone en un bouton, et <b>badges</b> de la journée.</li>
     </ul>
     <p>Les mises à jour arrivent toutes seules à la prochaine ouverture de l'appli.</p>
   `,
@@ -768,6 +819,54 @@ I18N.fr = {
 
 I18N.en = {
   locale: 'en-GB',
+  // Ajouts : test du téléphone, badges
+  'd.title': 'Ready for tomorrow?',
+  'd.hint': 'Check in one tap that everything works on this phone: server, location, compass, notifications, offline map.',
+  'd.run': 'Test my phone',
+  'd.again': 'Run the test again',
+  'd.score': '{n} of {total}: a few things left to sort out.',
+  'd.allGood': 'All set, have a great day! 🎉',
+  'd.done': 'Done',
+  'd.undo': 'Not yet',
+  'd.test': 'Test',
+  'd.enable': 'Turn on',
+  'd.download': 'Download',
+  'd.server': 'Server reachable',
+  'd.serverKo': 'The server isn\'t responding: check the network, or that your server is running.',
+  'd.profile': 'Profile “{name}” saved on the server',
+  'd.profileKo': 'Local or missing profile: pick your nickname (top-right button).',
+  'd.gps': 'GPS location',
+  'd.gpsAcc': 'accuracy ~{m} m',
+  'd.gpsDenied': 'Denied: allow location for this site in the phone\'s settings.',
+  'd.gpsKo': 'No location for now: try again outdoors.',
+  'd.compass': 'Compass (arrow)',
+  'd.compassHint': 'Tap “Test”, then turn the phone a little.',
+  'd.notif': 'Notifications',
+  'd.notifTest': 'On: “Test” sends a notification to this phone.',
+  'd.notifDenied': 'Blocked: allow them in the phone\'s settings.',
+  'd.notifIos': 'On iPhone: first open the app from the home screen icon.',
+  'd.map': 'Map downloaded (offline)',
+  'd.mapHint': 'Do it on wifi: a few MB.',
+  'd.install': 'App on the home screen',
+  'd.installIos': 'Safari → Share → Add to Home Screen.',
+  'd.installAndroid': 'Menu ⋮ → Install app.',
+  'd.tickets': 'Tickets linked in the official app (for {vl})',
+  'd.battery': 'Power bank charged',
+  'd.car': 'Remember to save the car spot when you arrive',
+  'b.new': '🏅 New badge: {list}',
+  'b.first': 'Off we go',
+  'b.thrill5': '5 big thrills',
+  'b.wet3': 'Soaked',
+  'b.again3': 'Again! (×3)',
+  'b.flash': 'Lightning (big ride ≤ 10 min)',
+  'b.early': 'Early bird',
+  'b.owl': 'Last ride',
+  'b.rides15': '15 rides',
+  'b.allMusts': 'All the favourites',
+  'b.walker': 'Marathoner (8 km)',
+  'b.shows2': 'Show-goer',
+  'b.vl2': 'Queue-skip pro',
+  'b.smart': 'Smart (1 h of queuing saved)',
   // Ajouts : mode simple, flèche, démarrage en 3 questions
   'mode.title': 'Display',
   'mode.simple': '😊 Simple',
@@ -1109,6 +1208,7 @@ I18N.en = {
   'help.recap': `<summary>Day recap</summary>
     <p>Every “Done” is recorded. In the evening, the Now tab shows your day: number of rides, time spent in queues, distance walked (estimated between rides), wait saved compared with the day's average, best move and favourite ride. <b>Share</b> button to send it to the group. Any time: Settings → <i>My day recap</i>.</p>
     <p><b>Ratings</b>: after each “Done”, the app asks for 1 to 5 stars (also in the details). 4 or 5 stars add the ride to “ride again” if nothing is set. The recap shows your favourites, and the list shows the average rating across all profiles.</p>
+    <p><b>Badges</b>: 🎢 5 big thrills, 💦 Soaked, 🔁 Again!, ⚡ Lightning, 🌅 Early bird, 🦉 Last ride, 🏆 All the favourites… They pop up during the day and appear in the shared recap.</p>
   `,
   'help.crowd': `<summary>Crowds</summary>
     <p>During the day, the app compares current queues with the usual queues at the same time and takes it into account (“Crowds: 20% above”). The day before, the preview shows the usual crowds for that day of the week, based on the days recorded by the server. Settings → Crowds shows the last few days and the quietest days.</p>
@@ -1133,6 +1233,7 @@ I18N.en = {
     </ul>
     <p><b>Bright sunlight mode</b> (Settings): maximum contrast and bigger text. <b>Battery saver</b>: less precise GPS and a refresh every 5 min; on Android the app offers it by itself below 20% battery.</p>
     <p><b>Seasonal</b>: seasonal shows (Halloween, Christmas…) are marked 🎃 and listed first among shows.</p>
+    <p><b>🧳 Ready for tomorrow?</b> (Settings): the day before, test each phone in one tap (server, profile, location, compass, notifications, offline map, install) and tick the rest (linked tickets, power bank).</p>
   `,
   'help.faq': `<summary>Common problems</summary>
     <table>
@@ -1169,6 +1270,7 @@ I18N.en = {
       <li><b>Shared plan</b> by vote, <b>meeting point</b> to split up and meet again.</li>
       <li><b>Bright sunlight mode</b>, <b>battery saver</b>, seasonal shows 🎃, <b>replay a day</b>.</li>
       <li><b>Simple mode</b> by default, with an <b>arrow</b> to the next step, and a 3-question start.</li>
+      <li><b>🧳 Ready for tomorrow?</b>: one-tap phone test, and daily <b>badges</b>.</li>
     </ul>
     <p>Updates arrive on their own the next time you open the app.</p>
   `,
@@ -1508,6 +1610,54 @@ I18N.en = {
 
 I18N.de = {
   locale: 'de-DE',
+  // Ajouts : test du téléphone, badges
+  'd.title': 'Bereit für morgen?',
+  'd.hint': 'Prüfe mit einem Tipp, ob auf diesem Handy alles funktioniert: Server, Standort, Kompass, Benachrichtigungen, Offline-Karte.',
+  'd.run': 'Mein Handy testen',
+  'd.again': 'Test wiederholen',
+  'd.score': '{n} von {total}: Noch ein paar Dinge zu erledigen.',
+  'd.allGood': 'Alles bereit, viel Spaß! 🎉',
+  'd.done': 'Erledigt',
+  'd.undo': 'Noch nicht',
+  'd.test': 'Testen',
+  'd.enable': 'Einschalten',
+  'd.download': 'Herunterladen',
+  'd.server': 'Server erreichbar',
+  'd.serverKo': 'Der Server antwortet nicht: Prüfe das Netz oder ob dein Server läuft.',
+  'd.profile': 'Profil „{name}“ auf dem Server gespeichert',
+  'd.profileKo': 'Lokales oder fehlendes Profil: Wähle deinen Namen (Knopf oben rechts).',
+  'd.gps': 'GPS-Standort',
+  'd.gpsAcc': 'Genauigkeit ~{m} m',
+  'd.gpsDenied': 'Abgelehnt: Erlaube den Standort für diese Seite in den Handy-Einstellungen.',
+  'd.gpsKo': 'Noch kein Standort: Versuche es draußen erneut.',
+  'd.compass': 'Kompass (Pfeil)',
+  'd.compassHint': 'Tippe auf „Testen“ und dreh das Handy ein wenig.',
+  'd.notif': 'Benachrichtigungen',
+  'd.notifTest': 'An: „Testen“ schickt eine Benachrichtigung an dieses Handy.',
+  'd.notifDenied': 'Blockiert: Erlaube sie in den Handy-Einstellungen.',
+  'd.notifIos': 'Auf dem iPhone: Öffne die App zuerst über das Symbol auf dem Home-Bildschirm.',
+  'd.map': 'Karte heruntergeladen (offline)',
+  'd.mapHint': 'Im WLAN erledigen: ein paar MB.',
+  'd.install': 'App auf dem Home-Bildschirm',
+  'd.installIos': 'Safari → Teilen → Zum Home-Bildschirm.',
+  'd.installAndroid': 'Menü ⋮ → App installieren.',
+  'd.tickets': 'Tickets in der offiziellen App verknüpft (für {vl})',
+  'd.battery': 'Powerbank geladen',
+  'd.car': 'Daran denken, den Parkplatz bei der Ankunft zu speichern',
+  'b.new': '🏅 Neues Abzeichen: {list}',
+  'b.first': 'Los geht\'s',
+  'b.thrill5': '5 große Nervenkitzel',
+  'b.wet3': 'Klatschnass',
+  'b.again3': 'Nochmal! (×3)',
+  'b.flash': 'Blitz (große Attraktion ≤ 10 min)',
+  'b.early': 'Frühaufsteher',
+  'b.owl': 'Letzte Fahrt',
+  'b.rides15': '15 Fahrten',
+  'b.allMusts': 'Alle Lieblinge',
+  'b.walker': 'Marathonläufer (8 km)',
+  'b.shows2': 'Showfan',
+  'b.vl2': 'Warteschlangen-Profi',
+  'b.smart': 'Clever (1 h Wartezeit gespart)',
   // Ajouts : mode simple, flèche, démarrage en 3 questions
   'mode.title': 'Ansicht',
   'mode.simple': '😊 Einfach',
@@ -1849,6 +1999,7 @@ I18N.de = {
   'help.recap': `<summary>Tagesrückblick</summary>
     <p>Jedes „Fertig“ wird notiert. Am Abend zeigt der Tab Jetzt deinen Tag: Anzahl der Fahrten, Zeit in Schlangen, Fußweg (zwischen den Attraktionen geschätzt), gesparte Wartezeit gegenüber dem Tagesschnitt, bester Treffer und Lieblingsattraktion. Button <b>Teilen</b>, um ihn an die Gruppe zu schicken. Jederzeit: Einstellungen → <i>Mein Tagesrückblick</i>.</p>
     <p><b>Bewertungen</b>: Nach jedem „Erledigt“ fragt die App nach 1 bis 5 Sternen (auch im Steckbrief). 4 oder 5 Sterne setzen die Attraktion auf „Nochmal fahren“, falls nichts eingestellt ist. Die Bilanz zeigt eure Favoriten, die Liste die Durchschnittsbewertung aller Profile.</p>
+    <p><b>Abzeichen</b>: 🎢 5 große Nervenkitzel, 💦 Klatschnass, 🔁 Nochmal!, ⚡ Blitz, 🌅 Frühaufsteher, 🦉 Letzte Fahrt, 🏆 Alle Lieblinge… Sie erscheinen im Lauf des Tages und in der geteilten Bilanz.</p>
   `,
   'help.crowd': `<summary>Andrang</summary>
     <p>Tagsüber vergleicht die App die aktuellen Schlangen mit den üblichen zur gleichen Uhrzeit und berücksichtigt das („Andrang: 20 % über“). Am Vortag zeigt die Vorschau den üblichen Andrang an diesem Wochentag, nach den vom Server erfassten Tagen. Einstellungen → Andrang zeigt die letzten Tage und die ruhigsten Tage.</p>
@@ -1873,6 +2024,7 @@ I18N.de = {
     </ul>
     <p><b>Sonnenmodus</b> (Einstellungen): maximaler Kontrast und größere Schrift. <b>Akku sparen</b>: ungenaueres GPS und Aktualisierung alle 5 Minuten; auf Android schlägt die App es unter 20 % Akku selbst vor.</p>
     <p><b>Saison</b>: Saison-Shows (Halloween, Weihnachten…) sind mit 🎃 markiert und stehen in der Showliste oben.</p>
+    <p><b>🧳 Bereit für morgen?</b> (Einstellungen): Teste am Vortag jedes Handy mit einem Tipp (Server, Profil, Standort, Kompass, Benachrichtigungen, Offline-Karte, Installation) und hake den Rest ab (verknüpfte Tickets, Powerbank).</p>
   `,
   'help.faq': `<summary>Häufige Probleme</summary>
     <table>
@@ -1909,6 +2061,7 @@ I18N.de = {
       <li><b>Gemeinsamer Plan</b> per Abstimmung, <b>Treffpunkt</b> zum Aufteilen und Wiedertreffen.</li>
       <li><b>Sonnenmodus</b>, <b>Akku sparen</b>, Saison-Shows 🎃, <b>einen Tag nachspielen</b>.</li>
       <li><b>Einfacher Modus</b> als Standard, mit einem <b>Pfeil</b> zum nächsten Schritt, und Start in 3 Fragen.</li>
+      <li><b>🧳 Bereit für morgen?</b>: Handy-Test mit einem Tipp, und <b>Abzeichen</b> des Tages.</li>
     </ul>
     <p>Updates kommen beim nächsten Öffnen der App von selbst.</p>
   `,
