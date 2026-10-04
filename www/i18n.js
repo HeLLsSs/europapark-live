@@ -10,6 +10,56 @@ const I18N = {};
 
 I18N.fr = {
   locale: 'fr-FR',
+  // Ajouts : mode simple, flèche, démarrage en 3 questions
+  'mode.title': 'Affichage',
+  'mode.simple': '😊 Simple',
+  'mode.expert': '🤓 Complet',
+  'mode.hint': 'Simple : une seule chose à faire à la fois, en gros. Complet : itinéraire, détails et tous les réglages.',
+  'adv.title': 'Réglages avancés',
+  's.hello': 'Salut {name} !',
+  's.start': 'Trois questions et c\'est parti.',
+  's.go': 'C\'est parti',
+  's.all': 'Voir toute la journée',
+  's.less': 'Revenir à l\'essentiel',
+  's.today': 'Aujourd\'hui',
+  's.beAt': 'Rendez-vous à l\'entrée à {time}',
+  's.startWith': 'On commence par : {list}',
+  's.allDone': 'Tout est fait, bravo !',
+  's.shortest': 'Les files les plus courtes maintenant :',
+  's.inQueue': 'Tu fais la queue pour',
+  's.left': 'encore ~{n} min',
+  's.finished': '✅ Fini !',
+  's.seen': '✅ Vu !',
+  's.leaveQueue': '🚪 Je sors de la file',
+  's.vl': 'Ton créneau {vl}',
+  's.at': 'à {time}',
+  's.leaveAt': 'pars à {time}',
+  's.show': 'Spectacle',
+  's.meal': 'On mange !',
+  's.goTo': 'Va à',
+  's.queue': '{n} min de file',
+  's.imHere': '🙋 J\'y suis, je fais la queue',
+  's.then': 'Ensuite : {list}',
+  'c.enable': '📍 Active ta position pour voir la flèche',
+  'c.here': '🎯 Tu y es !',
+  'c.north': 'nord en haut',
+  'c.turn': '🧭 Tourner la flèche avec le téléphone',
+  'c.denied': 'Boussole refusée : la flèche reste orientée nord en haut.',
+  'w.step': 'Étape {n} sur 3',
+  'w.like': 'Tu préfères…',
+  'w.thrills': 'Ça secoue !',
+  'w.calm': 'Tranquille',
+  'w.mix': 'Un peu de tout',
+  'w.kids': 'Il y a des petits avec vous ?',
+  'w.noKids': 'Non, que des grands',
+  'w.kidCm': 'Oui, le plus petit fait {cm} cm',
+  'w.howTitle': 'C\'est tout simple',
+  'w.how1': '👉 Va où l\'appli te dit, suis la flèche',
+  'w.how2': '🙋 Dans la file, appuie sur « J\'y suis »',
+  'w.how3': '✅ À la sortie, appuie sur « Fini ! » : la suite arrive toute seule',
+  'w.gps': '📍 Activer ma position',
+  'w.notif': '🔔 Activer les notifications',
+  'w.go': 'C\'est parti !',
   // Rejouer : colonne incontournables
   'replay.musts': 'Incontournables ({n})',
   // Ajouts : rendez-vous, programme commun, plein soleil, batterie, rejouer une journée
@@ -157,7 +207,7 @@ I18N.fr = {
   'route.walk': 'Moins de marche',
   'route.balanced': 'Équilibré',
   'route.wait': "Moins d'attente",
-  'set.sr': 'Single rider accepté',
+  'set.sr': '🙋 File solo accepté (single rider)',
   'set.srHint': 'File séparée sur Blue Fire, Voltron, CanCan, Arthur (à vérifier sur place) : souvent bien plus courte, mais vous êtes séparés dans le wagon',
   'set.pace': 'Rythme de marche',
   'pace.kids': 'Avec enfants',
@@ -192,6 +242,16 @@ I18N.fr = {
   'help.intro': 'EP Live te dit à chaque instant quelle attraction faire maintenant, et prévoit le reste de ta journée pour attendre et marcher le moins possible.',
   'help.version': 'Version {v}',
   // Aide (data-i18n-html : contenu de chaque <details>)
+  'help.simple': `<summary>Le mode simple</summary>
+    <p>Par défaut, l'écran Maintenant n'affiche qu'une chose : <b>où aller maintenant</b>, en gros, avec trois boutons :</p>
+    <ul>
+      <li><b>🙋 J'y suis</b> : tu fais la queue (un minuteur démarre) ;</li>
+      <li><b>✅ Fini !</b> : à la sortie, l'étape suivante arrive toute seule ;</li>
+      <li><b>⏭ Pas maintenant</b> : on y reviendra plus tard.</li>
+    </ul>
+    <p><b>La flèche</b> montre la direction de la prochaine étape (à vol d'oiseau) et la distance. Avec la position activée, elle tourne avec le téléphone ; sur iPhone, touche « Tourner la flèche » une fois pour l'autoriser. « 🎯 Tu y es ! » quand tu es arrivé.</p>
+    <p><b>Voir toute la journée</b> déplie l'itinéraire complet. Réglages → <b>Affichage</b> : 😊 Simple ou 🤓 Complet (tous les détails, réglages avancés ouverts).</p>
+  `,
   'help.start': `<summary>Démarrer en 4 étapes</summary>
     <ol>
       <li><b>Installe l'appli</b> sur l'écran d'accueil (voir « Installer l'appli »).</li>
@@ -352,6 +412,7 @@ I18N.fr = {
       <li><b>Notes</b> des attractions, écart affiché / réel <b>par attraction</b>, calendrier <b>« Quel jour venir ? »</b>.</li>
       <li><b>Programme commun</b> par vote, <b>rendez-vous</b> pour se séparer puis se retrouver.</li>
       <li><b>Mode plein soleil</b>, <b>économie de batterie</b>, spectacles de saison 🎃, <b>rejouer une journée</b>.</li>
+      <li><b>Mode simple</b> par défaut, avec une <b>flèche</b> vers la prochaine étape, et démarrage en 3 questions.</li>
     </ul>
     <p>Les mises à jour arrivent toutes seules à la prochaine ouverture de l'appli.</p>
   `,
@@ -443,7 +504,7 @@ I18N.fr = {
   'board.from': ' depuis {place}',
   'board.entrance': "l'entrée",
   'board.arrive': 'Arrivée {time}',
-  'board.sr': 'Single rider ~{w} min',
+  'board.sr': '🙋 File solo ~{w} min',
   'board.vlOpen': '{vl} ouvert',
   'board.alts': 'Autres bons choix',
   goNow: 'Pars maintenant',
@@ -452,7 +513,7 @@ I18N.fr = {
   'act.details': 'Fiche',
   'act.seen': 'Vu',
   'act.notToday': "Pas aujourd'hui",
-  'act.later': 'Plus tard',
+  'act.later': '⏭ Pas maintenant',
   'act.restaurant': 'Le resto',
   'act.inQueue': 'Dans la file',
 
@@ -519,7 +580,7 @@ I18N.fr = {
   'banner.stale': "La source des temps d'attente ne répond pas : données du dernier relevé.",
 
   // Liste
-  'list.hint.plan': "Étoile pleine : incontournable · demi-étoile : bonus. Touche l'étoile pour changer.",
+  'list.hint.plan': 'Étoile pleine : ⭐ j\'adore · demi-étoile : 👍 si on a le temps. Touche l\'étoile pour changer.',
   'list.hint.rides': "Ajoute des attractions à ton programme avec l'étoile.",
   'list.hint.shows': "Étoile : le spectacle entre dans ton itinéraire, à la meilleure représentation.",
   'list.hint.food': 'Restaurants et stands du parc.',
@@ -531,8 +592,8 @@ I18N.fr = {
   'list.done': 'fait',
   'list.seen': 'vu',
   'list.over': 'terminé',
-  'star.must': 'Incontournable — passer en bonus',
-  'star.bonus': 'Bonus — retirer du programme',
+  'star.must': '⭐ J\'adore — passer à « si on a le temps »',
+  'star.bonus': '👍 Si on a le temps — retirer du programme',
   'star.add': 'Ajouter au programme',
   'show.remove': "Retirer de l'itinéraire",
   'show.add': "Ajouter à l'itinéraire",
@@ -604,8 +665,8 @@ I18N.fr = {
   'sheet.vlOffer': ' · créneau proposé vers {time}',
   'sheet.inPlan': 'Dans mon programme',
   'sheet.plan': 'Programme',
-  'plan.must': 'Incontournable',
-  'plan.bonus': 'Bonus',
+  'plan.must': '⭐ J\'adore',
+  'plan.bonus': '👍 Si on a le temps',
   'sheet.redone': 'Refait ({n}×)',
   'sheet.markDone': 'Marquer fait',
   'sheet.inQueue': 'Je suis dans la file',
@@ -707,6 +768,56 @@ I18N.fr = {
 
 I18N.en = {
   locale: 'en-GB',
+  // Ajouts : mode simple, flèche, démarrage en 3 questions
+  'mode.title': 'Display',
+  'mode.simple': '😊 Simple',
+  'mode.expert': '🤓 Full',
+  'mode.hint': 'Simple: one thing to do at a time, in big. Full: route, details and all settings.',
+  'adv.title': 'Advanced settings',
+  's.hello': 'Hi {name}!',
+  's.start': 'Three questions and off you go.',
+  's.go': 'Let\'s go',
+  's.all': 'See the whole day',
+  's.less': 'Back to the essentials',
+  's.today': 'Today',
+  's.beAt': 'Be at the entrance at {time}',
+  's.startWith': 'We start with: {list}',
+  's.allDone': 'All done, well done!',
+  's.shortest': 'Shortest queues right now:',
+  's.inQueue': 'You\'re queuing for',
+  's.left': 'about {n} min left',
+  's.finished': '✅ Done!',
+  's.seen': '✅ Seen!',
+  's.leaveQueue': '🚪 I\'m leaving the queue',
+  's.vl': 'Your {vl} slot',
+  's.at': 'at {time}',
+  's.leaveAt': 'leave at {time}',
+  's.show': 'Show',
+  's.meal': 'Time to eat!',
+  's.goTo': 'Go to',
+  's.queue': '{n} min queue',
+  's.imHere': '🙋 I\'m here, queuing',
+  's.then': 'Then: {list}',
+  'c.enable': '📍 Turn on your location to see the arrow',
+  'c.here': '🎯 You\'re there!',
+  'c.north': 'north up',
+  'c.turn': '🧭 Turn the arrow with the phone',
+  'c.denied': 'Compass denied: the arrow stays north-up.',
+  'w.step': 'Step {n} of 3',
+  'w.like': 'You prefer…',
+  'w.thrills': 'Big thrills!',
+  'w.calm': 'Easy-going',
+  'w.mix': 'A bit of everything',
+  'w.kids': 'Any little ones with you?',
+  'w.noKids': 'No, only grown-ups',
+  'w.kidCm': 'Yes, the smallest is {cm} cm',
+  'w.howTitle': 'It\'s really simple',
+  'w.how1': '👉 Go where the app says, follow the arrow',
+  'w.how2': '🙋 In the queue, tap “I\'m here”',
+  'w.how3': '✅ When you\'re out, tap “Done!”: the next one shows up by itself',
+  'w.gps': '📍 Turn on my location',
+  'w.notif': '🔔 Turn on notifications',
+  'w.go': 'Let\'s go!',
   // Rejouer : colonne incontournables
   'replay.musts': 'Must-dos ({n})',
   // Ajouts : rendez-vous, programme commun, plein soleil, batterie, rejouer une journée
@@ -853,7 +964,7 @@ I18N.en = {
   'route.walk': 'Less walking',
   'route.balanced': 'Balanced',
   'route.wait': 'Less waiting',
-  'set.sr': 'Single rider OK',
+  'set.sr': '🙋 Solo line OK (single rider)',
   'set.srHint': "Separate queue on Blue Fire, Voltron, CanCan, Arthur (check on site): often much shorter, but you're split up on the ride",
   'set.pace': 'Walking pace',
   'pace.kids': 'With kids',
@@ -887,6 +998,16 @@ I18N.en = {
   'help.news': "What's new",
   'help.intro': 'EP Live tells you at every moment which ride to do now, and plans the rest of your day so you wait and walk as little as possible.',
   'help.version': 'Version {v}',
+  'help.simple': `<summary>Simple mode</summary>
+    <p>By default the Now screen shows just one thing: <b>where to go now</b>, in big, with three buttons:</p>
+    <ul>
+      <li><b>🙋 I'm here</b>: you're queuing (a timer starts);</li>
+      <li><b>✅ Done!</b>: when you're out, the next step shows up by itself;</li>
+      <li><b>⏭ Not now</b>: we'll come back to it later.</li>
+    </ul>
+    <p><b>The arrow</b> points to the next step (as the crow flies) with the distance. With location on, it turns with the phone; on iPhone, tap “Turn the arrow” once to allow it. “🎯 You're there!” when you've arrived.</p>
+    <p><b>See the whole day</b> unfolds the full route. Settings → <b>Display</b>: 😊 Simple or 🤓 Full (all the details, advanced settings open).</p>
+  `,
   'help.start': `<summary>Get started in 4 steps</summary>
     <ol>
       <li><b>Install the app</b> on your Home Screen (see “Install the app”).</li>
@@ -1047,6 +1168,7 @@ I18N.en = {
       <li>Ride <b>ratings</b>, posted / real wait gap <b>per ride</b>, <b>“Which day to come?”</b> calendar.</li>
       <li><b>Shared plan</b> by vote, <b>meeting point</b> to split up and meet again.</li>
       <li><b>Bright sunlight mode</b>, <b>battery saver</b>, seasonal shows 🎃, <b>replay a day</b>.</li>
+      <li><b>Simple mode</b> by default, with an <b>arrow</b> to the next step, and a 3-question start.</li>
     </ul>
     <p>Updates arrive on their own the next time you open the app.</p>
   `,
@@ -1133,7 +1255,7 @@ I18N.en = {
   'board.from': ' from {place}',
   'board.entrance': 'the entrance',
   'board.arrive': 'Arrive {time}',
-  'board.sr': 'Single rider ~{w} min',
+  'board.sr': '🙋 Solo line ~{w} min',
   'board.vlOpen': '{vl} open',
   'board.alts': 'Other good picks',
   goNow: 'Leave now',
@@ -1142,7 +1264,7 @@ I18N.en = {
   'act.details': 'Details',
   'act.seen': 'Seen',
   'act.notToday': 'Not today',
-  'act.later': 'Later',
+  'act.later': '⏭ Not now',
   'act.restaurant': 'Restaurant',
   'act.inQueue': 'In queue',
 
@@ -1205,7 +1327,7 @@ I18N.en = {
   'banner.offline': 'No network: showing the last data received. Updates resume automatically.',
   'banner.stale': "The wait-time source isn't responding: showing the last reading.",
 
-  'list.hint.plan': 'Full star: must-do · half star: bonus. Tap the star to change.',
+  'list.hint.plan': 'Full star: ⭐ love it · half star: 👍 if there\'s time. Tap the star to change.',
   'list.hint.rides': 'Add rides to your plan with the star.',
   'list.hint.shows': 'Star: the show goes into your route, at the best showtime.',
   'list.hint.food': 'Restaurants and stands in the park.',
@@ -1217,8 +1339,8 @@ I18N.en = {
   'list.done': 'done',
   'list.seen': 'seen',
   'list.over': 'over',
-  'star.must': 'Must-do — switch to bonus',
-  'star.bonus': 'Bonus — remove from plan',
+  'star.must': '⭐ Love it — switch to “if there\'s time”',
+  'star.bonus': '👍 If there\'s time — remove from the plan',
   'star.add': 'Add to plan',
   'show.remove': 'Remove from route',
   'show.add': 'Add to route',
@@ -1287,8 +1409,8 @@ I18N.en = {
   'sheet.vlOffer': ' · slot offered around {time}',
   'sheet.inPlan': 'In my plan',
   'sheet.plan': 'Plan',
-  'plan.must': 'Must-do',
-  'plan.bonus': 'Bonus',
+  'plan.must': '⭐ Love it',
+  'plan.bonus': '👍 If there\'s time',
   'sheet.redone': 'Done again ({n}×)',
   'sheet.markDone': 'Mark as done',
   'sheet.inQueue': "I'm in the queue",
@@ -1386,6 +1508,56 @@ I18N.en = {
 
 I18N.de = {
   locale: 'de-DE',
+  // Ajouts : mode simple, flèche, démarrage en 3 questions
+  'mode.title': 'Ansicht',
+  'mode.simple': '😊 Einfach',
+  'mode.expert': '🤓 Ausführlich',
+  'mode.hint': 'Einfach: immer nur eine Sache, groß angezeigt. Ausführlich: Route, Details und alle Einstellungen.',
+  'adv.title': 'Weitere Einstellungen',
+  's.hello': 'Hallo {name}!',
+  's.start': 'Drei Fragen und los geht\'s.',
+  's.go': 'Los geht\'s',
+  's.all': 'Ganzen Tag anzeigen',
+  's.less': 'Zurück zum Wesentlichen',
+  's.today': 'Heute',
+  's.beAt': 'Um {time} am Eingang sein',
+  's.startWith': 'Wir beginnen mit: {list}',
+  's.allDone': 'Alles geschafft, super!',
+  's.shortest': 'Gerade die kürzesten Schlangen:',
+  's.inQueue': 'Du stehst an bei',
+  's.left': 'noch ~{n} min',
+  's.finished': '✅ Fertig!',
+  's.seen': '✅ Gesehen!',
+  's.leaveQueue': '🚪 Ich verlasse die Schlange',
+  's.vl': 'Dein {vl}-Zeitfenster',
+  's.at': 'um {time}',
+  's.leaveAt': 'losgehen um {time}',
+  's.show': 'Show',
+  's.meal': 'Essenszeit!',
+  's.goTo': 'Geh zu',
+  's.queue': '{n} min Wartezeit',
+  's.imHere': '🙋 Bin da, stehe an',
+  's.then': 'Danach: {list}',
+  'c.enable': '📍 Standort einschalten, um den Pfeil zu sehen',
+  'c.here': '🎯 Du bist da!',
+  'c.north': 'Norden oben',
+  'c.turn': '🧭 Pfeil mit dem Handy drehen',
+  'c.denied': 'Kompass abgelehnt: Der Pfeil bleibt nach Norden ausgerichtet.',
+  'w.step': 'Schritt {n} von 3',
+  'w.like': 'Du magst lieber…',
+  'w.thrills': 'Action!',
+  'w.calm': 'Gemütlich',
+  'w.mix': 'Von allem etwas',
+  'w.kids': 'Sind Kinder dabei?',
+  'w.noKids': 'Nein, nur Große',
+  'w.kidCm': 'Ja, das kleinste ist {cm} cm',
+  'w.howTitle': 'Ganz einfach',
+  'w.how1': '👉 Geh dahin, wo die App sagt, folge dem Pfeil',
+  'w.how2': '🙋 In der Schlange auf „Bin da“ tippen',
+  'w.how3': '✅ Danach auf „Fertig!“ tippen: Das Nächste kommt von selbst',
+  'w.gps': '📍 Standort einschalten',
+  'w.notif': '🔔 Benachrichtigungen einschalten',
+  'w.go': 'Los geht\'s!',
   // Rejouer : colonne incontournables
   'replay.musts': 'Muss ({n})',
   // Ajouts : rendez-vous, programme commun, plein soleil, batterie, rejouer une journée
@@ -1532,7 +1704,7 @@ I18N.de = {
   'route.walk': 'Weniger laufen',
   'route.balanced': 'Ausgewogen',
   'route.wait': 'Weniger warten',
-  'set.sr': 'Single Rider ist okay',
+  'set.sr': '🙋 Single-Rider-Schlange OK',
   'set.srHint': 'Eigene Schlange bei Blue Fire, Voltron, CanCan, Arthur (vor Ort prüfen): oft viel kürzer, aber ihr sitzt getrennt',
   'set.pace': 'Lauftempo',
   'pace.kids': 'Mit Kindern',
@@ -1566,6 +1738,16 @@ I18N.de = {
   'help.news': 'Neuigkeiten',
   'help.intro': 'EP Live sagt dir jederzeit, welche Attraktion du jetzt machen solltest, und plant den Rest deines Tages so, dass du möglichst wenig wartest und läufst.',
   'help.version': 'Version {v}',
+  'help.simple': `<summary>Einfacher Modus</summary>
+    <p>Standardmäßig zeigt der Jetzt-Bildschirm nur eines: <b>wohin du jetzt gehst</b>, groß, mit drei Knöpfen:</p>
+    <ul>
+      <li><b>🙋 Bin da</b>: Du stehst an (ein Timer startet);</li>
+      <li><b>✅ Fertig!</b>: Danach kommt der nächste Schritt von selbst;</li>
+      <li><b>⏭ Nicht jetzt</b>: Später kommen wir darauf zurück.</li>
+    </ul>
+    <p><b>Der Pfeil</b> zeigt Richtung (Luftlinie) und Entfernung zum nächsten Schritt. Mit eingeschaltetem Standort dreht er sich mit dem Handy; auf dem iPhone einmal „Pfeil mit dem Handy drehen“ antippen, um es zu erlauben. „🎯 Du bist da!“, wenn du angekommen bist.</p>
+    <p><b>Ganzen Tag anzeigen</b> klappt die ganze Route auf. Einstellungen → <b>Ansicht</b>: 😊 Einfach oder 🤓 Ausführlich (alle Details, weitere Einstellungen offen).</p>
+  `,
   'help.start': `<summary>In 4 Schritten loslegen</summary>
     <ol>
       <li><b>Installier die App</b> auf dem Home-Bildschirm (siehe „App installieren“).</li>
@@ -1726,6 +1908,7 @@ I18N.de = {
       <li><b>Bewertungen</b> der Attraktionen, Abweichung angezeigt / echt <b>pro Attraktion</b>, Kalender <b>„Welcher Tag ist am besten?“</b>.</li>
       <li><b>Gemeinsamer Plan</b> per Abstimmung, <b>Treffpunkt</b> zum Aufteilen und Wiedertreffen.</li>
       <li><b>Sonnenmodus</b>, <b>Akku sparen</b>, Saison-Shows 🎃, <b>einen Tag nachspielen</b>.</li>
+      <li><b>Einfacher Modus</b> als Standard, mit einem <b>Pfeil</b> zum nächsten Schritt, und Start in 3 Fragen.</li>
     </ul>
     <p>Updates kommen beim nächsten Öffnen der App von selbst.</p>
   `,
@@ -1812,7 +1995,7 @@ I18N.de = {
   'board.from': ' ab {place}',
   'board.entrance': 'dem Eingang',
   'board.arrive': 'Ankunft {time}',
-  'board.sr': 'Single Rider ~{w} min',
+  'board.sr': '🙋 Single Rider ~{w} min',
   'board.vlOpen': '{vl} offen',
   'board.alts': 'Weitere gute Optionen',
   goNow: 'Jetzt losgehen',
@@ -1821,7 +2004,7 @@ I18N.de = {
   'act.details': 'Details',
   'act.seen': 'Gesehen',
   'act.notToday': 'Heute nicht',
-  'act.later': 'Später',
+  'act.later': '⏭ Nicht jetzt',
   'act.restaurant': 'Restaurant',
   'act.inQueue': 'In der Schlange',
 
@@ -1884,7 +2067,7 @@ I18N.de = {
   'banner.offline': 'Kein Netz: Es werden die zuletzt empfangenen Daten angezeigt. Die Aktualisierung läuft automatisch weiter.',
   'banner.stale': 'Die Quelle der Wartezeiten antwortet nicht: Daten der letzten Abfrage.',
 
-  'list.hint.plan': 'Voller Stern: Pflicht · halber Stern: Bonus. Tippe auf den Stern zum Ändern.',
+  'list.hint.plan': 'Voller Stern: ⭐ Lieblings · halber Stern: 👍 wenn Zeit bleibt. Tippe auf den Stern zum Ändern.',
   'list.hint.rides': 'Füg Attraktionen mit dem Stern zu deinem Programm hinzu.',
   'list.hint.shows': 'Stern: Die Show kommt in deine Route, zur besten Vorstellung.',
   'list.hint.food': 'Restaurants und Stände im Park.',
@@ -1896,8 +2079,8 @@ I18N.de = {
   'list.done': 'erledigt',
   'list.seen': 'gesehen',
   'list.over': 'vorbei',
-  'star.must': 'Pflicht — zu Bonus ändern',
-  'star.bonus': 'Bonus — aus dem Programm entfernen',
+  'star.must': '⭐ Lieblings — auf „wenn Zeit bleibt“ setzen',
+  'star.bonus': '👍 Wenn Zeit bleibt — aus dem Plan nehmen',
   'star.add': 'Zum Programm hinzufügen',
   'show.remove': 'Aus der Route entfernen',
   'show.add': 'Zur Route hinzufügen',
@@ -1966,8 +2149,8 @@ I18N.de = {
   'sheet.vlOffer': ' · angebotenes Zeitfenster gegen {time}',
   'sheet.inPlan': 'In meinem Programm',
   'sheet.plan': 'Programm',
-  'plan.must': 'Pflicht',
-  'plan.bonus': 'Bonus',
+  'plan.must': '⭐ Lieblings',
+  'plan.bonus': '👍 Wenn Zeit bleibt',
   'sheet.redone': 'Nochmal erledigt ({n}×)',
   'sheet.markDone': 'Als erledigt markieren',
   'sheet.inQueue': 'Ich stehe an',

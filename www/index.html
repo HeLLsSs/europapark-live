@@ -197,6 +197,32 @@ dialog.sheet::backdrop{background:rgba(5,12,10,.45)}
 .chart text{font:600 10px var(--font-body);fill:var(--muted)}
 .showtimes{display:flex;flex-wrap:wrap;gap:6px}
 
+/* Mode simple */
+.simple{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:20px 18px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+.simple p{margin:0}
+.s-emoji{font-size:3rem;line-height:1}
+.s-label{font:700 1rem/1.2 var(--font-body);color:var(--muted)}
+.s-title{font:800 2.4rem/1 var(--font-display);text-transform:uppercase;text-wrap:balance;border:0;background:none;color:var(--ink);padding:0;overflow-wrap:anywhere}
+.s-facts{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;font-size:1.15rem;font-weight:700}
+.s-actions{display:flex;flex-direction:column;gap:10px;width:100%}
+.btn.big{min-height:60px;font-size:1.25rem;border-radius:16px;width:100%}
+.s-next{color:var(--muted)}
+.s-more{border:0;background:none;color:var(--accent);font-weight:700;padding:6px;cursor:pointer}
+.s-list{display:flex;flex-direction:column;gap:8px;width:100%}
+.compass{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:40px}
+.c-arrow{width:96px;height:96px;color:var(--accent);transition:transform .25s ease-out}
+.c-arrow svg{width:100%;height:100%}
+.c-dist{font:800 1.6rem/1 var(--font-display);display:flex;flex-direction:column;align-items:center}
+.c-dist small{font:600 .75rem var(--font-body);color:var(--muted)}
+.c-here{font:800 1.6rem var(--font-display);color:var(--w-low)}
+.w-choices{display:flex;flex-direction:column;gap:10px}
+.w-choice{display:flex;align-items:center;gap:14px;min-height:64px;padding:10px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font-size:1.2rem;font-weight:700;cursor:pointer;text-align:left}
+.w-choice span{font-size:2rem}
+.w-how{font-size:1.15rem;line-height:1.5;padding-left:22px;margin:0}
+details.adv{border-top:1px solid var(--line);padding-top:14px}
+details.adv > summary{font-weight:700;cursor:pointer;padding:6px 0}
+details.adv > .set{padding-top:14px}
+
 /* Mode plein soleil : clair, contraste maximal, textes plus gros (réglage de l'appareil) */
 :root[data-sun="1"]{--bg:#FFFFFF;--surface:#FFFFFF;--sunk:#EDEDED;--ink:#000000;--muted:#262626;--line:#8A8A8A;
   --accent:#3A12B8;--accent-ink:#FFFFFF;--accent-soft:#E4DCFF;--board:#000000;--board-ink:#FFFFFF;--board-muted:#E0E0E0;--board-line:#555555;
@@ -304,6 +330,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
           <button class="btn" data-act="goto" data-tab="list" type="button" data-i18n="onb.self">Je choisis moi-même</button>
         </div>
       </div>
+      <div id="simpleBox"></div>
       <div id="recapBox"></div>
       <div id="nextBox"></div>
       <section class="block" id="vlBlock" hidden></section>
@@ -373,6 +400,14 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
           </div>
         </div>
         <div class="set">
+          <h2 data-i18n="mode.title">Affichage</h2>
+          <div class="seg" id="modeSeg" role="group" aria-label="Affichage">
+            <button type="button" data-mode="simple" data-i18n="mode.simple">😊 Simple</button>
+            <button type="button" data-mode="expert" data-i18n="mode.expert">🤓 Complet</button>
+          </div>
+          <p class="muted" data-i18n="mode.hint">Simple : une seule chose à faire à la fois, en gros. Complet : itinéraire, détails et tous les réglages.</p>
+        </div>
+        <div class="set">
           <h2 data-i18n="profile">Profil</h2>
           <p class="muted" id="userSummary"></p>
           <div class="row-inline"><button class="btn small" data-act="switch-user" type="button" data-i18n="switchUser">Changer de profil</button></div>
@@ -390,58 +425,10 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
             <button class="btn small" data-act="clear-plan" type="button" data-i18n="set.clear">Vider</button>
           </div>
         </div>
-        <div class="set" id="voteSet">
-          <h2 data-i18n="vote.title">Programme commun</h2>
-          <p class="muted" data-i18n="vote.hint">Chacun met ses étoiles dans son profil, puis l'appli fusionne : incontournable si la moitié du groupe le veut, bonus si au moins une personne le veut.</p>
-          <div class="row-inline"><button class="btn small" data-act="vote" type="button" data-i18n="vote.open">Fusionner des programmes</button></div>
-        </div>
-        <div class="set">
-          <label class="toggle"><span><b data-i18n="sun.title">Mode plein soleil</b><br><span class="muted" data-i18n="sun.hint">Contraste maximal et textes plus gros, pour lire l'écran dehors</span></span>
-            <input type="checkbox" id="sunChk"></label>
-          <label class="toggle"><span><b data-i18n="eco.title">Économie de batterie</b><br><span class="muted" data-i18n="eco.hint">GPS moins précis, actualisation toutes les 5 min au lieu de 2</span></span>
-            <input type="checkbox" id="ecoChk"></label>
-        </div>
-        <div class="set">
-          <label class="toggle"><span><b data-i18n="meal">Pause repas</b><br><span class="muted" data-i18n="set.mealHint">Placée quand les files sont au plus haut, près d'un resto ouvert</span></span>
-            <input type="checkbox" id="mealChk"></label>
-          <div class="seg" id="mealDurSeg" role="group" aria-label="Durée du repas" data-i18n-attr="aria-label:set.mealDur">
-            <button type="button" data-meal-dur="30">30 min</button>
-            <button type="button" data-meal-dur="45">45 min</button>
-            <button type="button" data-meal-dur="60">1 h</button>
-          </div>
-          <div class="row-inline">
-            <label class="field" style="flex:1"><span data-i18n="set.mealFrom">Pas avant</span><select id="mealFrom"></select></label>
-            <label class="field" style="flex:1"><span data-i18n="set.mealTo">Fini avant</span><select id="mealTo"></select></label>
-          </div>
-        </div>
-        <div class="set">
-          <h2 data-i18n="set.route">Priorité de l'itinéraire</h2>
-          <div class="seg" id="routeSeg" role="group" aria-label="Priorité de l'itinéraire" data-i18n-attr="aria-label:set.route">
-            <button type="button" data-route="marche" data-i18n="route.walk">Moins de marche</button>
-            <button type="button" data-route="equilibre" data-i18n="route.balanced">Équilibré</button>
-            <button type="button" data-route="attente" data-i18n="route.wait">Moins d'attente</button>
-          </div>
-        </div>
-        <div class="set">
-          <label class="toggle"><span><b data-i18n="set.sr">Single rider accepté</b><br><span class="muted" data-i18n="set.srHint">File séparée sur Blue Fire, Voltron, CanCan, Arthur (à vérifier sur place) : souvent bien plus courte, mais vous êtes séparés dans le wagon</span></span>
-            <input type="checkbox" id="singleChk"></label>
-        </div>
-        <div class="set">
-          <h2 data-i18n="set.pace">Rythme de marche</h2>
-          <div class="seg" id="paceSeg" role="group" aria-label="Rythme de marche" data-i18n-attr="aria-label:set.pace">
-            <button type="button" data-pace="enfants" data-i18n="pace.kids">Avec enfants</button>
-            <button type="button" data-pace="normal" data-i18n="pace.normal">Normal</button>
-            <button type="button" data-pace="rapide" data-i18n="pace.fast">Rapide</button>
-          </div>
-        </div>
         <div class="set">
           <label class="field"><span data-i18n="set.height">Taille du plus petit du groupe (cm)</span>
             <input id="heightIn" type="number" inputmode="numeric" min="0" max="220" step="1" placeholder="Pas de limite" data-i18n-attr="placeholder:set.noLimit"></label>
           <p class="muted" data-i18n="set.heightHint">Tailles minimales accompagné, indicatives : vérifie toujours le panneau à l'entrée.</p>
-        </div>
-        <div class="set">
-          <label class="toggle"><span><b data-i18n="set.hotel">Je dors dans un hôtel du parc</b><br><span class="muted" data-i18n="set.hotelHint">Entrée anticipée dès l'horaire hôtel (souvent 8:30, certaines attractions seulement)</span></span>
-            <input type="checkbox" id="hotelChk"></label>
         </div>
         <div class="set">
           <h2 data-i18n="set.position">Ma position</h2>
@@ -461,29 +448,6 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
           </div>
         </div>
         <div class="set">
-          <h2 data-i18n="set.crowd">Affluence</h2>
-          <p class="muted" id="crowdStatus"></p>
-          <div class="cal" id="calendar"></div>
-        </div>
-        <div class="set">
-          <h2 data-i18n="fc.title">Quel jour venir ?</h2>
-          <p class="muted" id="fcHint"></p>
-          <div class="cal" id="forecast"></div>
-        </div>
-        <div class="set">
-          <h2 data-i18n="replay.title">Rejouer une journée</h2>
-          <p class="muted" data-i18n="replay.hint">Simule une journée enregistrée par le serveur avec ton programme : l'itinéraire de l'appli face à deux stratégies simples, avec les vraies files de ce jour-là.</p>
-          <div class="row-inline">
-            <label class="field" style="flex:1"><span data-i18n="replay.day">Journée</span><select id="replayDay"></select></label>
-            <button class="btn small" data-act="replay" type="button" data-i18n="replay.run">Rejouer</button>
-          </div>
-          <div id="replayOut"></div>
-        </div>
-        <div class="set">
-          <h2 data-i18n="set.data">Données</h2>
-          <p class="muted" id="dataStatus"></p>
-        </div>
-        <div class="set">
           <h2 data-i18n="set.help">Aide et mises à jour</h2>
           <p class="muted" id="versionLine"></p>
           <div class="row-inline">
@@ -493,11 +457,86 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
             <button class="btn small" data-act="check-update" type="button" data-i18n="set.update">Mettre à jour</button>
           </div>
         </div>
-        <div class="set">
-          <h2 data-i18n="set.newDay">Nouvelle journée</h2>
-          <p class="muted" data-i18n="set.newDayHint">Remet à zéro les attractions faites, les créneaux VirtualLine, le repas et les alertes envoyées. Ton programme est conservé.</p>
-          <div class="row-inline"><button class="btn small" id="resetBtn" data-act="reset" type="button" data-i18n="reset">Remettre à zéro</button></div>
-        </div>
+        <details class="adv" id="advSet">
+          <summary data-i18n="adv.title">Réglages avancés</summary>
+          <div class="set" id="voteSet">
+            <h2 data-i18n="vote.title">Programme commun</h2>
+            <p class="muted" data-i18n="vote.hint">Chacun met ses étoiles dans son profil, puis l'appli fusionne : incontournable si la moitié du groupe le veut, bonus si au moins une personne le veut.</p>
+            <div class="row-inline"><button class="btn small" data-act="vote" type="button" data-i18n="vote.open">Fusionner des programmes</button></div>
+          </div>
+          <div class="set">
+            <label class="toggle"><span><b data-i18n="sun.title">Mode plein soleil</b><br><span class="muted" data-i18n="sun.hint">Contraste maximal et textes plus gros, pour lire l'écran dehors</span></span>
+              <input type="checkbox" id="sunChk"></label>
+            <label class="toggle"><span><b data-i18n="eco.title">Économie de batterie</b><br><span class="muted" data-i18n="eco.hint">GPS moins précis, actualisation toutes les 5 min au lieu de 2</span></span>
+              <input type="checkbox" id="ecoChk"></label>
+          </div>
+          <div class="set">
+            <label class="toggle"><span><b data-i18n="meal">Pause repas</b><br><span class="muted" data-i18n="set.mealHint">Placée quand les files sont au plus haut, près d'un resto ouvert</span></span>
+              <input type="checkbox" id="mealChk"></label>
+            <div class="seg" id="mealDurSeg" role="group" aria-label="Durée du repas" data-i18n-attr="aria-label:set.mealDur">
+              <button type="button" data-meal-dur="30">30 min</button>
+              <button type="button" data-meal-dur="45">45 min</button>
+              <button type="button" data-meal-dur="60">1 h</button>
+            </div>
+            <div class="row-inline">
+              <label class="field" style="flex:1"><span data-i18n="set.mealFrom">Pas avant</span><select id="mealFrom"></select></label>
+              <label class="field" style="flex:1"><span data-i18n="set.mealTo">Fini avant</span><select id="mealTo"></select></label>
+            </div>
+          </div>
+          <div class="set">
+            <h2 data-i18n="set.route">Priorité de l'itinéraire</h2>
+            <div class="seg" id="routeSeg" role="group" aria-label="Priorité de l'itinéraire" data-i18n-attr="aria-label:set.route">
+              <button type="button" data-route="marche" data-i18n="route.walk">Moins de marche</button>
+              <button type="button" data-route="equilibre" data-i18n="route.balanced">Équilibré</button>
+              <button type="button" data-route="attente" data-i18n="route.wait">Moins d'attente</button>
+            </div>
+          </div>
+          <div class="set">
+            <label class="toggle"><span><b data-i18n="set.sr">🙋 File solo accepté (single rider)</b><br><span class="muted" data-i18n="set.srHint">File séparée sur Blue Fire, Voltron, CanCan, Arthur (à vérifier sur place) : souvent bien plus courte, mais vous êtes séparés dans le wagon</span></span>
+              <input type="checkbox" id="singleChk"></label>
+          </div>
+          <div class="set">
+            <h2 data-i18n="set.pace">Rythme de marche</h2>
+            <div class="seg" id="paceSeg" role="group" aria-label="Rythme de marche" data-i18n-attr="aria-label:set.pace">
+              <button type="button" data-pace="enfants" data-i18n="pace.kids">Avec enfants</button>
+              <button type="button" data-pace="normal" data-i18n="pace.normal">Normal</button>
+              <button type="button" data-pace="rapide" data-i18n="pace.fast">Rapide</button>
+            </div>
+          </div>
+          <div class="set">
+            <label class="toggle"><span><b data-i18n="set.hotel">Je dors dans un hôtel du parc</b><br><span class="muted" data-i18n="set.hotelHint">Entrée anticipée dès l'horaire hôtel (souvent 8:30, certaines attractions seulement)</span></span>
+              <input type="checkbox" id="hotelChk"></label>
+          </div>
+          <div class="set">
+            <h2 data-i18n="set.crowd">Affluence</h2>
+            <p class="muted" id="crowdStatus"></p>
+            <div class="cal" id="calendar"></div>
+          </div>
+          <div class="set">
+            <h2 data-i18n="fc.title">Quel jour venir ?</h2>
+            <p class="muted" id="fcHint"></p>
+            <div class="cal" id="forecast"></div>
+          </div>
+          <div class="set">
+            <h2 data-i18n="replay.title">Rejouer une journée</h2>
+            <p class="muted" data-i18n="replay.hint">Simule une journée enregistrée par le serveur avec ton programme : l'itinéraire de l'appli face à deux stratégies simples, avec les vraies files de ce jour-là.</p>
+            <div class="row-inline">
+              <label class="field" style="flex:1"><span data-i18n="replay.day">Journée</span><select id="replayDay"></select></label>
+              <button class="btn small" data-act="replay" type="button" data-i18n="replay.run">Rejouer</button>
+            </div>
+            <div id="replayOut"></div>
+          </div>
+          <div class="set">
+            <h2 data-i18n="set.data">Données</h2>
+            <p class="muted" id="dataStatus"></p>
+          </div>
+          <div class="set">
+            <h2 data-i18n="set.newDay">Nouvelle journée</h2>
+            <p class="muted" data-i18n="set.newDayHint">Remet à zéro les attractions faites, les créneaux VirtualLine, le repas et les alertes envoyées. Ton programme est conservé.</p>
+            <div class="row-inline"><button class="btn small" id="resetBtn" data-act="reset" type="button" data-i18n="reset">Remettre à zéro</button></div>
+          </div>
+        </details>
+
       </div>
       <p class="note" data-i18n="set.credits">Temps d'attente : ceux annoncés par le parc, relayés par themeparks.wiki. Météo : Open-Meteo. Page non officielle, sans lien avec Europa-Park.</p>
     </section>
@@ -519,7 +558,18 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
     <button class="icon-btn" type="button" data-act="help-close" aria-label="Fermer" data-i18n-attr="aria-label:close">✕</button></div>
   <p class="muted" data-i18n="help.intro">EP Live te dit à chaque instant quelle attraction faire maintenant, et prévoit le reste de ta journée pour attendre et marcher le moins possible.</p>
 
-  <details id="help-start" data-i18n-html="help.start" open><summary>Démarrer en 4 étapes</summary>
+  <details id="help-simple" data-i18n-html="help.simple" open><summary>Le mode simple</summary>
+    <p>Par défaut, l'écran Maintenant n'affiche qu'une chose : <b>où aller maintenant</b>, en gros, avec trois boutons :</p>
+    <ul>
+      <li><b>🙋 J'y suis</b> : tu fais la queue (un minuteur démarre) ;</li>
+      <li><b>✅ Fini !</b> : à la sortie, l'étape suivante arrive toute seule ;</li>
+      <li><b>⏭ Pas maintenant</b> : on y reviendra plus tard.</li>
+    </ul>
+    <p><b>La flèche</b> montre la direction de la prochaine étape (à vol d'oiseau) et la distance. Avec la position activée, elle tourne avec le téléphone ; sur iPhone, touche « Tourner la flèche » une fois pour l'autoriser. « 🎯 Tu y es ! » quand tu es arrivé.</p>
+    <p><b>Voir toute la journée</b> déplie l'itinéraire complet. Réglages → <b>Affichage</b> : 😊 Simple ou 🤓 Complet (tous les détails, réglages avancés ouverts).</p>
+  </details>
+
+  <details id="help-start" data-i18n-html="help.start"><summary>Démarrer en 4 étapes</summary>
     <ol>
       <li><b>Installe l'appli</b> sur l'écran d'accueil (voir « Installer l'appli »).</li>
       <li><b>Choisis ton profil</b> : ton pseudo, sans mot de passe. Tout est enregistré sur le serveur.</li>
@@ -696,10 +746,12 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
       <li><b>Notes</b> des attractions, écart affiché / réel <b>par attraction</b>, calendrier <b>« Quel jour venir ? »</b>.</li>
       <li><b>Programme commun</b> par vote, <b>rendez-vous</b> pour se séparer puis se retrouver.</li>
       <li><b>Mode plein soleil</b>, <b>économie de batterie</b>, spectacles de saison 🎃, <b>rejouer une journée</b>.</li>
+      <li><b>Mode simple</b> par défaut, avec une <b>flèche</b> vers la prochaine étape, et démarrage en 3 questions.</li>
     </ul>
     <p>Les mises à jour arrivent toutes seules à la prochaine ouverture de l'appli.</p>
   </details>
 </div></dialog>
+<dialog class="sheet" id="wizard" aria-label="EP Live"></dialog>
 <dialog class="sheet" id="login" aria-labelledby="loginTitle"></dialog>
 <div class="toast" id="toast" role="status" hidden></div>
 
@@ -717,7 +769,7 @@ const PACES = {enfants: 55, normal: 75, rapide: 90}; // mètres par minute
 // Poids d'une minute de marche face à une minute de file gagnée.
 // Au-delà de 8 min de trajet, chaque minute compte double : on ne traverse le parc que si ça vaut vraiment le coup.
 const ROUTE = {attente: 1, equilibre: 1.6, marche: 2.4};
-const APP_VERSION = '2026.10.06.3';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
+const APP_VERSION = '2026.10.06.4';  // à changer à chaque mise à jour, avec la liste « Nouveautés » de l'aide
 const PEAK = {A: 45, B: 20, C: 8};
 // Courbe générique de remplissage d'un parc sur la journée (multiplicateur), minute du jour -> facteur
 const PRIOR = [[480,.4],[540,.45],[600,.75],[660,.95],[720,1],[900,.95],[960,.85],[1020,.65],[1050,.5],[1080,.3],[1140,.2]];
@@ -927,6 +979,7 @@ async function selectUser(u) {
   usersCache = null;
   render();
   refresh();
+  if (!Object.keys(prefs.plan).length && !prefs.onboarded) setTimeout(openWizard, 600);
 }
 let usersCache = null;
 async function fetchUsers() {
@@ -1614,6 +1667,15 @@ function renderNow(P, plan) {
       <p>${t('tips.notif')}</p>`;
   }
   renderVL(P, plan);
+  // Mode simple : une seule carte en gros ; le reste seulement si « Voir toute la journée »
+  const simple = simpleMode();
+  $('#simpleBox').innerHTML = simple ? simpleHTML(P, plan) : '';
+  if (simple) {
+    $('#onboard').hidden = true;
+    for (const el of [box, $('#vlBlock'), itinB, shows, tipsB]) if (!showAll) el.hidden = true;
+    if (showAll) box.hidden = false;
+    updateCompass();
+  } else box.hidden = false;
 }
 
 function upcomingShows(P) {
@@ -2125,6 +2187,7 @@ function renderSettings() {
   if (document.activeElement !== $('#heightIn')) $('#heightIn').value = prefs.height || '';
   $('#hotelChk').checked = !!prefs.hotel;
   $('#sunChk').checked = !!device.sun;
+  document.querySelectorAll('#modeSeg button').forEach(bt => bt.setAttribute('aria-pressed', bt.dataset.mode === (device.mode || 'simple')));
   $('#ecoChk').checked = !!device.eco;
   $('#voteSet').hidden = !remote();
   const rd = $('#replayDay'), days = (calData || []).map(d => d.day).reverse();
@@ -2360,12 +2423,13 @@ function rate(id, n) {
 const starsHTML = (id, cur) => `<span class="stars" role="group" aria-label="${esc(t('rate.mine'))}">${[1, 2, 3, 4, 5].map(n =>
   `<button type="button" data-act="rate" data-id="${esc(id)}" data-n="${n}" aria-pressed="${!!cur && n <= cur}" aria-label="${n}/5">★</button>`).join('')}</span>`;
 document.addEventListener('click', ev => {
-  const el = ev.target.closest('[data-act], [data-tab], [data-filter], [data-sort], [data-pace], [data-route], [data-meal-dur], [data-lang]');
+  const el = ev.target.closest('[data-act], [data-tab], [data-filter], [data-sort], [data-pace], [data-route], [data-meal-dur], [data-lang], [data-mode]');
   if (!el) return;
   if (el.dataset.tab && !el.dataset.act) { switchTab(el.dataset.tab); return; }
   if (el.dataset.filter) { device.filter = el.dataset.filter; saveDevice(); renderList(lastP || phaseInfo()); return; }
   if (el.dataset.sort) { device.sort = el.dataset.sort; saveDevice(); renderList(lastP || phaseInfo()); return; }
   if (el.dataset.pace) { prefs.pace = el.dataset.pace; savePrefs(); render(); return; }
+  if (el.dataset.mode) { device.mode = el.dataset.mode; showAll = false; saveDevice(); applyMode(); render(); return; }
   if (el.dataset.route) { prefs.route = el.dataset.route; savePrefs(); render(); return; }
   if (el.dataset.mealDur) { prefs.meal.dur = +el.dataset.mealDur; savePrefs(); render(); return; }
   if (el.dataset.lang) { setLang(el.dataset.lang); return; }
@@ -2428,6 +2492,13 @@ document.addEventListener('click', ev => {
     case 'car-clear': withUndo(t('car.cleared'), () => { prefs.car = null; }); $('#sheet').close(); break;
     case 'car-show': $('#sheet').close(); switchTab('map'); setTimeout(() => { follow = false; lmap?.setView([prefs.car.lat, prefs.car.lon], 17); }, 100); break;
     case 'map-dl': downloadMap(); break;
+    case 'show-all': showAll = !showAll; render(); break;
+    case 'compass': enableCompass(); break;
+    case 'wizard': openWizard(); break;
+    case 'wiz-like': prefs.plan = presetPlan(el.dataset.v); prefs.onboarded = true; savePrefs(); wizStep = 2; renderWizard(); break;
+    case 'wiz-kids': prefs.height = +el.dataset.v; savePrefs(); wizStep = 3; renderWizard(); break;
+    case 'wiz-gps': device.gps = true; saveDevice(); startGps(); renderWizard(); break;
+    case 'wiz-done': prefs.onboarded = true; savePrefs(); $('#wizard').close(); render(); break;
     case 'eco-on': device.eco = true; saveDevice(); if (device.gps) startGps(); toast(t('eco.on')); render(); break;
     case 'meet-set': {
       const tv = $('#meetTime').value, P = lastP || phaseInfo();
@@ -2534,6 +2605,8 @@ document.addEventListener('change', ev => {
   if (tg.id === 'ecoChk') { device.eco = tg.checked; saveDevice(); if (device.gps) startGps(); render(); }
   if (tg.id === 'heightIn') { prefs.height = clamp(Math.round(+tg.value || 0), 0, 220); savePrefs(); render(); }
 });
+// « Réglages avancés » : ouvert par défaut en mode complet, sauf si l'utilisateur l'a replié lui-même
+document.addEventListener('click', ev => { if (ev.target.closest('#advSet > summary')) $('#advSet').dataset.touched = '1'; });
 document.addEventListener('submit', ev => {
   if (ev.target.id === 'newUser') { ev.preventDefault(); createUser($('#newName').value); }
 });
@@ -2703,6 +2776,164 @@ function meetingPoint(people) {
     if (d < bd) { bd = d; best = e; }
   }
   return best;
+}
+
+/* ---------- Mode simple : une seule chose à faire, en gros ----------
+   Réglage de l'appareil (device.mode), « simple » par défaut. Le mode complet garde tout l'affichage détaillé. */
+const simpleMode = () => (device.mode || 'simple') === 'simple';
+let showAll = false;   // mode simple : « Voir toute la journée » déplie l'affichage complet sans changer de mode
+function applyMode() {
+  document.documentElement.dataset.mode = simpleMode() ? 'simple' : 'expert';
+  const adv = $('#advSet');
+  if (adv && !adv.dataset.touched) adv.open = !simpleMode();
+}
+const bigBtn = (act, label, primary, id) => `<button class="btn big${primary ? ' primary' : ''}" type="button" data-act="${act}"${id ? ` data-id="${esc(id)}"` : ''}>${label}</button>`;
+function simpleHTML(P, plan) {
+  const planCount = Object.keys(prefs.plan).length;
+  if (!user) return '';
+  if (!planCount && !Object.keys(prefs.shows).length) {
+    return `<article class="simple"><div class="s-emoji">👋</div><div class="s-title">${t('s.hello', {name: esc(user.local ? '' : user.name)})}</div>
+      <p>${t('s.start')}</p><div class="s-actions">${bigBtn('wizard', t('s.go'), true)}</div></article>`;
+  }
+  if (P.phase === 'unknown') return `<article class="simple"><div class="s-emoji">🤷</div><p>${t('now.noHours')}</p></article>`;
+  const steps = plan?.steps || [], first = steps[0];
+  const next = steps.slice(1).filter(s => s.kind === 'ride').slice(0, 2).map(s => esc(shortName(ents.get(s.id))));
+  const more = `<button class="s-more" type="button" data-act="show-all">${showAll ? t('s.less') : t('s.all')}</button>`;
+  if (P.phase !== 'open') {
+    const rides = steps.filter(s => s.kind === 'ride').slice(0, 3).map(s => esc(shortName(ents.get(s.id))));
+    return `<article class="simple"><div class="s-emoji">${P.phase === 'before' ? '🌅' : '🌙'}</div>
+      <div class="s-label">${P.phase === 'before' ? t('s.today') : esc(fmtDay(P.day))}</div>
+      <div class="s-title">${t('s.beAt', {time: hhmm(Math.max(0, P.h.open - 15))})}</div>
+      ${rides.length ? `<p>${t('s.startWith', {list: rides.join(', ')})}</p>` : ''}${more}</article>`;
+  }
+  if (!first) {
+    const easy = [...live.keys()].filter(id => hasQueue(id) && waitOf(id) != null && !tooSmall(id)).sort((a, b) => waitOf(a) - waitOf(b)).slice(0, 3);
+    return `<article class="simple"><div class="s-emoji">🎉</div><div class="s-title">${t('s.allDone')}</div>
+      ${easy.length ? `<p>${t('s.shortest')}</p><div class="s-list">${easy.map(id => `<button class="btn" type="button" data-act="open" data-id="${esc(id)}">${esc(shortName(ents.get(id)))} · ${waitOf(id)} min</button>`).join('')}</div>` : ''}${more}</article>`;
+  }
+  let emoji, label, title, facts = [], actions = [], target = null;
+  const e = ents.get(first.id);
+  if (first.kind === 'queue') {
+    const q = prefs.queue, left = Math.max(0, Math.round(q.posted * realFactor(q.id) - (now() - q.since) / 60000));
+    emoji = '⏳'; label = t('s.inQueue'); title = esc(shortName(e));
+    facts.push(t('s.left', {n: left}));
+    actions = [bigBtn('done', t('s.finished'), true, first.id), bigBtn('queue-cancel', t('s.leaveQueue'), false, first.id)];
+  } else if (first.kind === 'vl') {
+    emoji = '🎟'; label = t('s.vl', {vl: esc(VQ.name)}); title = esc(shortName(e)); target = e;
+    facts.push(t('s.at', {time: hhmm(first.slot)}), first.leaveAt <= P.mod + 1 ? t('goNow') : t('s.leaveAt', {time: hhmm(first.leaveAt)}));
+    actions = [bigBtn('done', t('s.finished'), true, first.id)];
+  } else if (first.kind === 'show') {
+    emoji = '🎭'; label = t('s.show'); title = esc(shortName(e)); target = e;
+    facts.push(t('s.at', {time: hhmm(first.slot)}), t('walk', {n: first.walk}));
+    actions = [bigBtn('done', t('s.seen'), true, first.id), bigBtn('show-skip', t('act.notToday'), false, first.id)];
+  } else if (first.kind === 'meal') {
+    const place = first.place && ents.get(first.place);
+    emoji = '🍽'; label = t('s.meal'); title = place ? esc(shortName(place)) : t('meal'); target = place;
+    facts.push(t('s.at', {time: hhmm(first.slot)}), t('walk', {n: first.walk}));
+    actions = [bigBtn('meal-done', t('s.finished'), true, 'meal'), bigBtn('meal-later', t('act.later'), false, 'meal')];
+  } else if (first.kind === 'meet') {
+    emoji = '👋'; label = t('meet.title'); title = esc(shortName(e)); target = e;
+    facts.push(t('s.at', {time: hhmm(first.slot)}), t('walk', {n: first.walk}));
+    actions = [bigBtn('meet-done', t('meet.here'), true)];
+  } else {
+    const w = waitOf(first.id) ?? r5(first.wait);
+    emoji = '👉'; label = t('s.goTo'); title = esc(shortName(e)); target = e;
+    facts.push(`🚶 ${t('walk', {n: first.walk})}`, `⏱ ${t('s.queue', {n: w})}`);
+    actions = [bigBtn('queue', t('s.imHere'), true, first.id), bigBtn('done', t('s.finished'), false, first.id), bigBtn('skip', t('act.later'), false, first.id)];
+  }
+  compassTarget = target && target.lat != null ? target : null;
+  return `<article class="simple"><div class="s-label">${emoji} ${label}</div>
+    <button class="s-title" type="button" data-act="open" data-id="${esc(first.kind === 'meal' ? first.place || '' : first.id)}">${title}</button>
+    <div class="s-facts">${facts.map(f => `<span>${f}</span>`).join('')}</div>
+    ${compassTarget ? `<div class="compass" id="compass"></div>` : ''}
+    <div class="s-actions">${actions.join('')}</div>
+    ${next.length ? `<p class="s-next">${t('s.then', {list: next.join(', ')})}</p>` : ''}${more}</article>`;
+}
+
+/* ---------- Flèche vers la prochaine étape ----------
+   Direction à vol d'oiseau, tournée selon la boussole du téléphone quand elle est disponible
+   (iPhone : autorisation demandée au premier toucher). Sans boussole : nord en haut. */
+let compassTarget = null, heading = null, compassListening = false;
+const icArrow = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 80 88 50 70 20 88Z" fill="currentColor"/></svg>';
+function bearing(a, b) {
+  const r = Math.PI / 180, y = Math.sin((b.lon - a.lon) * r) * Math.cos(b.lat * r);
+  const x = Math.cos(a.lat * r) * Math.sin(b.lat * r) - Math.sin(a.lat * r) * Math.cos(b.lat * r) * Math.cos((b.lon - a.lon) * r);
+  return (Math.atan2(y, x) / r + 360) % 360;
+}
+function onOrient(e) {
+  let h = e.webkitCompassHeading ?? (e.absolute && e.alpha != null ? 360 - e.alpha : null);
+  if (h == null) return;
+  h = (h + (screen.orientation?.angle || 0)) % 360;
+  // Lissage (la boussole tremble), en tenant compte du passage 359° → 0°
+  heading = heading == null ? h : (heading + ((h - heading + 540) % 360 - 180) * .25 + 360) % 360;
+  updateCompass();
+}
+function listenCompass() {
+  if (compassListening) return;
+  compassListening = true;
+  window.addEventListener('deviceorientationabsolute', onOrient);
+  window.addEventListener('deviceorientation', onOrient);
+}
+async function enableCompass() {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission && await DeviceOrientationEvent.requestPermission() !== 'granted') { toast(t('c.denied')); return; }
+  } catch (e) { toast(t('c.denied')); return; }
+  device.compass = true; saveDevice();
+  listenCompass();
+  if (!device.gps) { device.gps = true; saveDevice(); startGps(); }
+  updateCompass();
+}
+function updateCompass() {
+  const el = $('#compass');
+  if (!el || !compassTarget) return;
+  const fresh = gpsPos && Date.now() - gpsPos.ts < 5 * 60000;
+  if (!fresh) {
+    el.innerHTML = `<button class="btn" type="button" data-act="compass">${t('c.enable')}</button>`;
+    return;
+  }
+  const d = dist(gpsPos, compassTarget), b = bearing(gpsPos, compassTarget);
+  if (d < 35) { el.innerHTML = `<div class="c-here">${t('c.here')}</div>`; return; }
+  const rot = heading == null ? b : b - heading;
+  el.innerHTML = `<div class="c-arrow" style="transform:rotate(${Math.round(rot)}deg)">${icArrow}</div>
+    <div class="c-dist">${Math.round(d / 10) * 10} m${heading == null ? `<small>${t('c.north')}</small>` : ''}</div>
+    ${heading == null && !device.compass ? `<button class="btn small" type="button" data-act="compass">${t('c.turn')}</button>` : ''}`;
+}
+
+/* ---------- Démarrage en 3 questions ---------- */
+let wizStep = 1;
+function openWizard() {
+  wizStep = 1;
+  renderWizard();
+  const dlg = $('#wizard');
+  if (!dlg.open) { try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); } }
+}
+function renderWizard() {
+  const choice = (act, v, emoji, label) => `<button class="w-choice" type="button" data-act="${act}" data-v="${v}"><span>${emoji}</span>${label}</button>`;
+  let body;
+  if (wizStep === 1) body = `<h2 class="sheet-title">${t('w.like')}</h2><div class="w-choices">
+    ${choice('wiz-like', 'sensations', '🎢', t('w.thrills'))}${choice('wiz-like', 'famille', '🎠', t('w.calm'))}${choice('wiz-like', 'mix', '😄', t('w.mix'))}</div>`;
+  else if (wizStep === 2) body = `<h2 class="sheet-title">${t('w.kids')}</h2><div class="w-choices">
+    ${choice('wiz-kids', '0', '🧑', t('w.noKids'))}${[90, 100, 120, 130].map(cm => choice('wiz-kids', cm, '🧒', t('w.kidCm', {cm}))).join('')}</div>`;
+  else body = `<h2 class="sheet-title">${t('w.howTitle')}</h2>
+    <ol class="w-how"><li>${t('w.how1')}</li><li>${t('w.how2')}</li><li>${t('w.how3')}</li></ol>
+    <div class="row-inline">${device.gps ? '' : `<button class="btn" type="button" data-act="wiz-gps">${t('w.gps')}</button>`}
+      ${pushOn ? '' : `<button class="btn" type="button" data-act="push-on">${t('w.notif')}</button>`}</div>
+    <div class="s-actions">${bigBtn('wiz-done', t('w.go'), true)}</div>`;
+  $('#wizard').innerHTML = `<div class="sheet-in"><div class="sheet-head"><div class="eyebrow">${t('w.step', {n: wizStep})}</div>
+    <button class="icon-btn" type="button" data-act="wiz-done" aria-label="${t('close')}">✕</button></div>${body}</div>`;
+}
+function presetPlan(name) {
+  const ps = name === 'mix'
+    ? {must: [...new Set([...(PRESETS.sensations?.must || []).slice(0, 7), ...(PRESETS.famille?.must || []).slice(0, 5)])],
+       bonus: [...new Set([...(PRESETS.sensations?.must || []).slice(7), ...(PRESETS.famille?.must || []).slice(5), ...(PRESETS.sensations?.bonus || [])])]}
+    : PRESETS[name];
+  const plan = {};
+  for (const e of ents.values()) {
+    if (e.type !== 'ATTRACTION' || e.transport || !ps) continue;
+    if (ps.must.some(k => e.key.includes(k))) plan[e.id] = 'must';
+    else if (ps.bonus.some(k => e.key.includes(k))) plan[e.id] = 'bonus';
+  }
+  return plan;
 }
 
 /* ---------- Plein soleil, batterie ---------- */
@@ -3006,6 +3237,8 @@ function restoreFromCache() {
   restoreFromCache();
   if (user) { rolloverDay(); syncLang(); }
   applySun();
+  applyMode();
+  if (device.compass) listenCompass();
   // Batterie faible (Android) : on propose le mode économie
   navigator.getBattery?.().then(b => {
     const chk = () => { lowBattery = b.level <= .2 && !b.charging; scheduleRender(); };

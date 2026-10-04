@@ -57,7 +57,32 @@ Tout ce que tu fais est enregistré sur le serveur à chaque changement : progra
 
 **Pour se retrouver** : dans **Réglages → Ma position**, coche « Partager ma position avec le groupe » et indique ton prénom. Sur la **Carte**, chaque membre apparaît en point plein avec son prénom et le temps de marche jusqu'à lui. Un losange marque le **point de rencontre** conseillé : l'attraction la plus proche du centre du groupe. Une position disparaît 20 min après le dernier point, ou dès qu'on décoche le partage.
 
-## 3. Préparer la journée (la veille)
+## 3. Démarrer en 3 questions
+
+Avec un profil neuf, l'appli pose trois questions, une par écran :
+1. « Tu préfères… » 🎢 *Ça secoue !*, 🎠 *Tranquille* ou 😄 *Un peu de tout* : le programme se remplit tout seul.
+2. « Il y a des petits avec vous ? » : non, ou la taille du plus petit (90 à 130 cm).
+3. « C'est tout simple » : comment se servir de l'appli, avec deux boutons pour activer la position et les notifications.
+
+Tout se modifie ensuite dans **Attractions** (les étoiles) et dans **Réglages**.
+
+## 4. Mode simple ou complet
+
+**Réglages → Affichage** propose deux modes, au choix sur chaque téléphone :
+
+- **😊 Simple** (par défaut) : l'écran Maintenant n'affiche qu'une chose, en gros. Par exemple « 👉 Va à Silver Star · 🚶 1 min · ⏱ 20 min de file », avec trois boutons :
+  - **🙋 J'y suis** (tu fais la queue) ;
+  - **✅ Fini !** (l'étape suivante arrive toute seule) ;
+  - **⏭ Pas maintenant**.
+
+  Une **flèche** montre la direction et la distance de la prochaine étape, à vol d'oiseau. Avec la position activée, elle tourne avec le téléphone grâce à la boussole ; sur iPhone, il faut l'autoriser une fois. Sans boussole, le nord est en haut. Elle affiche « 🎯 Tu y es ! » à l'arrivée. **Voir toute la journée** déplie l'affichage complet sans changer de mode.
+- **🤓 Complet** : tout l'affichage détaillé (panneau, autres bons choix, itinéraire, VirtualLine, spectacles), avec les réglages avancés ouverts.
+
+Dans les deux modes, les Réglages commencent par l'essentiel : langue, affichage, profil, programme, taille, position, installation, notifications, aide. Le reste est rangé dans **Réglages avancés**.
+
+Les libellés sont simples : ⭐ *J'adore* (incontournable), 👍 *Si on a le temps* (bonus), ⏭ *Pas maintenant*, 🙋 *File solo* (single rider).
+
+## 5. Préparer la journée (la veille)
 
 1. **Programme** : touche *Sensations fortes* ou *En famille*, puis ajuste dans **Attractions** avec les étoiles.
    - étoile pleine = **incontournable** ;
@@ -79,9 +104,9 @@ Tout ce que tu fais est enregistré sur le serveur à chaque changement : progra
 
 Le soir et la veille, l'onglet **Maintenant** affiche un **aperçu de la journée suivante** : itinéraire estimé depuis l'ouverture, météo, conseils, et **affluence prévue**. Celle-ci correspond à l'attente moyenne habituelle de ce jour de la semaine, comparée à la moyenne des derniers jours enregistrés par le serveur.
 
-## 4. Dans le parc
+## 6. Dans le parc
 
-L'onglet **Maintenant** montre en grand la **prochaine étape** : son nom, l'attente actuelle, le temps de marche et la raison du choix. Juste en dessous, trois autres bons choix et l'itinéraire du reste de la journée avec les heures d'arrivée.
+En mode complet, l'onglet **Maintenant** montre en grand la **prochaine étape** : son nom, l'attente actuelle, le temps de marche et la raison du choix. Juste en dessous, trois autres bons choix et l'itinéraire du reste de la journée avec les heures d'arrivée.
 
 | Bouton | Effet |
 |---|---|
@@ -128,7 +153,7 @@ Au-dessus de la carte, des boutons affichent ou masquent les **toilettes, l'eau 
 
 **Repas et spectacles** apparaissent dans l'itinéraire comme des étapes à heure fixe. Pour le repas, l'appli indique le resto ouvert le plus proche. *Plus tard* le décale d'au moins 30 min, *Fait* le retire.
 
-## 5. Les notifications
+## 7. Les notifications
 
 Une fois activées (**Réglages → Notifications**), elles arrivent même appli fermée :
 
@@ -146,11 +171,11 @@ Une fois activées (**Réglages → Notifications**), elles arrivent même appli
 
 Les alertes de file courte, d'attraction à refaire et de réouverture sont mises en pause pendant que tu es « dans la file ». Appli ouverte, les mêmes alertes s'affichent aussi en bandeau, avec vibration.
 
-## 6. Aide dans l'appli
+## 8. Aide dans l'appli
 
 Le bouton **?** en haut ouvre l'aide : démarrage, boutons, couleurs, calcul de l'itinéraire, VirtualLine, repas et spectacles, notifications, GPS, groupe, problèmes fréquents et **Nouveautés**. **Réglages → Aide et mises à jour** donne la version et un bouton **Mettre à jour**.
 
-## 7. Le soir : récap de la journée
+## 9. Le soir : récap de la journée
 
 Chaque « Fait » est noté. Une fois le parc fermé, l'onglet **Maintenant** affiche **Ta journée** :
 - le nombre de tours et le temps passé dans les files (mesuré si tu as utilisé « Dans la file », sinon le temps affiché) ;
@@ -164,7 +189,7 @@ Le bouton **Partager** l'envoie à qui tu veux. Le récap est aussi disponible �
 
 **Réglages → Nouvelle journée** remet à zéro les attractions faites, les créneaux, le repas et les alertes, en gardant le programme. Ça se fait aussi tout seul au changement de jour.
 
-## 8. Langues
+## 10. Langues
 
 L'appli existe en **français**, **anglais** et **allemand**. Par défaut, elle prend la langue du téléphone (une autre langue que ces trois-là donne l'anglais). **Réglages → Langue / Language / Sprache** la change pour ce téléphone, sans recharger la page ; les dates, les nombres et l'aide suivent.
 
