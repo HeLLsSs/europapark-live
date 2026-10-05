@@ -797,6 +797,10 @@ const SR_FACTOR = .5;
 const NOT_MEAL = /drinks?\b|langnese|magnum|granini|coca-cola|\beis\b|gelateria|helader|is huset|refresh|wine|le vin|lounge|bar chez/i;
 // Fond de carte (OpenStreetMap : usage modéré, attribution obligatoire)
 const MAP_TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+// OpenStreetMap refuse les tuiles demandées sans Referer (le site envoie « same-origin ») et renvoie
+// alors une image « Access blocked » en 200 avec « Cache-Control: no-cache » : à ne pas garder (même test dans sw.js)
+const TILE_REFERRER = 'strict-origin-when-cross-origin';
+const tileBlocked = r => /no-cache/.test(r.headers.get('cache-control') || '');
 const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
 
 /* Parc de l'instance : parks.json, choisi côté serveur par EP_PARK (api.php?r=config).
@@ -1214,6 +1218,10 @@ function phaseInfo() {
     const start = prefs.hotel && h.early != null ? Math.min(h.early, h.open) : h.open;
     if (mod < start) return {phase: 'before', day, h, t0: start, mod};
     if (mod < h.close) return {phase: 'open', day, h, t0: mod, mod};
+    // Horaires annoncés parfois plus courts que la réalité (fermeture annoncée à 18 h, attractions ouvertes jusqu'à 19 h) :
+    // tant que des attractions tournent encore d'après des données récentes, le parc reste ouvert
+    if (mod < h.close + 120 && Date.now() - meta.fetchedAt < 15 * 60000 && [...live.keys()].filter(id => hasQueue(id) && waitOf(id) != null).length >= 5)
+      return {phase: 'open', day, h: Object.assign({}, h, {close: mod + 30}), t0: mod, mod};
   }
   const next = (schedule?.schedule || []).filter(s => s.type === 'OPERATING' && s.date > day).sort((a, b) => a.date < b.date ? -1 : 1)[0];
   if (next) {
@@ -2003,7 +2011,7 @@ function renderMap(P, plan) {
     const box = L.latLngBounds([BOUNDS.south, BOUNDS.west], [BOUNDS.north, BOUNDS.east]);
     lmap = L.map('lmap', {maxBounds: box.pad(.5), minZoom: 14, zoomSnap: .5});
     lmap.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
-    L.tileLayer(MAP_TILES, {maxZoom: 19, crossOrigin: true, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(lmap);
+    L.tileLayer(MAP_TILES, {maxZoom: 19, crossOrigin: true, referrerPolicy: TILE_REFERRER, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(lmap);
     lLayer = L.layerGroup().addTo(lmap);
     lmap.on('click', ev => { const el = ev.originalEvent?.target?.closest?.('[data-id]'); if (el) openSheet(el.dataset.id); });
     // Déplacer la carte à la main arrête le suivi de la position
@@ -2172,7 +2180,7 @@ async function downloadMap() {
     while (list.length) {
       const url = list.pop();
       try {
-        if (!await cache.match(url, {ignoreVary: true})) { const r = await fetch(url, {mode: 'cors'}); if (r.ok) await cache.put(url, r); else failed++; }
+        if (!await cache.match(url, {ignoreVary: true})) { const r = await fetch(url, {mode: 'cors', referrerPolicy: TILE_REFERRER}); if (r.ok && !tileBlocked(r)) await cache.put(url, r); else failed++; }
       } catch (e) { failed++; }
       done++;
       if (done % 5 === 0) renderMapTools(Math.round(done / (done + list.length) * 100));

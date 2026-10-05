@@ -1,7 +1,7 @@
 /* Service worker : garde la page et les polices en cache pour qu'elle s'ouvre
    instantanément, même quand le réseau du parc est saturé.
    Les temps d'attente (api.php / themeparks.wiki) passent toujours par le réseau. */
-const CACHE = 'ep-live-v6';
+const CACHE = 'ep-live-v7';
 const TILES = 'ep-tiles';   // fond de carte et Leaflet : gardés d'une version à l'autre
 const SHELL = ['./', 'index.html', 'i18n.js', 'manifest.webmanifest', 'parks.json', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
@@ -9,10 +9,15 @@ self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 
+// Tuile « Access blocked » d'OpenStreetMap (même test que tileBlocked() dans index.html)
+const blocked = r => /no-cache/.test(r.headers.get('cache-control') || '');
+
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== TILES).map(k => caches.delete(k))))
+      // Tuiles bloquées gardées par une version précédente : on les retire pour les retélécharger
+      .then(() => caches.open(TILES)).then(async c => { for (const k of await c.keys()) if (blocked(await c.match(k))) await c.delete(k); })
       .then(() => self.clients.claim())
   );
 });
@@ -30,7 +35,7 @@ self.addEventListener('fetch', e => {
       const hit = await cache.match(e.request, {ignoreVary: true});   // tuiles aussi téléchargées par la page (carte hors ligne)
       if (hit) return hit;
       const r = await fetch(e.request);
-      if (r.ok || r.type === 'opaque') cache.put(e.request, r.clone());
+      if ((r.ok || r.type === 'opaque') && !blocked(r)) cache.put(e.request, r.clone());
       return r;
     }));
     return;

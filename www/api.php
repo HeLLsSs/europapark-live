@@ -616,9 +616,12 @@ function typical_profile(string $data, string $today): array
     $basis = $same ? ($isWeekend ? 'week-end' : 'semaine') : 'tous';
     if ($same) $files = $same;
 
-    $sum = []; $cnt = [];
+    $sum = []; $cnt = []; $days = 0;
     foreach ($files as $f) {
         $hist = json_decode((string) file_get_contents($f), true);
+        // Journée incomplète (relevés lancés le soir, panne) : elle ferait croire que presque tout est resté fermé
+        if (count($hist['snapshots'] ?? []) < 60) continue;
+        $days++;
         foreach ($hist['snapshots'] ?? [] as $snap) {
             $b = intdiv(minute_of_day((int) $snap['t']), BUCKET_MIN) * BUCKET_MIN;
             foreach ($snap['w'] as $id => $wait) {
@@ -633,7 +636,7 @@ function typical_profile(string $data, string $today): array
         foreach ($buckets as $b => $total) $typical[$id][(string) $b] = round($total / $cnt[$id][$b], 1);
     }
 
-    $result = ['days' => count($files), 'basis' => $basis, 'typical' => (object) $typical];
+    $result = ['days' => $days, 'basis' => $basis, 'typical' => (object) $typical];
     foreach (glob("$data/cache/typical-*.json") ?: [] as $old) @unlink($old);
     file_put_contents($cacheFile, json_encode($result, JSON_UNESCAPED_SLASHES));
     return $result;
