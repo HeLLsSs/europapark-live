@@ -457,6 +457,7 @@ button.board-name{border:0;background:none;color:inherit;padding:0;text-align:le
             <button class="btn small" id="pushTest" data-act="push-test" type="button" hidden data-i18n="set.pushTest">Tester</button>
           </div>
         </div>
+        <div class="set" id="mapDlSet"></div>
         <div class="set">
           <h2 data-i18n="d.title">Prêt pour demain ?</h2>
           <p class="muted" data-i18n="d.hint">Vérifie en un bouton que tout marche sur ce téléphone : serveur, position, boussole, notifications, carte hors ligne.</p>
@@ -2198,9 +2199,11 @@ function renderMapTools(pct) {
   const at = device.mapAt && device.mapFor === PARK.slug ? new Date(device.mapAt).toLocaleDateString(t('locale')) : null;
   const car = prefs.car ? `<p><b>🚗 ${t('car.title')}</b> · ${esc(prefs.car.name || t('car.myPos'))} · ${t('car.walk', {min: carWalk()})} <a href="${esc(carRoute())}" target="_blank" rel="noopener">${t('car.route')}</a></p>`
     : `<p class="muted">🚗 ${t('car.none')} <button class="btn small" type="button" data-act="car">${t('car.save')}</button></p>`;
-  $('#mapTools').innerHTML = `${car}
-    <p class="muted">${pct != null ? t('map.dlProgress', {pct}) : at ? t('map.dlDoneAt', {date: at}) : t('map.dlHint')}</p>
+  const dl = `<p class="muted">${pct != null ? t('map.dlProgress', {pct}) : at ? t('map.dlDoneAt', {date: at}) : t('map.dlHint')}</p>
     <div class="row-inline"><button class="btn small" type="button" data-act="map-dl" ${dlBusy ? 'disabled' : ''}>${t('map.dl', {mb})}</button></div>`;
+  $('#mapTools').innerHTML = car + dl;
+  // Aussi dans les réglages : sous la carte, le bouton est difficile à atteindre sur un téléphone
+  $('#mapDlSet').innerHTML = `<h2>${t('set.offlineMap')}</h2>${dl}`;
 }
 function renderMapSVG(P, plan) {
   const pts = [...ents.values()].filter(e => e.type === 'ATTRACTION' && e.lat != null && hasQueue(e.id));
@@ -2322,6 +2325,7 @@ function renderSettings() {
     sel.innerHTML = others.length ? others.map(u => `<option value="${esc(u.id)}">${esc(u.name)}</option>`).join('') : `<option value="">${t('set.noOther')}</option>`;
     if (others.some(u => u.id === v)) sel.value = v;
   }).catch(() => { $('#copyRow').hidden = true; });
+  renderMapTools();
   $('#planSummary').textContent = t('set.planSummary', {must: vals.filter(v => v === 'must').length, bonus: vals.filter(v => v === 'bonus').length, shows: showN, done: doneN});
   $('#mealChk').checked = !!prefs.meal.on;
   document.querySelectorAll('#mealDurSeg button').forEach(bt => bt.setAttribute('aria-pressed', +bt.dataset.mealDur === prefs.meal.dur));
